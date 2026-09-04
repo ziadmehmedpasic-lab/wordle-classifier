@@ -63,6 +63,15 @@ The pattern detector reports one of two tiers.
 
 ## Consent and data
 
+- When enabled, status/activity text and available profile avatars/banners are inspected
+  using the same layers as messages. Members must be informed of this coverage. Statuses,
+  account images and inaccessible profile fields cannot be cleared by the bot; findings
+  require moderator action. Timeout alone does not remove those fields.
+- Server channel topics/tags, event descriptions/images, role icons and emoji/sticker
+  images are inspected on changes and answer rollover. Confirmed spoilers are cleared
+  only when the bot has the necessary permissions; otherwise moderators are alerted.
+- Surface alerts contain generic outcomes and resource IDs, never spoiler text or images.
+
 - Members are told that message text, and images posted as attachments, may be sent to
   Anthropic's API and to the project's own scorer endpoint for classification.
 - The bot stores nothing about benign messages. Deleted messages live in the mod log.

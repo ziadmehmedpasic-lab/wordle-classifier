@@ -88,7 +88,7 @@ async function extractDocument(bytes, { name = "attachment", ocrImage, depth = 0
         } finally { pdf.canvasFactory.destroy(canvas); page.cleanup(); }
       }
     } finally { await task.destroy(); }
-  } else if (type?.mime.startsWith("video/") || type?.mime.startsWith("audio/") || type?.mime === "image/gif") {
+  } else if (type?.mime.startsWith("video/") || type?.mime.startsWith("audio/") || ["image/gif", "image/apng"].includes(type?.mime)) {
     result.clips.push({ bytes, name, contentType: type.mime });
   } else if (type?.mime.startsWith("image/") || (!type && /<svg[\s>]/i.test(bytes.subarray(0, 4096).toString()))) {
     if (++budget.images > limits.pages) { result.issues.push("rendered image limit exceeded"); return result; }

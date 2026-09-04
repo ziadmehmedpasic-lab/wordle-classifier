@@ -7,6 +7,7 @@ import pytest
 
 from scripts.generate import (
     EXAMPLES_SCHEMA,
+    STYLES,
     STYLES_BY_LABEL,
     Config,
     build_prompt,
@@ -226,3 +227,10 @@ def test_batch_mode_failed_result_is_an_error(tmp_path: Path, monkeypatch):
     cfg = Config(words=["wager"], templates=["casual"], out_dir=tmp_path, mode="batch")
     with pytest.raises(AssertionError):
         main(cfg, client=client)
+
+
+def test_prompt_lists_every_style():
+    # multi_direct is off by default and deliberately not described to the generator
+    system = build_prompt(Config(), "wager", "casual").system[0]["text"]
+    names = system.split("Style names: ")[1].split(".")[0].split(", ")
+    assert set(names) == set(STYLES) - {"multi_direct"}

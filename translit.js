@@ -29,6 +29,7 @@ const KANA = { "あ": ["a"], "い": ["i"], "う": ["u"], "え": ["e"], "お": ["
   "ぁ": ["a"], "ぃ": ["i"], "ぅ": ["u"], "ぇ": ["e"], "ぉ": ["o"], "ゃ": ["ya"], "ゅ": ["yu"], "ょ": ["yo"], "ゎ": ["wa"], "っ": [""], "ー": ["", "r"] }; // loanwords drop the vowel after a consonant (スト = st) and write -er as a long vowel (ー)
 const SMALL_VOWEL = new Set("ぁぃぅぇぉ"), SMALL_Y = new Set("ゃゅょ");
 
+/** @param {string} word @returns {string[][] | null} */
 function kanaRomaji(word) {
   const chars = [...word.normalize("NFKC")].map((c) => { const cp = c.codePointAt(0); return cp >= 0x30a1 && cp <= 0x30f6 ? String.fromCodePoint(cp - 0x60) : c; });
   const out = [];
@@ -53,6 +54,7 @@ function kanaRomaji(word) {
 const H_INITIAL = [["g", "k"], ["kk"], ["n"], ["d", "t"], ["tt"], ["r", "l"], ["m"], ["b"], ["pp"], ["s"], ["ss"], [""], ["j", "g", "z"], ["jj"], ["ch"], ["k", "c"], ["t"], ["p", "f"], ["h"]];
 const H_MEDIAL = [["a"], ["ae", "e"], ["ya"], ["yae"], ["eo", "o", "u"], ["e"], ["yeo"], ["ye"], ["o"], ["wa"], ["wae", "we"], ["oe", "we"], ["yo"], ["u", "oo"], ["wo"], ["we"], ["wi"], ["yu"], ["eu", "u", ""], ["ui"], ["i", "ee"]];
 const H_FINAL = [[""], ["k", "g"], ["k"], ["k"], ["n"], ["n"], ["n"], ["t", "d"], ["l", "r"], ["k"], ["m"], ["p"], ["l"], ["l"], ["l"], ["l"], ["m"], ["p", "b"], ["p"], ["t", "s"], ["t"], ["ng"], ["t", "j"], ["t"], ["k"], ["t"], ["p"], ["h"]];
+/** @param {string} word @returns {string[][] | null} */
 function hangulRomaji(word) {
   const out = [];
   for (const c of word) {
@@ -65,6 +67,7 @@ function hangulRomaji(word) {
 }
 
 // longest-key-first lookup through a letter map; null when a character is not in the map
+/** @param {string} word @param {Record<string, string[]>} map @param {number} maxKey @returns {string[][] | null} */
 function mapRomaji(word, map, maxKey) {
   const out = [];
   for (let i = 0; i < word.length; ) {
@@ -78,6 +81,7 @@ function mapRomaji(word, map, maxKey) {
 }
 
 for (const k of Object.keys(DEVANAGARI_C)) if (k.normalize("NFC") !== k) { DEVANAGARI_C[k.normalize("NFC")] = DEVANAGARI_C[k]; delete DEVANAGARI_C[k]; }
+/** @param {string} word @returns {string[][] | null} */
 function devanagariRomaji(word) {
   const chars = [...word.normalize("NFC")];
   const out = [];
@@ -108,6 +112,7 @@ const SCRIPTS = [
 const SCRIPT_CHAR = /[\u0590-\u06ff\u0370-\u03ff\u1f00-\u1fff\u0400-\u04ff\u0530-\u058f\u10a0-\u10ff\u0900-\u097f\u3040-\u30ff\uff66-\uff9f\uac00-\ud7a3]/;
 
 const CAP = 256;
+/** @param {string[][]} options @returns {string[]} */
 function expand(options) {
   let vs = [""];
   for (const o of options) {
@@ -120,10 +125,13 @@ function expand(options) {
 
 // every token written in one of the scripts above -> { variants, abjad }; a run of consecutive
 // script tokens is also joined so letters spaced out ("و ا ي ج ر") read as one word
+/** @param {string} text @returns {{variants: string[], abjad: boolean, joined: boolean}[]} */
 function transliterate(text) {
   const out = [];
   const seen = new Set();
   const push = (word, script, joined = false) => {
+    // bound candidate expansion for a five-letter target, including exaggerated loanword spellings.
+    if (word.length > 20) return;
     if (seen.has(word)) return;
     seen.add(word);
     const options = script.romaji(word);

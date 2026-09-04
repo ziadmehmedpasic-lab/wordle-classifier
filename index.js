@@ -1,21 +1,36 @@
-require("dotenv").config();
-const { Client, GatewayIntentBits, Partials, Events, PermissionsBitField, ChannelType } = require("discord.js");
+if (require.main === module) require("dotenv").config();
+const { Client, GatewayIntentBits, Partials, Events, PermissionsBitField, Routes } = require("discord.js");
 const detector = require("./detector");
 const llm = require("./llm");
 const audio = require("./audio");
 const gifs = require("./gifs");
 const frames = require("./frames");
-const docs = require("./docs");
+const { inspectMessage } = require("./inspection");
+const { ocrImage } = require("./ocr");
+const { SurfaceModerator } = require("./surfaces");
+const { Conversation } = require("./conversation");
+const { Answers } = require("./answers");
+const { InspectionAlerts } = require("./alerts");
+const answers = new Answers();
+const inspectionAlerts = new InspectionAlerts();
+const conversation = new Conversation();
+const versions = new Map();
 
 const env = (k, d) => (process.env[k] ?? d).toString().toLowerCase() === "true";
 const TOKEN = process.env.DISCORD_TOKEN;
-const CHECK_YESTERDAY = env("CHECK_YESTERDAY", "true");
 const POLICE_NICKNAMES = env("POLICE_NICKNAMES", "true");
+const POLICE_PROFILES = env("POLICE_PROFILES", "false");
+const POLICE_PRESENCES = env("POLICE_PRESENCES", "false");
 const OCR_IMAGES = env("OCR_IMAGES", "true");
 const SCAN_BACKLOG = env("SCAN_BACKLOG", "true");
+// repeat offenders: this many removals inside the window and the member is timed out. 0 disables
+const TIMEOUT_AFTER = Number(process.env.TIMEOUT_AFTER ?? 3);
+const TIMEOUT_WINDOW_MIN = Number(process.env.TIMEOUT_WINDOW_MIN ?? 10);
+const TIMEOUT_MINUTES = Number(process.env.TIMEOUT_MINUTES ?? 10);
 const ALLOWED_CHANNEL_IDS = new Set((process.env.ALLOWED_CHANNEL_IDS || "").split(",").map((s) => s.trim()).filter(Boolean));
 
 detector.configure({
+  scripts: env("CATCH_SCRIPTS", "true"),
   suffixes: env("CATCH_SUFFIXES", "true"),
   phonetic: env("CATCH_PHONETIC", "true"),
   acrostics: env("CATCH_ACROSTICS", "true"),
@@ -23,137 +38,30 @@ detector.configure({
   fuzzy: env("CATCH_FUZZY", "true"),
 });
 
-if (!TOKEN) { console.error("Missing DISCORD_TOKEN in .env"); process.exit(1); }
+if (require.main === module && !TOKEN) { console.error("Missing DISCORD_TOKEN in .env"); process.exit(1); }
 
 // ---------------------------------------------------------------------
 // Daily answer from the New York Times
 // ---------------------------------------------------------------------
-let lastFetchedDate = "";
-function dateString(offset = 0) {
-  const d = new Date(); d.setDate(d.getDate() + offset);
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+/** @returns {boolean} */
+function hasCurrentAnswers() {
+  const current = answers.get();
+  return current.length > 0 && current.join(",") === detector.getAnswers().join(",");
 }
-async function fetchAnswer(date) {
-  const res = await fetch(`https://www.nytimes.com/svc/wordle/v2/${date}.json`, { headers: { "User-Agent": "Mozilla/5.0 (wordle-spoiler-bot)" } });
-  if (!res.ok) throw new Error(`NYT returned ${res.status} for ${date}`);
-  const data = await res.json();
-  if (!data.solution) throw new Error(`No solution for ${date}`);
-  return data.solution.toLowerCase();
-}
+
+/** @param {boolean} force @returns {Promise<void>} */
 async function refreshAnswers(force = false) {
-  const today = dateString(0);
-  if (!force && today === lastFetchedDate) return;
-  try {
-    const list = [await fetchAnswer(today)];
-    if (CHECK_YESTERDAY) { try { list.push(await fetchAnswer(dateString(-1))); } catch (e) { console.warn("Yesterday:", e.message); } }
-    try { list.push(await fetchAnswer(dateString(1))); } catch { /* not yet published */ }
-    detector.setAnswers(list);
-    lastFetchedDate = today;
-    console.log(`[${new Date().toISOString()}] Banned words updated (${list.length} words) for ${today}`);
-  } catch (e) { console.error("Failed to refresh Wordle answer:", e.message); }
-}
-
-// ---------------------------------------------------------------------
-// OCR for screenshots (tesseract.js, lazy-loaded)
-// ---------------------------------------------------------------------
-let ocrWorker = null;
-async function getOcr() {
-  if (!OCR_IMAGES) return null;
-  if (!ocrWorker) {
-    try {
-      const { createWorker } = require("tesseract.js");
-      ocrWorker = await createWorker("eng", undefined, {
-        // Without this, tesseract.js throws inside its worker message handler on unreadable
-        // images (e.g. "Unknown format") and crashes the whole process, even though the
-        // recognize() promise is also rejected. Our try/catch in ocrImage handles that rejection.
-        errorHandler: (e) => console.warn("OCR worker error:", typeof e === "string" ? e : e?.message || e),
-      });
-      console.log("OCR ready");
-    } catch (e) { console.error("OCR unavailable:", e.message); OCR_IMAGES_FAILED = true; return null; }
-  }
-  return ocrWorker;
-}
-let OCR_IMAGES_FAILED = false;
-async function ocrImage(url) {
-  if (OCR_IMAGES_FAILED) return "";
-  const w = await getOcr();
-  if (!w) return "";
-  try {
-    const { data } = await w.recognize(url);
-    return data.text || "";
-  } catch (e) { console.warn("OCR failed:", e.message); return ""; }
-}
-
-// ---------------------------------------------------------------------
-// Collect every piece of text a message can carry
-// ---------------------------------------------------------------------
-function collectText(message) {
-  const bits = [message.content || ""];
-  for (const e of message.embeds || []) {
-    bits.push(e.title, e.description, e.url, e.author?.name, e.footer?.text, e.provider?.name);
-    for (const f of e.fields || []) bits.push(f.name, f.value);
-  }
-  for (const a of message.attachments?.values?.() || []) bits.push(a.name, a.description, a.title);
-  for (const s of message.stickers?.values?.() || []) bits.push(s.name, s.description);
-  if (message.poll) {
-    bits.push(message.poll.question?.text);
-    for (const ans of message.poll.answers?.values?.() || []) bits.push(ans.text);
-  }
-  for (const snap of message.messageSnapshots?.values?.() || []) bits.push(snap.content);
-  for (const c of message.components || []) for (const r of c.components || []) bits.push(r.label, r.content);
-  return bits.filter(Boolean).join(" \n ");
-}
-
-async function collectSlowText(message) {
-  const bits = [];
-  for (const a of message.attachments?.values?.() || []) {
-    const type = a.contentType || "";
-    if (frames.kind(a)) {
-      bits.push(await frames.ocr(a.url, ocrImage, { id: a.id, name: a.name, size: a.size })); // every frame of a gif or video
-    } else if (/^image\/(png|jpe?g|webp|bmp)/.test(type) && a.size < 8_000_000) {
-      bits.push(await ocrImage(a.url));
-    } else if (docs.kind(a)) {
-      bits.push(await docs.read(a.url, ocrImage, { id: a.id, name: a.name, size: a.size })); // text files, office documents, pdfs, zips, anything else
-    }
-  }
-  for (const e of message.embeds || []) {
-    if (!OCR_IMAGES) break;
-    const media = frames.embedMedia(e); // gif link previews (tenor, giphy, direct .gif links)
-    const img = e.image?.url || e.thumbnail?.url;
-    if (media) bits.push(await frames.ocr(media, ocrImage, { id: media, name: media }));
-    else if (img) bits.push(await ocrImage(img));
-  }
-  return bits.filter(Boolean).join(" \n ");
-}
-
-// Voice messages, audio files and video soundtracks, as text. Link-preview videos are
-// skipped: their embed url is a player page, not a media file.
-async function collectTranscripts(message) {
-  const bits = [];
-  for (const a of message.attachments?.values?.() || []) if (audio.kind(a)) bits.push(await audio.transcribe(a));
-  return bits.filter(Boolean).join(" \n ");
-}
-
-// ---------------------------------------------------------------------
-// Multi-message spelling: "w" "a" "g" "e" "r" or "wa" "ger" as separate messages
-// ---------------------------------------------------------------------
-const recent = new Map();
-const WINDOW_MS = 3 * 60 * 1000;
-function trackFragments(message) {
-  const text = detector.normalize(message.content || "").replace(/[^a-z0-9]/g, "");
-  if (!text || text.length > 3) return [];
-  const key = `${message.channelId}:${message.author.id}`;
-  const now = Date.now();
-  const list = (recent.get(key) || []).filter((m) => now - m.at < WINDOW_MS);
-  list.push({ id: message.id, text, at: now });
-  while (list.length > 12) list.shift();
-  recent.set(key, list);
-  const joined = list.map((m) => m.text).join("");
-  if (detector.scan(joined) || detector.scan(list.map((m) => m.text).join(" "))) {
-    recent.delete(key);
-    return list.map((m) => m.id);
-  }
-  return [];
+  try { await answers.refresh({ force }); }
+  catch (error) { console.error("Failed to refresh Wordle answer:", error.message); }
+  const list = answers.get();
+  if (list.join(",") === detector.getAnswers().join(",")) return;
+  detector.setAnswers(list);
+  conversation.channels.clear();
+  surfaces.inFlight.clear();
+  if (!list.length) { console.warn("Current Wordle answer unavailable; moderation suspended"); return; }
+  console.log(`Protected answers updated for ${answers.date} (${answers.timeZone}, ${list.length} words)`);
+  sweepMembers().catch((e) => console.error("Member sweep:", e.message));
+  for (const guild of client.guilds.cache.values()) surfaces.sweep(guild).catch((e) => console.error("Surface sweep:", e.message));
 }
 
 // ---------------------------------------------------------------------
@@ -165,110 +73,118 @@ const client = new Client({
     GatewayIntentBits.GuildMessages,
     GatewayIntentBits.MessageContent,
     GatewayIntentBits.GuildMessageReactions,
-    ...(POLICE_NICKNAMES ? [GatewayIntentBits.GuildMembers] : []),
+    GatewayIntentBits.GuildExpressions,
+    GatewayIntentBits.GuildScheduledEvents,
+    GatewayIntentBits.GuildVoiceStates,
+    ...(POLICE_NICKNAMES || POLICE_PROFILES ? [GatewayIntentBits.GuildMembers] : []),
+    ...(POLICE_PRESENCES ? [GatewayIntentBits.GuildPresences] : []),
   ],
   partials: [Partials.Message, Partials.Channel, Partials.Reaction],
 });
 
+const surfaces = new SurfaceModerator({
+  ocrImage, profiles: POLICE_PROFILES, presences: POLICE_PRESENCES, allowedChannels: ALLOWED_CHANNEL_IDS, isCurrent: hasCurrentAnswers,
+  report: async ({ guild, kind, id, status, issues = [] }) => {
+    console.warn(`Surface moderation ${guild.id}/${kind}/${id}: ${status}`);
+    if (status === "unscanned") { reportIncomplete({ guild, id }, { status, issues }, kind); return; }
+    const channel = guild.channels.cache.get(process.env.MOD_LOG_CHANNEL_ID);
+    if (channel?.isTextBased() && typeof channel.send === "function") {
+      await channel.send({ content: `Wordle moderation: ${kind} ${id}: ${status.startsWith("moderation failed") ? "moderation failed; check bot logs" : status}.`, allowedMentions: { parse: [] } });
+    }
+  },
+});
+
+/** @param {object} target @param {object} result @param {string} kind @returns {void} */
+function reportIncomplete(target, result, kind = "message") {
+  if (result.status !== "unscanned") return;
+  inspectionAlerts.record({ guild: target.guild, id: target.id, kind, issues: result.issues });
+  inspectionAlerts.flush().catch((error) => console.error("Inspection alerts:", error.message));
+}
+
+/** @param {object} target @param {string} kind @returns {Promise<void>} */
+async function checkSurface(target, kind) {
+  try {
+    await refreshAnswers();
+    if (!hasCurrentAnswers()) { reportIncomplete(target, { status: "unscanned", issues: ["current answer unavailable"] }, kind); return; }
+    await surfaces.check(target, kind);
+  }
+  catch (error) { console.error(`Surface ${kind}:`, error.message); }
+}
+
 const canManage = (ch) => { const me = ch.guild?.members?.me; return me && ch.permissionsFor(me)?.has(PermissionsBitField.Flags.ManageMessages); };
 
-async function warn(channel, user) {
+// every removal is a strike; enough strikes inside the window and the member is timed out,
+// which also stops them feeding the ocr and llm layers
+const strikes = new Map();
+async function strike(message) {
+  if (!TIMEOUT_AFTER) return;
+  const key = `${message.guildId}:${message.author.id}`;
+  const now = Date.now();
+  const list = (strikes.get(key) || []).filter((t) => now - t < TIMEOUT_WINDOW_MIN * 60_000);
+  list.push(message.createdTimestamp || now); // posting time, so a startup backlog scan does not stack strikes
+  strikes.set(key, list);
+  if (list.length < TIMEOUT_AFTER) return;
+  strikes.delete(key);
+  const member = message.member || await message.guild.members.fetch(message.author.id).catch(() => null);
+  if (!member?.moderatable) { console.warn(`Cannot time out ${message.author.tag}: needs Moderate Members and a role above theirs`); return; }
   try {
-    const m = await channel.send({ content: `${user}, your message was removed because it contained today's Wordle answer. No spoilers please!`, allowedMentions: { users: [user.id] } });
+    await member.timeout(TIMEOUT_MINUTES * 60_000, `${list.length} Wordle spoilers in ${TIMEOUT_WINDOW_MIN} minutes`);
+    console.log(`Timed out ${message.author.tag} for ${TIMEOUT_MINUTES} min`);
+    await message.channel.send({ content: `${message.author} is timed out for ${TIMEOUT_MINUTES} minutes: ${list.length} spoilers removed in ${TIMEOUT_WINDOW_MIN} minutes.`, allowedMentions: { users: [message.author.id] } });
+  } catch (e) { console.error("Timeout failed:", e.message); }
+}
+
+// tell the author, then count the strike. `what` is how the message spoiled: "contained", "gave away", "hinted at"
+async function warn(message, what = "contained") {
+  if (message.author?.bot) return;
+  try {
+    const m = await message.channel.send({ content: `${message.author}, your message was removed because it ${what} today's Wordle answer. No spoilers please!`, allowedMentions: { users: [message.author.id] } });
     setTimeout(() => m.delete().catch(() => {}), 10_000);
   } catch { /* ignore */ }
+  await strike(message);
 }
 
 async function removeMessage(message, hit, how) {
   if (!canManage(message.channel)) { console.warn(`No Manage Messages permission in #${message.channel.name}`); return; }
   try {
     await message.delete();
+    conversation.forget(message.channelId, message.id);
     console.log(`Deleted spoiler (${how}) from ${message.author?.tag} in #${message.channel.name} (word: ${hit})`);
-    if (!message.author?.bot) await warn(message.channel, message.author);
+    await warn(message);
   } catch (e) { console.error("Failed to delete:", e.message); }
-}
-
-// Recent messages per channel, fed to the LLM as context so multi-message hints are visible
-const channelHistory = new Map();
-function remember(message, text) {
-  const list = channelHistory.get(message.channelId) || [];
-  list.push({ author: message.author?.username || "user", text: text.slice(0, 300), at: Date.now() });
-  while (list.length > llm.cfg.maxContextMessages) list.shift();
-  channelHistory.set(message.channelId, list);
-}
-
-async function warnHint(channel, user, verdict) {
-  try {
-    const what = verdict === "spoiler" ? "gave away" : "hinted at";
-    const m = await channel.send({ content: `${user}, your message was removed because it ${what} today's Wordle answer. No spoilers please!`, allowedMentions: { users: [user.id] } });
-    setTimeout(() => m.delete().catch(() => {}), 10_000);
-  } catch { /* ignore */ }
 }
 
 async function handleMessage(message, { fromBacklog = false } = {}) {
   if (!message.guild) return;
   if (message.author?.id === client.user?.id) return; // never our own warnings
   if (ALLOWED_CHANNEL_IDS.has(message.channelId)) return;
-  await refreshAnswers();
-  if (!detector.getAnswers().length) return;
+  const version = Symbol(message.id);
+  versions.set(message.id, version);
+  try {
+    await refreshAnswers();
+    if (versions.get(message.id) !== version) return;
+    if (!hasCurrentAnswers()) { reportIncomplete(message, { status: "unscanned", issues: ["current answer unavailable"] }); return; }
+    const inspectedAnswers = detector.getAnswers().join(",");
+    if (!fromBacklog) checkMember(message.member).catch((e) => console.error("Member:", e.message));
 
-  const text = collectText(message);
-
-  // Fast path: text
-  const hit = detector.scan(text);
-  if (hit) return removeMessage(message, hit, "text");
-
-  // GIF links: tags and descriptions from the Tenor/Giphy APIs, before any pixels are looked at
-  const gifText = await gifs.describe(text);
-  if (gifText) {
-    const hitGif = detector.scan(gifText);
-    if (hitGif) return removeMessage(message, hitGif, "gif tags");
-  }
-
-  // Slow path: text attachments, image OCR, speech-to-text
-  const imageUrls = [...(message.attachments?.values?.() || [])].filter((a) => /^image\/(png|jpe?g|webp|gif)/.test(a.contentType || "")).map((a) => a.url);
-  let transcript = "";
-  if (message.attachments?.size || message.embeds?.some((e) => e.image || e.thumbnail || e.video)) {
-    const slow = await collectSlowText(message);
-    const hit2 = detector.scan(slow);
-    if (hit2) return removeMessage(message, hit2, "attachment/ocr");
-    transcript = await collectTranscripts(message);
-    const hit3 = detector.scan(transcript);
-    if (hit3) return removeMessage(message, hit3, "audio");
-  }
-
-  // LLM layer: meaning-based hints, riddles, synonyms, translations, solved-grid screenshots, spoken hints
-  if (!fromBacklog && !message.author?.bot) {
-    const llmText = [text, transcript && `[voice transcript]: ${transcript}`, gifText && `[gif tags]: ${gifText}`].filter(Boolean).join("\n");
-    llm.noteContext(message.channelId, llmText);
-    const context = (channelHistory.get(message.channelId) || []).slice();
-    remember(message, llmText);
-    if (llm.shouldCheck(message.channelId, llmText, imageUrls.length > 0, Boolean(transcript))) {
-      const result = await llm.classify({ text: llmText, answers: detector.getAnswers(), context, imageUrls: llm.cfg.vision ? imageUrls : [] });
-      if (result) {
-        const u = result.usage || {};
-        console.log(`LLM verdict: ${result.verdict} (${result.confidence}) "${llmText.slice(0, 60)}" — ${result.reason} [in ${u.input_tokens ?? "?"} / cached ${u.cache_read_input_tokens ?? 0} / out ${u.output_tokens ?? "?"}]`);
-        if (llm.shouldDelete(result) && canManage(message.channel)) {
-          try {
-            await message.delete();
-            console.log(`Deleted ${result.verdict} (LLM) from ${message.author?.tag} in #${message.channel.name}`);
-            await warnHint(message.channel, message.author, result.verdict);
-          } catch (e) { console.error("Failed to delete:", e.message); }
-          return;
-        }
-      }
+    conversation.remember(message, message.content || "");
+    const context = conversation.get(message.channelId).filter((row) => row.id !== message.id);
+    const result = await inspectMessage(message, { ocrImage, context });
+    if (versions.get(message.id) !== version || !hasCurrentAnswers() || inspectedAnswers !== detector.getAnswers().join(",")) return;
+    if (result.issues.length) console.warn(`Incomplete inspection ${message.id}: ${result.issues.join("; ")}`);
+    reportIncomplete(message, result);
+    if (result.status === "spoiler") return removeMessage(message, result.hit, "inspection");
+    conversation.remember(message, result.text, result.fragmentText ?? result.text);
+    const ids = conversation.fragments(message.channelId, message.id);
+    if (ids.length && canManage(message.channel)) {
+      try {
+        await message.channel.bulkDelete(ids, true);
+        for (const id of ids) { conversation.forget(message.channelId, id); versions.delete(id); }
+        console.log(`Deleted ${ids.length} fragment messages from ${message.author.tag}`);
+        await warn(message);
+      } catch (e) { console.error("Bulk delete:", e.message); }
     }
-  }
-
-  if (fromBacklog || message.author?.bot) return;
-  const ids = trackFragments(message);
-  if (ids.length && canManage(message.channel)) {
-    try {
-      await message.channel.bulkDelete(ids, true);
-      console.log(`Deleted ${ids.length} fragment messages from ${message.author.tag}`);
-      await warn(message.channel, message.author);
-    } catch (e) { console.error("Bulk delete:", e.message); }
-  }
+  } finally { if (versions.get(message.id) === version) versions.delete(message.id); }
 }
 
 async function scanBacklog() {
@@ -279,33 +195,50 @@ async function scanBacklog() {
       if (!ch.isTextBased?.() || !ch.viewable || ALLOWED_CHANNEL_IDS.has(ch.id)) continue;
       try {
         const msgs = await ch.messages.fetch({ limit: 50 });
-        for (const m of msgs.values()) { scanned++; await handleMessage(m, { fromBacklog: true }); }
+        for (const m of [...msgs.values()].sort((a, b) => a.createdTimestamp - b.createdTimestamp)) { scanned++; await handleMessage(m, { fromBacklog: true }); }
       } catch { /* no access */ }
     }
   }
   console.log(`Backlog scan complete (${scanned} messages)`);
 }
 
-async function checkName(target, kind) {
+// what shows next to a member's messages is the nickname, else the global display name,
+// else the username. only the nickname is ours to change, so a bad global name or
+// username gets a nickname set over it
+async function checkMember(member) {
+  if (!member) return;
   await refreshAnswers();
-  const name = target.name || target.nickname;
-  if (!name || !detector.scan(name)) return;
+  if (!hasCurrentAnswers()) return;
+  await surfaces.check(member, "profile");
+  if (POLICE_PRESENCES && member.presence) await surfaces.check(member.presence, "presence");
+  if (!POLICE_NICKNAMES || !hasCurrentAnswers()) return;
+  const shown = member.displayName;
+  if (!detector.scan(shown)) return;
+  if (!member.manageable) { console.warn(`Cannot rename ${member.user.tag} ("${shown}"): the bot's role must be above theirs`); return; }
+  const replacement = detector.scan(member.user.displayName) ? "spoiler-removed" : null;
   try {
-    if (kind === "nickname") await target.setNickname(null, "Wordle spoiler");
-    else await target.setName("spoiler-removed", "Wordle spoiler");
-    console.log(`Renamed ${kind} "${name}"`);
-  } catch (e) { console.error(`${kind} rename failed:`, e.message); }
+    await member.setNickname(replacement, "Wordle spoiler");
+    console.log(`Renamed member "${shown}" -> "${replacement ?? member.user.displayName}"`);
+  } catch (e) { console.error("Member rename failed:", e.message); }
+}
+
+async function sweepMembers() {
+  if (!POLICE_NICKNAMES && !POLICE_PROFILES && !POLICE_PRESENCES) return;
+  for (const guild of client.guilds.cache.values()) {
+    const members = await guild.members.fetch({ withPresences: POLICE_PRESENCES });
+    for (const m of members.values()) await checkMember(m);
+  }
 }
 
 client.once(Events.ClientReady, async (c) => {
   console.log(`Logged in as ${c.user.tag}`);
-  await refreshAnswers(true);
-  setInterval(() => refreshAnswers(), 15 * 60 * 1000);
   llm.init();
   audio.init();
   gifs.init();
   if (OCR_IMAGES) frames.init();
-  getOcr(); // warm up in background
+  await refreshAnswers(true);
+  setInterval(() => refreshAnswers(), 60_000);
+  setInterval(() => inspectionAlerts.flush().catch((error) => console.error("Inspection alerts:", error.message)), 10_000).unref();
   scanBacklog();
 });
 
@@ -313,14 +246,32 @@ client.on(Events.MessageCreate, (m) => handleMessage(m).catch((e) => console.err
 client.on(Events.MessageUpdate, async (_o, u) => {
   try { await handleMessage(u.partial ? await u.fetch() : u); } catch (e) { console.error("Edit:", e.message); }
 });
+client.on(Events.MessageDelete, (message) => {
+  conversation.forget(message.channelId, message.id);
+  versions.delete(message.id);
+});
+client.on(Events.MessageBulkDelete, (messages) => {
+  for (const message of messages.values()) { conversation.forget(message.channelId, message.id); versions.delete(message.id); }
+});
 
 // Reactions spelling the answer, or custom emoji named after it
 client.on(Events.MessageReactionAdd, async (reaction, user) => {
   try {
-    if (user.bot) return;
     const msg = reaction.message.partial ? await reaction.message.fetch() : reaction.message;
     if (!msg.guild || ALLOWED_CHANNEL_IDS.has(msg.channelId) || !canManage(msg.channel)) return;
     await refreshAnswers();
+    if (!hasCurrentAnswers()) return;
+    const inspectedAnswers = detector.getAnswers().join(",");
+    if (reaction.emoji.id) {
+      const url = reaction.emoji.imageURL({ size: 256, extension: reaction.emoji.animated ? "gif" : "png" });
+      const result = await inspectMessage({ channelId: msg.channelId, content: reaction.emoji.name || "", attachments: [{ url, name: "reaction emoji" }] }, { ocrImage });
+      if (!hasCurrentAnswers() || inspectedAnswers !== detector.getAnswers().join(",")) return;
+      if (result.status === "spoiler") await reaction.remove();
+      else if (result.issues.length) {
+        console.warn(`Incomplete reaction inspection ${msg.id}`);
+        reportIncomplete(msg, result, "reaction");
+      }
+    }
     const letters = [];
     for (const r of msg.reactions.cache.values()) {
       const n = detector.normalize(r.emoji.name || "");
@@ -332,21 +283,41 @@ client.on(Events.MessageReactionAdd, async (reaction, user) => {
   } catch (e) { console.error("Reaction:", e.message); }
 });
 
-client.on(Events.GuildMemberUpdate, (_o, m) => POLICE_NICKNAMES && m.nickname && m.manageable && checkName(m, "nickname"));
-client.on(Events.ThreadCreate, (t) => t.manageable && checkName(t, "thread"));
-client.on(Events.ThreadUpdate, (_o, t) => t.manageable && checkName(t, "thread"));
-client.on(Events.ChannelCreate, (ch) => ch.manageable && checkName(ch, "channel"));
-client.on(Events.ChannelUpdate, (_o, ch) => ch.manageable && ch.type !== ChannelType.DM && checkName(ch, "channel"));
-client.on(Events.GuildRoleCreate, (r) => r.editable && checkName(r, "role"));
-client.on(Events.GuildRoleUpdate, (_o, r) => r.editable && checkName(r, "role"));
-client.on(Events.GuildEmojiCreate, async (e) => { await refreshAnswers(); if (detector.scan(e.name) && e.deletable) e.delete("Wordle spoiler").catch(() => {}); });
-client.on(Events.GuildStickerCreate, async (s) => { await refreshAnswers(); if (detector.scan(`${s.name} ${s.description || ""}`) && s.deletable) s.delete("Wordle spoiler").catch(() => {}); });
+client.on(Events.GuildMemberUpdate, (_o, m) => checkMember(m).catch((e) => console.error("Member:", e.message)));
+client.on(Events.GuildMemberAdd, (m) => checkMember(m).catch((e) => console.error("Member:", e.message)));
+client.on(Events.UserUpdate, async (_o, u) => {
+  // global display name or username changed: recheck the member in every server we share
+  for (const guild of client.guilds.cache.values()) {
+    try { await checkMember(await guild.members.fetch(u.id)); } catch (e) { console.error("User:", e.message); }
+  }
+});
+for (const [create, update, kind] of [
+  [Events.ThreadCreate, Events.ThreadUpdate, "channel"],
+  [Events.ChannelCreate, Events.ChannelUpdate, "channel"],
+  [Events.GuildRoleCreate, Events.GuildRoleUpdate, "role"],
+  [Events.GuildEmojiCreate, Events.GuildEmojiUpdate, "emoji"],
+  [Events.GuildStickerCreate, Events.GuildStickerUpdate, "sticker"],
+  [Events.GuildScheduledEventCreate, Events.GuildScheduledEventUpdate, "event"],
+  [Events.StageInstanceCreate, Events.StageInstanceUpdate, "stage"],
+]) {
+  client.on(create, (target) => checkSurface(target, kind));
+  client.on(update, (_old, target) => checkSurface(target, kind));
+}
+client.on(Events.PresenceUpdate, (_old, presence) => checkSurface(presence, "presence"));
+client.on(Events.Raw, (packet) => {
+  if (packet.t !== "VOICE_CHANNEL_STATUS_UPDATE") return;
+  const guild = client.guilds.cache.get(packet.d.guild_id);
+  if (!guild) return;
+  checkSurface({ id: packet.d.id, guild, topic: packet.d.status, channel: guild.channels.cache.get(packet.d.id), clear: () => client.rest.put(Routes.channelVoiceStatus(packet.d.id), { body: { status: null } }) }, "voice-status");
+});
 client.on(Events.Error, (e) => console.error("Client error:", e.message));
 
-client.login(TOKEN).catch((e) => {
+if (require.main === module) client.login(TOKEN).catch((e) => {
   if (String(e.message).includes("disallowed intents")) {
-    console.error("\nDiscord rejected the bot's intents.\nFix: developer portal -> Bot -> Privileged Gateway Intents -> enable MESSAGE CONTENT INTENT" + (POLICE_NICKNAMES ? " and SERVER MEMBERS INTENT" : "") + ", then Save.\n" + (POLICE_NICKNAMES ? "Or set POLICE_NICKNAMES=false in .env.\n" : ""));
+    console.error("\nDiscord rejected the bot's intents.\nFix: developer portal -> Bot -> Privileged Gateway Intents -> enable MESSAGE CONTENT INTENT; profile scans need SERVER MEMBERS INTENT; presence scans need PRESENCE INTENT" + (POLICE_NICKNAMES ? " and SERVER MEMBERS INTENT" : "") + ", then Save.\n" + (POLICE_NICKNAMES ? "Or set POLICE_NICKNAMES=false in .env.\n" : ""));
     process.exit(1);
   }
   throw e;
 });
+
+module.exports = { client, handleMessage, conversation, versions };

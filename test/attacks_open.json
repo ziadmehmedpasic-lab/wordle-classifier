@@ -222,5 +222,13 @@
   "decode": "japanese katakana su-te-a, the loanword spelling, which drops the r entirely",
   "worth_catching": false,
   "fp_risk": "reads as 'stea'; matching that to stare needs a rule that guesses a missing final consonant, which would fire on any short foreign word"
+ },
+ {
+  "answer": "wager",
+  "text": "sound like waiig errr",
+  "technique": "phonetic-split",
+  "decode": "'waiig errr' read aloud is wager. The phonetic check runs per token, and neither piece alone sounds like the answer; the joined form exceeds the length window.",
+  "worth_catching": true,
+  "fp_risk": "low if adjacent non-dictionary tokens are merged and deduped before the phonetic check; stretched-letter chat like 'ughhh' rarely sounds like an answer"
  }
 ]

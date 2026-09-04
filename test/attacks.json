@@ -2134,5 +2134,13 @@
   "decode": "Cyrillic transliteration read by sound (g-kh-o-s-t)",
   "worth_catching": true,
   "fp_risk": "ordinary chat in that script: a word whose consonants or sound match the answer. measured at 0.24% of (answer, message) pairs over 185 sentences of arabic, hebrew, russian, greek, japanese, korean, hindi, georgian and armenian chat, about the same rate as the whole detector on english benign chat; kept because a friend group that chats in english rarely posts in another script"
+ },
+ {
+  "answer": "wager",
+  "text": "Pager but replace the first letter with vv",
+  "technique": "letter-arithmetic-lookalike",
+  "decode": "pager with p->w = wager, but the edit letter is written as the look-alike pair vv. The arithmetic rule only accepted single-character tokens as the edit letter; it now maps look-alike pairs (vv, rn, cl) to their letter first.",
+  "worth_catching": true,
+  "fp_risk": "Very low: a standalone vv, rn or cl token next to a near-miss word and an instruction verb does not occur in ordinary chat."
  }
 ]

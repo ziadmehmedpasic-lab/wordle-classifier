@@ -19,4 +19,5 @@ ml/data/probes/
 __pycache__/
 web/dist/
 .vercel
+eval/runs/
 .env*

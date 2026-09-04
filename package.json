@@ -4,12 +4,15 @@
   "description": "Discord bot that deletes Wordle spoilers: pattern matching, OCR, speech-to-text, and an LLM layer",
   "main": "index.js",
   "scripts": {
-    "test": "node test/detector.test.js && node test/attacks.test.js && node test/audio.unit.test.js && node test/gifs.test.js && node test/frames.unit.test.js && node test/docs.unit.test.js",
+    "test": "node test/detector.test.js && node test/attacks.test.js && node test/audio.unit.test.js && node test/gifs.test.js && node test/frames.unit.test.js && node --test test/inspection.test.js test/documents.test.js test/media.test.js test/surfaces.test.js test/conversation.test.js test/judge.test.js test/limits.test.js test/messages.test.js test/evaluation.test.js test/evaluation-fixtures.test.js test/answers.test.js test/alerts.test.js test/qr-subtitles.test.js test/translit.test.js",
     "eval:data": "node test/eval_data.js",
     "start": "node index.js",
     "test:llm": "node test/llm.test.js",
+    "test:ocr": "node --test test/ocr.test.js",
     "test:audio": "node test/audio.test.js",
-    "build:web": "node web/build.js"
+    "build:web": "node web/build.js",
+    "eval:attacks": "node eval/run.js",
+    "eval:overload": "node eval/overload.js"
   },
   "keywords": [],
   "author": "",
@@ -17,24 +20,33 @@
   "type": "commonjs",
   "dependencies": {
     "@anthropic-ai/sdk": "^0.123.0",
+    "@napi-rs/canvas": "^1.0.8",
     "@upstash/redis": "^1.38.3",
     "an-array-of-english-words": "^2.0.0",
     "confusables": "^1.1.1",
     "discord.js": "^14.27.0",
     "dotenv": "^17.4.2",
     "double-metaphone": "^2.0.1",
-    "fflate": "^0.8.3",
     "ffmpeg-static": "^5.3.0",
+    "ffprobe-static": "^3.1.0",
+    "file-type": "^22.0.2",
+    "jsqr": "^1.4.0",
     "openai": "^7.10.0",
-    "pdf-parse": "^2.4.5",
+    "pdfjs-dist": "^6.3.289",
+    "saxes": "^6.0.0",
+    "sharp": "^0.35.4",
     "tesseract.js": "^7.0.0",
-    "unicode-emoji-json": "^0.9.0"
+    "unicode-emoji-json": "^0.9.0",
+    "yauzl": "^3.4.0"
   },
   "engines": {
     "node": ">=22"
   },
   "devDependencies": {
     "buffer": "^6.0.3",
-    "esbuild": "^0.28.2"
+    "esbuild": "^0.28.2",
+    "pdf-lib": "^1.17.1",
+    "qrcode": "^1.5.4",
+    "yazl": "^3.3.1"
   }
 }

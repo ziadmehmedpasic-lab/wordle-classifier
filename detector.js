@@ -285,6 +285,7 @@ function phoneticHit(word) {
 // letter (c, k and q count as one) and length within one; looser than that, ordinary foreign chat collides too often.
 // abjads (arabic, hebrew) write no short vowels, so their consonant skeleton is compared too: وايجر -> wayjr/waygr -> wgr
 const FIRST_LETTER = { c: "k", q: "k" };
+/** @param {string} v @param {boolean} abjad @returns {string | null} */
 function translitHit(v, abjad) {
   if (v.length < 3) return null;
   const h = exactHit(v);
@@ -626,10 +627,11 @@ function scan(text, depth = 0) {
     }
   }
 
-  // A near-miss dictionary word plus the edit letter on its own: "its wage but add an r", "planet without the t", "its crate but the t is an n".
+  // A near-miss dictionary word plus the edit letter on its own: "its wage but add an r", "planet without the t", "its crate but the t is an n",
+  // "pager but replace the first letter with vv" (look-alike pairs count as the letter).
   // a and i as the edit letter also need an instruction word, since they are ordinary words too.
   if (opts.arithmetic) {
-    const single = new Set(words.filter((w) => w.length === 1));
+    const single = new Set(words.flatMap(visualVariants).filter((v) => v.length === 1));
     const instructed = INSTRUCTION.test(norm) || /\bletter\b/.test(norm);
     for (const w of words) if (w.length >= 4 && isWord(w)) for (const d of derived) {
       if (w === d.word || !damerau1(w, d.word)) continue;

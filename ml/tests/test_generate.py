@@ -21,9 +21,14 @@ from spoiler.labels import Label
 
 PAYLOAD = {
     "examples": [
-        {"text": "w8g3r", "label": "direct", "style": "leet"},
-        {"text": "rhymes with pager", "label": "strong_hint", "style": "rhyme"},
-        {"text": "got it in 3", "label": "benign", "style": "wordle_chat"},
+        {"text": "w8g3r", "label": "direct", "style": "leet", "context": []},
+        {"text": "rhymes with pager", "label": "strong_hint", "style": "rhyme", "context": []},
+        {
+            "text": "and it rhymes with pager",
+            "label": "strong_hint",
+            "style": "multi_strong",
+            "context": [{"author": "bob", "text": "gambling word today"}],
+        },
     ]
 }
 
@@ -75,10 +80,15 @@ def test_style_plan_is_deterministic_and_cycles():
     plan = style_plan(cfg, "wager", "casual")
     assert plan == style_plan(cfg, "wager", "casual")
     assert plan != style_plan(cfg, "stare", "casual")
-    assert len(plan[Label.DIRECT]) == 2 and len(set(plan[Label.DIRECT])) == 2
+    assert len(plan[Label.DIRECT]) == 3 and len(set(plan[Label.DIRECT][:2])) == 2
     # only four weak styles exist, so nine picks cycle through them
     assert len(plan[Label.WEAK_HINT]) == 9 and set(plan[Label.WEAK_HINT]) == set(STYLES[20:24])
-    assert set(plan[Label.BENIGN]) == {"wordle_chat", "chat", "hard_benign"}
+    assert set(plan[Label.BENIGN]) == {"wordle_chat", "chat", "hard_benign", "multi_benign"}
+    assert plan[Label.DIRECT][-1] == "multi_direct" and plan[Label.STRONG_HINT][-2:] == [
+        "multi_strong",
+        "multi_strong",
+    ]
+    assert "multi" not in "".join(plan[Label.WEAK_HINT])
 
 
 def test_parse_examples_records():
@@ -86,10 +96,14 @@ def test_parse_examples_records():
     assert [r.id for r in records] == ["wager-casual-00", "wager-casual-01", "wager-casual-02"]
     assert records[0].answer == "wager"
     assert records[1].label == "strong_hint"
-    assert json.loads(records[2].to_json())["template_id"] == "casual"
+    assert records[0].context == []
+    assert records[2].context == [{"author": "bob", "text": "gambling word today"}]
+    assert json.loads(records[2].to_json())["context"][0]["author"] == "bob"
     with pytest.raises(ValueError):
         parse_examples(
-            json.dumps({"examples": [{"text": "x", "label": "bad", "style": "chat"}]}),
+            json.dumps(
+                {"examples": [{"text": "x", "label": "bad", "style": "chat", "context": []}]}
+            ),
             "w",
             "t",
             "m",
@@ -98,12 +112,16 @@ def test_parse_examples_records():
 
 
 def test_estimate_prices_direct_and_batch(capsys):
-    cfg = Config(model="claude-opus-5", n_direct=5, n_strong=5, n_weak=3, n_benign=7)
+    cfg = Config(
+        model="claude-opus-5", n_direct=5, n_strong=5, n_weak=3, n_benign=7,
+        n_multi_direct=1, n_multi_strong=2, n_multi_benign=2,
+    )  # fmt: skip
     jobs = [("wager", "casual"), ("stare", "casual")]
-    # 1000 input * 5 + 900 output * 25 per request, two requests
-    assert estimate(fake_client(), cfg, jobs) == pytest.approx((5000 + 22500) / 1e6 * 2)
+    # 1000 input * 5 + (20 * 45 + 5 * 120) output * 25 per request, two requests
+    per_request = (1000 * 5 + 1500 * 25) / 1e6
+    assert estimate(fake_client(), cfg, jobs) == pytest.approx(per_request * 2)
     cfg.mode = "batch"
-    assert estimate(fake_client(), cfg, jobs) == pytest.approx((5000 + 22500) / 1e6)
+    assert estimate(fake_client(), cfg, jobs) == pytest.approx(per_request)
     assert "estimated $" in capsys.readouterr().out
 
 

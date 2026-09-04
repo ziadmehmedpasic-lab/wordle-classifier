@@ -35,7 +35,15 @@ STYLES_BY_LABEL: dict[Label, list[str]] = {
     Label.WEAK_HINT: ["category", "letter", "count", "theme"],
     Label.BENIGN: ["wordle_chat", "chat", "hard_benign"],
 }  # fmt: skip
-STYLES = [style for styles in STYLES_BY_LABEL.values() for style in styles]
+# exchanges of several messages; the label applies to the final message given the context
+MULTI_STYLES: dict[Label, str] = {
+    Label.DIRECT: "multi_direct",
+    Label.STRONG_HINT: "multi_strong",
+    Label.BENIGN: "multi_benign",
+}
+STYLES = [style for styles in STYLES_BY_LABEL.values() for style in styles] + list(
+    MULTI_STYLES.values()
+)
 
 EXAMPLES_SCHEMA = {
     "type": "object",
@@ -47,11 +55,23 @@ EXAMPLES_SCHEMA = {
             "items": {
                 "type": "object",
                 "additionalProperties": False,
-                "required": ["text", "label", "style"],
+                "required": ["text", "label", "style", "context"],
                 "properties": {
                     "text": {"type": "string"},
                     "label": {"type": "string", "enum": [label.value for label in Label]},
                     "style": {"type": "string", "enum": STYLES},
+                    "context": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "additionalProperties": False,
+                            "required": ["author", "text"],
+                            "properties": {
+                                "author": {"type": "string"},
+                                "text": {"type": "string"},
+                            },
+                        },
+                    },
                 },
             },
         }
@@ -80,6 +100,10 @@ class Config:
     n_strong: int = 5
     n_weak: int = 3
     n_benign: int = 7
+    # multi-message exchanges per request, on top of the counts above
+    n_multi_direct: int = 1
+    n_multi_strong: int = 2
+    n_multi_benign: int = 2
     model: str = "claude-opus-5"
     mode: Literal["direct", "batch"] = "direct"
     # print the token estimate and cost, generate nothing
@@ -99,6 +123,8 @@ class Record:
     style: str
     template_id: str
     generator: str
+    # earlier messages as (author, text), oldest first; empty for single-message examples
+    context: list[dict[str, str]]
 
     def to_json(self) -> str:
         return json.dumps(self.__dict__, ensure_ascii=False)
@@ -129,6 +155,13 @@ def style_plan(cfg: Config, word: str, template: str) -> dict[Label, list[str]]:
         while len(picks) < n:
             picks += rng.sample(styles, min(len(styles), n - len(picks)))
         plan[label] = picks
+    multi = {
+        Label.DIRECT: cfg.n_multi_direct,
+        Label.STRONG_HINT: cfg.n_multi_strong,
+        Label.BENIGN: cfg.n_multi_benign,
+    }
+    for label, n in multi.items():
+        plan[label] += [MULTI_STYLES[label]] * n
     return plan
 
 
@@ -157,7 +190,7 @@ def build_request(cfg: Config, word: str, template: str) -> MessageCreateParamsN
     prompt = build_prompt(cfg, word, template)
     return MessageCreateParamsNonStreaming(
         model=cfg.model,
-        max_tokens=4000,
+        max_tokens=12000,
         system=prompt.system,
         messages=prompt.messages,
         output_config={"format": {"type": "json_schema", "schema": EXAMPLES_SCHEMA}},
@@ -177,6 +210,7 @@ def parse_examples(text: str, word: str, template: str, model: str, prefix: str)
                 style=ex["style"],
                 template_id=template,
                 generator=model,
+                context=[{"author": c["author"], "text": c["text"]} for c in ex["context"]],
             )
         )
     return records
@@ -189,8 +223,9 @@ def estimate(client: anthropic.Anthropic, cfg: Config, jobs: list[tuple[str, str
     counted = client.messages.count_tokens(
         model=cfg.model, system=prompt.system, messages=prompt.messages
     )
-    n_examples = cfg.n_direct + cfg.n_strong + cfg.n_weak + cfg.n_benign
-    output_guess = 45 * n_examples
+    n_single = cfg.n_direct + cfg.n_strong + cfg.n_weak + cfg.n_benign
+    n_multi = cfg.n_multi_direct + cfg.n_multi_strong + cfg.n_multi_benign
+    output_guess = 45 * n_single + 120 * n_multi
     price_in, price_out = PRICES[cfg.model]
     per_request = (counted.input_tokens * price_in + output_guess * price_out) / 1e6
     total = per_request * len(jobs)
@@ -209,7 +244,7 @@ def run_direct(
     def one(job: tuple[str, str]) -> list[Record]:
         word, template = job
         response = client.messages.create(**build_request(cfg, word, template))
-        assert response.stop_reason != "refusal", f"refused on {word}/{template}"
+        assert response.stop_reason == "end_turn", f"{word}/{template}: {response.stop_reason}"
         text = next(block.text for block in response.content if block.type == "text")
         return parse_examples(text, word, template, cfg.model, f"{word}-{template}")
 
@@ -236,6 +271,7 @@ def run_batch(
         assert result.result.type == "succeeded", f"{result.custom_id}: {result.result.type}"
         word, template = by_id[result.custom_id]
         message = result.result.message
+        assert message.stop_reason == "end_turn", f"{result.custom_id}: {message.stop_reason}"
         text = next(block.text for block in message.content if block.type == "text")
         records += parse_examples(text, word, template, cfg.model, result.custom_id)
     return records

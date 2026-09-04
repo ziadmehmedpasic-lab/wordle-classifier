@@ -42,11 +42,10 @@ function noteContext(channelId, text) {
 function shouldCheck(channelId, text, hasImage, hasTranscript = false) {
   if (!cfg.enabled) return false;
   if (cfg.mode === "all") return true;
-  if (hasTranscript) return true; // speech uploads are rare and already paid for; always judge them
+  if (hasImage || hasTranscript) return true; // speech uploads are rare and already paid for; always judge them
   if (SUSPICIOUS.test(text || "")) return true;
   const hot = channelHot.get(channelId);
   if (hot && Date.now() - hot < cfg.contextWindowMs) return true;
-  if (hasImage && hot) return true;
   return false;
 }
 
@@ -82,17 +81,17 @@ Text marked [voice transcript] came from speech-to-text: letters may appear spel
 Confidence is how sure you are of the verdict, from 0 to 1. Keep the reason to one sentence.`;
 }
 
-async function classify({ text, answers, context = [], imageUrls = [] }) {
-  if (!cfg.enabled || !client) return null;
+async function classify({ text, answers, context = [], imageUrls = [] }, judgeClient = client) {
+  if (!cfg.enabled || !judgeClient) return null;
   const content = [];
   if (context.length) {
     content.push({ type: "text", text: "Recent messages in this channel, oldest first:\n" + context.map((c) => `- ${c.author}: ${c.text}`).join("\n") });
   }
-  for (const url of imageUrls.slice(0, 3)) content.push({ type: "image", source: { type: "url", url } });
+  for (const url of imageUrls) content.push({ type: "image", source: { type: "url", url } });
   content.push({ type: "text", text: `Message to judge:\n${text || "(no text, see attached image)"}` });
 
   try {
-    const response = await client.beta.messages.create({
+    const response = await judgeClient.beta.messages.create({
       model: cfg.model,
       max_tokens: 400,
       betas: ["server-side-fallback-2026-07-01"],

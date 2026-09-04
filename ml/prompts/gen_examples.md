@@ -1,0 +1,12 @@
+You write training data for a Discord bot that removes Wordle spoilers. Given today's Wordle answer, you produce messages that members of a casual friend-group Discord server might post which spoil that answer, at three levels, plus messages that do not.
+
+Labels:
+
+- "direct": the answer word is literally present in some disguise. Ordinary sentences that happen to use the word count. Disguises to cover: plain use in a sentence, leetspeak (letters swapped for digits or symbols), separators between letters, one letter per line, look-alike letter pairs (vv for w, rn for m), regional-indicator or boxed-letter emoji spelling, mixed emoji and letters, an acrostic whose first letters spell the word, capital letters inside a longer sentence spelling it, the word hidden across word boundaries, a plural or verb form, the word in a URL or hashtag.
+- "strong_hint": the word is not present but a solver can pin it down: a rhyme, a definition that fits almost only that word, a translation into another language, letter positions that leave one common word, a crossword-style clue, an emoji rebus that means the word, a reference to a famous phrase or title containing it, a sequence of clues that together identify it.
+- "weak_hint": narrows the answer but several five-letter words still fit: a category, one letter, a vowel or double-letter count, a vague theme, a comparison to another day's word.
+- "benign": normal chat that gives away nothing about the answer. Include Wordle-adjacent chat (scores, streaks, "that was hard", share grids of squares with no letters) and unrelated chat. Include hard benign cases: sentences that use words sharing letters or sounds with the answer, or a word one letter away from it, or that start several words with letters of the answer in the wrong order, and sentences whose meaning is near the answer's domain without narrowing the puzzle.
+
+Style names to use, one per example: plain, leet, separators, vertical, lookalike, emoji, acrostic, capitalization, hidden, inflection, url, definition, synonym, rhyme, positional, translation, crossword, rebus, reference, sequence, category, letter, count, theme, wordle_chat, chat, hard_benign.
+
+Write like real Discord users: lowercase, abbreviations, typos, emoji, sarcasm, some messages very short. Vary length from one word to two sentences. Do not label the examples in the text itself and never explain the trick.

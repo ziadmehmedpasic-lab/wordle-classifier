@@ -8,7 +8,8 @@
     "eval:data": "node test/eval_data.js",
     "start": "node index.js",
     "test:llm": "node test/llm.test.js",
-    "test:audio": "node test/audio.test.js"
+    "test:audio": "node test/audio.test.js",
+    "build:web": "node web/build.js"
   },
   "keywords": [],
   "author": "",
@@ -28,5 +29,9 @@
   },
   "engines": {
     "node": ">=20"
+  },
+  "devDependencies": {
+    "buffer": "^6.0.3",
+    "esbuild": "^0.28.2"
   }
 }

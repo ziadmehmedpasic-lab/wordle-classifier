@@ -34,7 +34,7 @@ function embedMedia(embed) {
 
 /** @param {string} input @returns {Promise<object>} */
 async function probe(input) {
-  const { stdout } = await promisify(execFile)(ffprobePath, ["-v", "error", "-protocol_whitelist", "file,pipe", "-show_streams", "-show_format", "-of", "json", input], { timeout: 15_000, maxBuffer: 2_000_000 });
+  const { stdout } = await promisify(execFile)(ffprobePath, ["-v", "error", "-protocol_whitelist", "file,pipe", "-count_frames", "-show_streams", "-show_format", "-of", "json", input], { timeout: 15_000, maxBuffer: 2_000_000 });
   return JSON.parse(stdout);
 }
 
@@ -46,7 +46,7 @@ async function decode(input, onFrame) {
   if (!(video.width > 0 && video.height > 0) || video.width * video.height > cfg.maxPixels) throw new Error("invalid or excessive video dimensions");
   const issues = [];
   const seconds = Number(metadata.format.duration);
-  if (!Number.isFinite(seconds) || seconds > cfg.maxSeconds) issues.push("video duration exceeds limit or is unknown");
+  if (seconds > cfg.maxSeconds) issues.push("video duration exceeds limit");
   if (metadata.streams.filter((stream) => stream.codec_type === "video").length > 1) issues.push("additional video tracks are unscanned");
   if (metadata.streams.some((stream) => stream.codec_type === "subtitle")) issues.push("subtitle tracks are unscanned");
   // no frame-rate filter or near-duplicate removal: even a one-frame text change survives.
@@ -83,6 +83,9 @@ async function decode(input, onFrame) {
     else if (exit.error || exit.code !== 0 || pending.length) issues.push(`video decode failed: ${exit.error?.message || stderr || "incomplete frame"}`);
     if (!count) issues.push("no video frames decoded");
     if (count > cfg.maxFrames) issues.push("video frame limit exceeded");
+    // some GIF demuxers omit duration; a full frame count can still prove coverage.
+    if (!Number.isFinite(seconds) && count !== Number(video.nb_read_frames)) issues.push("video duration unknown and full frame coverage unverified");
+    if (Number.isFinite(Number(video.nb_read_frames)) && count < Number(video.nb_read_frames)) issues.push("not all source frames were decoded");
     return { issues, count: Math.min(count, cfg.maxFrames) };
   } finally { clearTimeout(timer); child.kill("SIGKILL"); await finished; }
 }

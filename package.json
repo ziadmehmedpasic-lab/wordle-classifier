@@ -1,0 +1,28 @@
+{
+  "name": "wordle-spoiler-bot",
+  "version": "1.0.0",
+  "description": "Discord bot that deletes Wordle spoilers: pattern matching, OCR, and an LLM layer",
+  "main": "index.js",
+  "scripts": {
+    "test": "node test/detector.test.js",
+    "start": "node index.js",
+    "test:llm": "node test/llm.test.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "type": "commonjs",
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.123.0",
+    "an-array-of-english-words": "^2.0.0",
+    "confusables": "^1.1.1",
+    "discord.js": "^14.27.0",
+    "dotenv": "^17.4.2",
+    "double-metaphone": "^2.0.1",
+    "tesseract.js": "^7.0.0",
+    "unicode-emoji-json": "^0.9.0"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

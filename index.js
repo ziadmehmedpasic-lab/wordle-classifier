@@ -1,5 +1,5 @@
 require("dotenv").config();
-const { Client, GatewayIntentBits, Partials, Events, PermissionsBitField, ChannelType } = require("discord.js");
+const { Client, GatewayIntentBits, Partials, Events, PermissionsBitField, Routes } = require("discord.js");
 const detector = require("./detector");
 const llm = require("./llm");
 const audio = require("./audio");
@@ -7,11 +7,14 @@ const gifs = require("./gifs");
 const frames = require("./frames");
 const { inspectMessage } = require("./inspection");
 const { ocrImage } = require("./ocr");
+const { SurfaceModerator } = require("./surfaces");
 
 const env = (k, d) => (process.env[k] ?? d).toString().toLowerCase() === "true";
 const TOKEN = process.env.DISCORD_TOKEN;
 const CHECK_YESTERDAY = env("CHECK_YESTERDAY", "true");
 const POLICE_NICKNAMES = env("POLICE_NICKNAMES", "true");
+const POLICE_PROFILES = env("POLICE_PROFILES", "false");
+const POLICE_PRESENCES = env("POLICE_PRESENCES", "false");
 const OCR_IMAGES = env("OCR_IMAGES", "true");
 const SCAN_BACKLOG = env("SCAN_BACKLOG", "true");
 // repeat offenders: this many removals inside the window and the member is timed out. 0 disables
@@ -55,7 +58,8 @@ async function refreshAnswers(force = false) {
     detector.setAnswers(list);
     lastFetchedDate = today;
     console.log(`[${new Date().toISOString()}] Banned words updated (${list.length} words) for ${today}`);
-    sweepMembers().catch((e) => console.error("Member sweep:", e.message)); // names set before today's word was known
+    sweepMembers().catch((e) => console.error("Member sweep:", e.message));
+    for (const guild of client.guilds.cache.values()) surfaces.sweep(guild).catch((e) => console.error("Surface sweep:", e.message)); // names set before today's word was known
   } catch (e) { console.error("Failed to refresh Wordle answer:", e.message); }
 }
 
@@ -90,10 +94,31 @@ const client = new Client({
     GatewayIntentBits.GuildMessages,
     GatewayIntentBits.MessageContent,
     GatewayIntentBits.GuildMessageReactions,
-    ...(POLICE_NICKNAMES ? [GatewayIntentBits.GuildMembers] : []),
+    GatewayIntentBits.GuildExpressions,
+    GatewayIntentBits.GuildScheduledEvents,
+    GatewayIntentBits.GuildVoiceStates,
+    ...(POLICE_NICKNAMES || POLICE_PROFILES ? [GatewayIntentBits.GuildMembers] : []),
+    ...(POLICE_PRESENCES ? [GatewayIntentBits.GuildPresences] : []),
   ],
   partials: [Partials.Message, Partials.Channel, Partials.Reaction],
 });
+
+const surfaces = new SurfaceModerator({
+  ocrImage, profiles: POLICE_PROFILES, presences: POLICE_PRESENCES, allowedChannels: ALLOWED_CHANNEL_IDS,
+  report: async ({ guild, kind, id, status }) => {
+    console.warn(`Surface moderation ${guild.id}/${kind}/${id}: ${status}`);
+    const channel = guild.channels.cache.get(process.env.MOD_LOG_CHANNEL_ID);
+    if (channel?.isTextBased() && typeof channel.send === "function") {
+      await channel.send({ content: `Wordle moderation: ${kind} ${id}: ${status.startsWith("moderation failed") ? "moderation failed; check bot logs" : status}.`, allowedMentions: { parse: [] } });
+    }
+  },
+});
+
+/** @param {object} target @param {string} kind @returns {Promise<void>} */
+async function checkSurface(target, kind) {
+  try { await refreshAnswers(); await surfaces.check(target, kind); }
+  catch (error) { console.error(`Surface ${kind}:`, error.message); }
+}
 
 const canManage = (ch) => { const me = ch.guild?.members?.me; return me && ch.permissionsFor(me)?.has(PermissionsBitField.Flags.ManageMessages); };
 
@@ -186,21 +211,15 @@ async function scanBacklog() {
   console.log(`Backlog scan complete (${scanned} messages)`);
 }
 
-async function checkName(target, kind) {
-  await refreshAnswers();
-  if (!detector.scan(target.name)) return;
-  try {
-    await target.setName("spoiler-removed", "Wordle spoiler");
-    console.log(`Renamed ${kind} "${target.name}"`);
-  } catch (e) { console.error(`${kind} rename failed:`, e.message); }
-}
-
 // what shows next to a member's messages is the nickname, else the global display name,
 // else the username. only the nickname is ours to change, so a bad global name or
 // username gets a nickname set over it
 async function checkMember(member) {
-  if (!POLICE_NICKNAMES || !member) return;
+  if (!member) return;
   await refreshAnswers();
+  await surfaces.check(member, "profile");
+  if (POLICE_PRESENCES && member.presence) await surfaces.check(member.presence, "presence");
+  if (!POLICE_NICKNAMES) return;
   const shown = member.displayName;
   if (!detector.scan(shown)) return;
   if (!member.manageable) { console.warn(`Cannot rename ${member.user.tag} ("${shown}"): the bot's role must be above theirs`); return; }
@@ -212,21 +231,21 @@ async function checkMember(member) {
 }
 
 async function sweepMembers() {
-  if (!POLICE_NICKNAMES) return;
+  if (!POLICE_NICKNAMES && !POLICE_PROFILES && !POLICE_PRESENCES) return;
   for (const guild of client.guilds.cache.values()) {
-    const members = await guild.members.fetch();
+    const members = await guild.members.fetch({ withPresences: POLICE_PRESENCES });
     for (const m of members.values()) await checkMember(m);
   }
 }
 
 client.once(Events.ClientReady, async (c) => {
   console.log(`Logged in as ${c.user.tag}`);
-  await refreshAnswers(true);
-  setInterval(() => refreshAnswers(), 15 * 60 * 1000);
   llm.init();
   audio.init();
   gifs.init();
   if (OCR_IMAGES) frames.init();
+  await refreshAnswers(true);
+  setInterval(() => refreshAnswers(), 15 * 60 * 1000);
   scanBacklog();
 });
 
@@ -238,10 +257,15 @@ client.on(Events.MessageUpdate, async (_o, u) => {
 // Reactions spelling the answer, or custom emoji named after it
 client.on(Events.MessageReactionAdd, async (reaction, user) => {
   try {
-    if (user.bot) return;
     const msg = reaction.message.partial ? await reaction.message.fetch() : reaction.message;
     if (!msg.guild || ALLOWED_CHANNEL_IDS.has(msg.channelId) || !canManage(msg.channel)) return;
     await refreshAnswers();
+    if (reaction.emoji.id) {
+      const url = reaction.emoji.imageURL({ size: 256, extension: reaction.emoji.animated ? "gif" : "png" });
+      const result = await inspectMessage({ channelId: msg.channelId, content: reaction.emoji.name || "", attachments: [{ url, name: "reaction emoji" }] }, { ocrImage });
+      if (result.status === "spoiler") await reaction.remove();
+      else if (result.issues.length) console.warn(`Incomplete reaction inspection ${msg.id}`);
+    }
     const letters = [];
     for (const r of msg.reactions.cache.values()) {
       const n = detector.normalize(r.emoji.name || "");
@@ -261,19 +285,30 @@ client.on(Events.UserUpdate, async (_o, u) => {
     try { await checkMember(await guild.members.fetch(u.id)); } catch (e) { console.error("User:", e.message); }
   }
 });
-client.on(Events.ThreadCreate, (t) => t.manageable && checkName(t, "thread"));
-client.on(Events.ThreadUpdate, (_o, t) => t.manageable && checkName(t, "thread"));
-client.on(Events.ChannelCreate, (ch) => ch.manageable && checkName(ch, "channel"));
-client.on(Events.ChannelUpdate, (_o, ch) => ch.manageable && ch.type !== ChannelType.DM && checkName(ch, "channel"));
-client.on(Events.GuildRoleCreate, (r) => r.editable && checkName(r, "role"));
-client.on(Events.GuildRoleUpdate, (_o, r) => r.editable && checkName(r, "role"));
-client.on(Events.GuildEmojiCreate, async (e) => { await refreshAnswers(); if (detector.scan(e.name) && e.deletable) e.delete("Wordle spoiler").catch(() => {}); });
-client.on(Events.GuildStickerCreate, async (s) => { await refreshAnswers(); if (detector.scan(`${s.name} ${s.description || ""}`) && s.deletable) s.delete("Wordle spoiler").catch(() => {}); });
+for (const [create, update, kind] of [
+  [Events.ThreadCreate, Events.ThreadUpdate, "channel"],
+  [Events.ChannelCreate, Events.ChannelUpdate, "channel"],
+  [Events.GuildRoleCreate, Events.GuildRoleUpdate, "role"],
+  [Events.GuildEmojiCreate, Events.GuildEmojiUpdate, "emoji"],
+  [Events.GuildStickerCreate, Events.GuildStickerUpdate, "sticker"],
+  [Events.GuildScheduledEventCreate, Events.GuildScheduledEventUpdate, "event"],
+  [Events.StageInstanceCreate, Events.StageInstanceUpdate, "stage"],
+]) {
+  client.on(create, (target) => checkSurface(target, kind));
+  client.on(update, (_old, target) => checkSurface(target, kind));
+}
+client.on(Events.PresenceUpdate, (_old, presence) => checkSurface(presence, "presence"));
+client.on(Events.Raw, (packet) => {
+  if (packet.t !== "VOICE_CHANNEL_STATUS_UPDATE") return;
+  const guild = client.guilds.cache.get(packet.d.guild_id);
+  if (!guild) return;
+  checkSurface({ id: packet.d.id, guild, topic: packet.d.status, channel: guild.channels.cache.get(packet.d.id), clear: () => client.rest.put(Routes.channelVoiceStatus(packet.d.id), { body: { status: null } }) }, "voice-status");
+});
 client.on(Events.Error, (e) => console.error("Client error:", e.message));
 
 client.login(TOKEN).catch((e) => {
   if (String(e.message).includes("disallowed intents")) {
-    console.error("\nDiscord rejected the bot's intents.\nFix: developer portal -> Bot -> Privileged Gateway Intents -> enable MESSAGE CONTENT INTENT" + (POLICE_NICKNAMES ? " and SERVER MEMBERS INTENT" : "") + ", then Save.\n" + (POLICE_NICKNAMES ? "Or set POLICE_NICKNAMES=false in .env.\n" : ""));
+    console.error("\nDiscord rejected the bot's intents.\nFix: developer portal -> Bot -> Privileged Gateway Intents -> enable MESSAGE CONTENT INTENT; profile scans need SERVER MEMBERS INTENT; presence scans need PRESENCE INTENT" + (POLICE_NICKNAMES ? " and SERVER MEMBERS INTENT" : "") + ", then Save.\n" + (POLICE_NICKNAMES ? "Or set POLICE_NICKNAMES=false in .env.\n" : ""));
     process.exit(1);
   }
   throw e;

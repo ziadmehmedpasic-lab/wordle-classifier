@@ -35,7 +35,14 @@ function collectContent(message) {
         if (image?.url && image.url !== video) assets.set(image.url, { url: image.url, contentType: "image/png" });
       }
     }
-    for (const s of value.stickers?.values?.() || []) texts.push(s.name, s.description);
+    for (const s of value.stickers?.values?.() || []) {
+      texts.push(s.name, s.description);
+      if (s.url) assets.set(s.url, { url: s.url, name: s.name, unsupported: s.format === 3 ? "Lottie sticker rendering unsupported" : undefined });
+    }
+    for (const match of (value.content || "").matchAll(/<(a?):[a-z0-9_]+:(\d+)>/gi)) {
+      const url = `https://cdn.discordapp.com/emojis/${match[2]}.${match[1] ? "gif" : "png"}?size=256`;
+      assets.set(url, { url, name: "custom emoji" });
+    }
     if (value.poll) {
       texts.push(value.poll.question?.text);
       for (const a of value.poll.answers?.values?.() || []) texts.push(a.text);
@@ -65,6 +72,7 @@ function collectContent(message) {
 
 /** @param {object} asset @param {object} options @returns {Promise<{text: string, images: string[], issues: string[]}>} */
 async function extractAsset(asset, { ocrImage }) {
+  if (asset.unsupported) return { text: "", images: [], issues: [asset.unsupported] };
   const bytes = await download(asset.url);
   const result = await extractDocument(bytes, { name: asset.name, ocrImage });
   const texts = [result.text];
@@ -73,7 +81,7 @@ async function extractAsset(asset, { ocrImage }) {
     try {
       const input = path.join(dir, clip.contentType === "image/gif" ? "input.gif" : "input");
       await fs.writeFile(input, clip.bytes);
-      if (clip.contentType.startsWith("video/") || clip.contentType === "image/gif") {
+      if (clip.contentType.startsWith("video/") || ["image/gif", "image/apng"].includes(clip.contentType)) {
         if (!frames.cfg.enabled) result.issues.push("frame inspection disabled");
         else {
           const visual = await frames.inspectFile(input, ocrImage);
@@ -100,7 +108,7 @@ async function extractAsset(asset, { ocrImage }) {
 }
 
 /** @param {object} message @param {object} options @returns {Promise<object>} */
-async function inspectMessage(message, { ocrImage, context = [], extract = extractAsset, judge = llm, describe = gifs.describe }) {
+async function inspectMessage(message, { ocrImage, context = [], extract = extractAsset, judge = llm, describe = gifs.describe, forceJudge = false }) {
   const content = collectContent(message);
   const texts = [content.text];
   const images = [];
@@ -126,7 +134,7 @@ async function inspectMessage(message, { ocrImage, context = [], extract = extra
   hit = detector.scan(text);
   if (hit) return { status: "spoiler", hit, text, issues };
   judge.noteContext(message.channelId, text);
-  if (judge.shouldCheck(message.channelId, text, images.length > 0, content.assets.length > 0)) {
+  if ((forceJudge && judge.cfg.enabled) || judge.shouldCheck(message.channelId, text, images.length > 0, content.assets.length > 0)) {
     const result = await judge.classify({ text, answers: detector.getAnswers(), context, imageUrls: judge.cfg.vision ? images : [] });
     if (!result) issues.push("meaning classifier failed");
     else if (judge.shouldDelete(result)) return { status: "spoiler", hit: result.verdict, text, issues };

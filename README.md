@@ -58,6 +58,21 @@ Bans today's word, plus yesterday's and tomorrow's (covers timezones). Moving to
    ```
 6. `npm test` runs the detector test suite.
 
+Additional surfaces: channel topics/forum tags, role icons, scheduled event descriptions and
+cover images, stage topics, voice-channel status updates, and custom emoji/sticker pixels are
+inspected. Creation and update events are handled; cached server surfaces are also checked
+at startup and answer rollover. Used external emoji/stickers and reaction images are scanned.
+The bot needs Manage Events for event edits and the existing channel/expression permissions
+for other edits. Findings it cannot remove are reported, never recorded as successful removal.
+
+Set `POLICE_PROFILES=true` to inspect available avatars/banners and account names, and
+`POLICE_PRESENCES=true` to inspect custom status/activity text. Enable Server Members Intent
+for profile scans and Presence Intent for status scans in Discord's developer portal first.
+These switches default off so an existing bot can start before the new privileged intent is
+enabled. `MOD_LOG_CHANNEL_ID` enables generic moderator alerts with resource IDs. Account
+profiles/statuses require human enforcement; a timeout does not hide them. Missing API fields
+and offline/invisible presence remain coverage limits. No profile bio endpoint is assumed.
+
 ## Layout
 - `POLICY.md` — the moderation policy: labels, what is deleted, which answers are protected, data handling
 - `detector.js` — layer 1, pure text detection logic (no Discord dependency)
@@ -169,6 +184,8 @@ Run `npm run test:audio` to transcribe a handful of synthesised clips (spoken an
 hints, clean chat) as both voice-message ogg and mp4. macOS only, it uses `say` to make the clips.
 
 ## What it cannot catch
+- Account fields Discord does not expose to the bot (including bios), unavailable presence
+  updates, and Lottie sticker rendering. Profile/status findings require moderator action.
 - Live speech in voice channels
 - Video frames beyond the configured frame/duration limits, and additional video/subtitle tracks
 - Private DMs between members

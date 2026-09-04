@@ -1,0 +1,6 @@
+ml/
+test/
+.claude/
+.env
+*.traineddata
+*.traineddata.gz

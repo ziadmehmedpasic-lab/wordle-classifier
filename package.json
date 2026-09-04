@@ -8,7 +8,8 @@
     "eval:data": "node test/eval_data.js",
     "start": "node index.js",
     "test:llm": "node test/llm.test.js",
-    "test:audio": "node test/audio.test.js"
+    "test:audio": "node test/audio.test.js",
+    "build:web": "node web/build.js"
   },
   "keywords": [],
   "author": "",
@@ -16,6 +17,7 @@
   "type": "commonjs",
   "dependencies": {
     "@anthropic-ai/sdk": "^0.123.0",
+    "@upstash/redis": "^1.38.3",
     "an-array-of-english-words": "^2.0.0",
     "confusables": "^1.1.1",
     "discord.js": "^14.27.0",
@@ -28,5 +30,9 @@
   },
   "engines": {
     "node": ">=22"
+  },
+  "devDependencies": {
+    "buffer": "^6.0.3",
+    "esbuild": "^0.28.2"
   }
 }

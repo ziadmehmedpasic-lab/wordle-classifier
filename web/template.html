@@ -1,0 +1,205 @@
+<title>Wordle Leak Playground</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@400;500;700;800&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+  :root {
+    --bg: #f8f7f3;
+    --bg-sunk: #efede6;
+    --ink: #1f1f1a;
+    --ink-soft: #5f5e56;
+    --ink-faint: #9a9890;
+    --line: #d5d3ca;
+    --tile-line: #8b8a80;
+    --tile-fill: #ffffff;
+    --green: #538d4e;
+    --green-ink: #ffffff;
+    --yellow: #c9a227;
+    --yellow-ink: #1f1f1a;
+    --red: #b04a3a;
+    --red-ink: #ffffff;
+    --focus: #2f6fdb;
+    --sans: "Libre Franklin", "Helvetica Neue", Arial, sans-serif;
+    --mono: "JetBrains Mono", "SFMono-Regular", Menlo, Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #121213;
+      --bg-sunk: #1c1c1e;
+      --ink: #ececec;
+      --ink-soft: #b3b3b0;
+      --ink-faint: #7a7a78;
+      --line: #333335;
+      --tile-line: #565758;
+      --tile-fill: #121213;
+      --green: #538d4e;
+      --yellow: #b59f3b;
+      --yellow-ink: #121213;
+      --red: #c65a48;
+      --focus: #6b9cff;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #121213;
+    --bg-sunk: #1c1c1e;
+    --ink: #ececec;
+    --ink-soft: #b3b3b0;
+    --ink-faint: #7a7a78;
+    --line: #333335;
+    --tile-line: #565758;
+    --tile-fill: #121213;
+    --green: #538d4e;
+    --yellow: #b59f3b;
+    --yellow-ink: #121213;
+    --red: #c65a48;
+    --focus: #6b9cff;
+  }
+
+  body { background: var(--bg); color: var(--ink); font-family: var(--sans); font-size: 15px; line-height: 1.5; }
+  main { max-width: 680px; margin: 0 auto; padding: 32px 20px 64px; display: flex; flex-direction: column; gap: 28px; }
+  h1 { font-size: 22px; font-weight: 800; letter-spacing: -0.01em; margin: 0; text-wrap: balance; }
+  h2 { font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-soft); margin: 0; }
+  p { margin: 0; max-width: 62ch; }
+  .lede { color: var(--ink-soft); }
+  a { color: inherit; }
+  button, input, textarea { font: inherit; color: inherit; }
+  :focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+
+  header { display: flex; flex-direction: column; gap: 6px; }
+
+  .target { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
+  .tiles { display: flex; gap: 6px; }
+  .tile {
+    width: 56px; height: 56px; display: grid; place-items: center;
+    border: 2px solid var(--tile-line); background: var(--tile-fill);
+    font-size: 30px; font-weight: 800; text-transform: uppercase; line-height: 1;
+  }
+  .tiles.small .tile { width: 22px; height: 22px; font-size: 12px; border-width: 1.5px; }
+  .tile.hit { background: var(--green); border-color: var(--green); color: var(--green-ink); }
+  .link { background: none; border: 0; padding: 0; color: var(--ink-soft); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+  .link:hover { color: var(--ink); }
+
+  .who { display: flex; gap: 20px; flex-wrap: wrap; align-items: end; }
+  .field { display: flex; flex-direction: column; gap: 6px; }
+  .field label, .seg-label { font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-soft); }
+  input[type="text"] {
+    background: var(--tile-fill); border: 1.5px solid var(--line); padding: 8px 10px; width: 180px;
+  }
+  .seg { display: inline-flex; border: 1.5px solid var(--line); }
+  .seg label { padding: 8px 14px; cursor: pointer; font-weight: 500; }
+  .seg label + label { border-left: 1.5px solid var(--line); }
+  .seg input { position: absolute; opacity: 0; width: 0; height: 0; }
+  .seg label:has(input:checked) { background: var(--ink); color: var(--bg); }
+  .seg label:has(input:focus-visible) { outline: 2px solid var(--focus); outline-offset: 2px; }
+
+  .compose { display: flex; flex-direction: column; gap: 10px; }
+  textarea {
+    width: 100%; box-sizing: border-box; min-height: 120px; resize: vertical;
+    background: var(--tile-fill); border: 1.5px solid var(--line); padding: 10px 12px;
+    font-family: var(--mono); font-size: 14px; line-height: 1.5;
+  }
+  .row { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .hint { color: var(--ink-faint); font-size: 13px; }
+  .primary {
+    background: var(--ink); color: var(--bg); border: 0; padding: 10px 18px; font-weight: 700; cursor: pointer;
+  }
+  .primary:disabled { opacity: 0.5; cursor: default; }
+
+  .result { display: none; padding: 14px 16px; gap: 4px; flex-direction: column; border-left: 6px solid var(--line); background: var(--bg-sunk); }
+  .result[data-state] { display: flex; }
+  .result[data-state="caught"], .result[data-state="passed"] { border-color: var(--green); }
+  .result[data-state="through"] { border-color: var(--yellow); }
+  .result[data-state="flagged"] { border-color: var(--red); }
+  .result strong { font-weight: 800; }
+  .result .detail { color: var(--ink-soft); }
+  .decode { display: none; flex-direction: column; gap: 8px; margin-top: 8px; }
+  .result[data-state="through"] .decode { display: flex; }
+  .decode input[type="text"] { width: 100%; box-sizing: border-box; }
+  .decode .row { justify-content: space-between; }
+  .secondary { background: none; border: 1.5px solid var(--ink); padding: 6px 12px; font-weight: 700; cursor: pointer; }
+
+  .board { display: flex; flex-direction: column; gap: 14px; }
+  .board-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+  .tally { display: flex; gap: 18px; font-variant-numeric: tabular-nums; color: var(--ink-soft); font-size: 13px; }
+  .tally b { color: var(--ink); font-weight: 800; font-size: 15px; }
+  .storage { font-size: 13px; color: var(--ink-faint); }
+  .storage.warn { color: var(--red); }
+
+  .feed { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; border-top: 1px solid var(--line); }
+  .feed li { display: grid; grid-template-columns: 82px 1fr; gap: 6px 14px; padding: 12px 0; border-bottom: 1px solid var(--line); }
+  .badge {
+    align-self: start; justify-self: start; padding: 3px 7px; font-size: 11px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase;
+    background: var(--bg-sunk); color: var(--ink-soft);
+  }
+  .badge.caught, .badge.passed { background: var(--green); color: var(--green-ink); }
+  .badge.through { background: var(--yellow); color: var(--yellow-ink); }
+  .badge.flagged { background: var(--red); color: var(--red-ink); }
+  .feed .msg { font-family: var(--mono); font-size: 13px; white-space: pre-wrap; overflow-wrap: anywhere; margin: 0; }
+  .feed .meta { grid-column: 2; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; font-size: 12px; color: var(--ink-faint); }
+  .feed .note { grid-column: 2; font-size: 13px; color: var(--ink-soft); }
+  .empty { color: var(--ink-faint); padding: 18px 0; }
+
+  @media (max-width: 480px) {
+    .tile { width: 48px; height: 48px; font-size: 26px; }
+    .feed li { grid-template-columns: 1fr; }
+    .feed .meta, .feed .note { grid-column: 1; }
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .tile { transition: background-color 120ms ease, border-color 120ms ease; }
+  }
+</style>
+
+<main>
+  <header>
+    <h1>Wordle Leak Playground</h1>
+    <p class="lede">The bot deletes anything that gives away today's Wordle. Here the answer is the word below. Write a message that leaks it and see whether the pattern layer catches it. Every attempt is recorded, and the ones that get through become test cases.</p>
+  </header>
+
+  <section class="target" aria-label="Target word">
+    <div class="tiles" id="word" aria-live="polite"></div>
+    <button type="button" class="link" id="reroll">New word</button>
+  </section>
+
+  <section class="who">
+    <div class="field">
+      <label for="nick">Your name</label>
+      <input type="text" id="nick" maxlength="24" autocomplete="nickname" placeholder="who is attacking">
+    </div>
+    <div class="field">
+      <span class="seg-label">This message is</span>
+      <div class="seg" role="radiogroup" aria-label="Intent">
+        <label><input type="radio" name="intent" value="leak" checked>trying to leak it</label>
+        <label><input type="radio" name="intent" value="innocent">innocent</label>
+      </div>
+    </div>
+  </section>
+
+  <section class="compose">
+    <textarea id="msg" spellcheck="false" placeholder="Type it the way you'd post it in the channel"></textarea>
+    <div class="row">
+      <button type="button" class="primary" id="send">Send</button>
+      <span class="hint">Ctrl+Enter also sends. Line breaks count, so acrostics work.</span>
+    </div>
+    <div class="result" id="result">
+      <strong id="verdict"></strong>
+      <span class="detail" id="detail"></span>
+      <div class="decode">
+        <label for="decode" class="hint">How would a reader work out the word? One line, for the ledger.</label>
+        <input type="text" id="decode" maxlength="300" placeholder="e.g. first letter of each line">
+        <div class="row">
+          <button type="button" class="secondary" id="savedecode">Add note</button>
+          <span class="hint" id="decodestatus"></span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="board">
+    <div class="board-head">
+      <h2>Attempts</h2>
+      <div class="tally" id="tally"></div>
+    </div>
+    <div class="storage" id="storage">Connecting to storage.</div>
+    <ul class="feed" id="feed"></ul>
+  </section>
+</main>
+
+<!--BUNDLE-->

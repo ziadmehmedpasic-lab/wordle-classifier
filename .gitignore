@@ -17,3 +17,6 @@ ml/data/splits/
 ml/data/real_chat/
 ml/data/probes/
 __pycache__/
+web/dist/
+.vercel
+.env*

@@ -3,6 +3,8 @@ const { Client, GatewayIntentBits, Partials, Events, PermissionsBitField, Channe
 const detector = require("./detector");
 const llm = require("./llm");
 const audio = require("./audio");
+const gifs = require("./gifs");
+const frames = require("./frames");
 
 const env = (k, d) => (process.env[k] ?? d).toString().toLowerCase() === "true";
 const TOKEN = process.env.DISCORD_TOKEN;
@@ -59,7 +61,12 @@ async function getOcr() {
   if (!ocrWorker) {
     try {
       const { createWorker } = require("tesseract.js");
-      ocrWorker = await createWorker("eng");
+      ocrWorker = await createWorker("eng", undefined, {
+        // Without this, tesseract.js throws inside its worker message handler on unreadable
+        // images (e.g. "Unknown format") and crashes the whole process, even though the
+        // recognize() promise is also rejected. Our try/catch in ocrImage handles that rejection.
+        errorHandler: (e) => console.warn("OCR worker error:", typeof e === "string" ? e : e?.message || e),
+      });
       console.log("OCR ready");
     } catch (e) { console.error("OCR unavailable:", e.message); OCR_IMAGES_FAILED = true; return null; }
   }
@@ -102,13 +109,18 @@ async function collectSlowText(message) {
     const type = a.contentType || "";
     if ((type.startsWith("text/") || /\.(txt|md|csv|json|log)$/i.test(a.name || "")) && a.size < 200_000) {
       try { const r = await fetch(a.url); bits.push(await r.text()); } catch { /* ignore */ }
-    } else if (/^image\/(png|jpe?g|webp|bmp|gif)/.test(type) && a.size < 8_000_000) {
+    } else if (frames.kind(a)) {
+      bits.push(await frames.ocr(a.url, ocrImage, { id: a.id, name: a.name, size: a.size })); // every frame of a gif or video
+    } else if (/^image\/(png|jpe?g|webp|bmp)/.test(type) && a.size < 8_000_000) {
       bits.push(await ocrImage(a.url));
     }
   }
   for (const e of message.embeds || []) {
+    if (!OCR_IMAGES) break;
+    const media = frames.embedMedia(e); // gif link previews (tenor, giphy, direct .gif links)
     const img = e.image?.url || e.thumbnail?.url;
-    if (img && OCR_IMAGES) bits.push(await ocrImage(img));
+    if (media) bits.push(await frames.ocr(media, ocrImage, { id: media, name: media }));
+    else if (img) bits.push(await ocrImage(img));
   }
   return bits.filter(Boolean).join(" \n ");
 }
@@ -205,10 +217,17 @@ async function handleMessage(message, { fromBacklog = false } = {}) {
   const hit = detector.scan(text);
   if (hit) return removeMessage(message, hit, "text");
 
+  // GIF links: tags and descriptions from the Tenor/Giphy APIs, before any pixels are looked at
+  const gifText = await gifs.describe(text);
+  if (gifText) {
+    const hitGif = detector.scan(gifText);
+    if (hitGif) return removeMessage(message, hitGif, "gif tags");
+  }
+
   // Slow path: text attachments, image OCR, speech-to-text
   const imageUrls = [...(message.attachments?.values?.() || [])].filter((a) => /^image\/(png|jpe?g|webp|gif)/.test(a.contentType || "")).map((a) => a.url);
   let transcript = "";
-  if (message.attachments?.size || message.embeds?.some((e) => e.image || e.thumbnail)) {
+  if (message.attachments?.size || message.embeds?.some((e) => e.image || e.thumbnail || e.video)) {
     const slow = await collectSlowText(message);
     const hit2 = detector.scan(slow);
     if (hit2) return removeMessage(message, hit2, "attachment/ocr");
@@ -219,7 +238,7 @@ async function handleMessage(message, { fromBacklog = false } = {}) {
 
   // LLM layer: meaning-based hints, riddles, synonyms, translations, solved-grid screenshots, spoken hints
   if (!fromBacklog && !message.author?.bot) {
-    const llmText = transcript ? `${text}\n[voice transcript]: ${transcript}` : text;
+    const llmText = [text, transcript && `[voice transcript]: ${transcript}`, gifText && `[gif tags]: ${gifText}`].filter(Boolean).join("\n");
     llm.noteContext(message.channelId, llmText);
     const context = (channelHistory.get(message.channelId) || []).slice();
     remember(message, llmText);
@@ -283,6 +302,8 @@ client.once(Events.ClientReady, async (c) => {
   setInterval(() => refreshAnswers(), 15 * 60 * 1000);
   llm.init();
   audio.init();
+  gifs.init();
+  if (OCR_IMAGES) frames.init();
   getOcr(); // warm up in background
   scanBacklog();
 });

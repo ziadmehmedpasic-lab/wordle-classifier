@@ -38,12 +38,16 @@ Bans today's word, plus yesterday's and tomorrow's (covers timezones). Moving to
 - `detector.js` — layer 1, pure text detection logic (no Discord dependency)
 - `llm.js` — layer 3, Claude-based meaning classifier (hints, riddles, translations, images)
 - `audio.js` — speech-to-text for voice messages, audio files and video soundtracks (OpenAI)
+- `gifs.js` — Tenor/Giphy tag and description lookup for GIF links
+- `frames.js` — ffmpeg frame sampling so OCR covers every frame of a GIF or video
 - `index.js` — Discord wiring: messages, edits, attachments, OCR, speech-to-text, reactions, names
 - `ml/` — layer 2: data generation, training, evaluation and serving for the fine-tuned classifier (Python, `uv`); see `ml/pyproject.toml`
 - `test/detector.test.js` — 132 targeted cases + generic sweep + false-positive sweep
 - `test/attacks.json`, `test/attacks_open.json`, `test/ATTACKS.md` — red-team ledger: attacks the detector must catch, and known gaps
 - `test/eval_data.js` — runs the generated ml data through the detector (recall per style, false positives); `--write` stamps each record with `detector_hit` so the classifier is scored only on what reaches it
 - `test/audio.unit.test.js` — offline audio checks; `test/audio.test.js` — live transcription of synthesised clips
+- `test/gifs.test.js` — offline GIF tag checks with a mocked API
+- `test/frames.unit.test.js` — offline frame sampling checks (ffmpeg-built fixtures, faked OCR); `test/frames.test.js` — real tesseract over text fixtures
 - `web/` — the playground page: `detector.js` bundled for the browser; `api/attempts.js` — its attempt store on Vercel
 
 ## Playground
@@ -86,6 +90,8 @@ Attempts feed the red-team ledger: `GET /api/attempts` returns the newest 500 as
 | Acrostics | `wife angle grey ear red`, `wage and real`, reversed initials, emoji names 🐳🍎🦒🥚🌈 with one distractor, emoji mixed with letters `w 🍎 g e r` |
 | Hidden in other content | URLs, custom emoji names, file names, embeds, link previews, polls, stickers, forwarded messages |
 | Attachments | `.txt`/`.md`/`.csv` contents, and **screenshots via OCR** |
+| GIF links | Tenor and Giphy URLs: the slug in the link, plus the post's tags, title and description from the provider API (needs `TENOR_API_KEY` / `GIPHY_API_KEY`); the tags also go to the LLM layer |
+| GIF and video frames | uploaded GIFs, gif link previews and videos are split into frames with ffmpeg (up to 20 per clip, near-duplicates dropped) and every frame is OCR'd, so text on a later frame or one letter per frame is read. Plain OCR reads only the first frame |
 | Speech | Discord **voice messages**, uploaded audio (`mp3/ogg/wav/m4a/flac/webm`) and the soundtrack of uploaded videos (`mp4/mov/webm`) are transcribed, then run through every text check and the LLM layer |
 | Fragments across messages | `w` `a` `g` `e` `r` or `wa` `ger` as separate messages (all deleted) |
 | Edits and link previews | messages re-scanned on edit and when embeds resolve |
@@ -98,6 +104,17 @@ Attempts feed the red-team ledger: `GET /api/attempts` returns the newest 500 as
 Examples are generated per past answer with Claude, a small model is fine-tuned on `(answer, recent messages, message) -> label`, and served over HTTP for the bot. See `ml/`.
 
 Layer 1 deletes before the classifier runs, so the classifier is trained on everything but evaluated and thresholded only on records with `detector_hit: false` (about 2 in 3 generated records, and almost none of the single-message `direct` ones). Run `node test/eval_data.js --write` after generating to stamp that field.
+
+Pipeline, all under `ml/` with `uv run`:
+```
+python scripts/build_dataset.py                       # answer-grouped train/val/test splits
+python scripts/evaluate.py --backend zeroshot         # baseline: Qwen3 label likelihoods, no training
+python scripts/evaluate.py --backend claude           # baseline: the Claude judge
+python scripts/train.py --name lora                   # LoRA on Qwen3, loss on the label tokens only
+python scripts/evaluate.py --backend lora --run-dir runs/<date>-lora \
+    --threshold-file data/splits/val.jsonl --max-fp-per-10k 50
+```
+Every scorer returns a distribution over the four labels; the bot's decision is a threshold on `1 - p(benign)`, picked on the validation split at the false-deletion budget. `evaluate.py` writes `metrics.json` (recall and false deletions per 10k benign with bootstrap intervals, per-label and per-style breakdowns, latency) and a Plotly `dashboard.html` per run. The fine-tune only ships if it beats the best baseline on recall at the accepted false-deletion rate.
 
 ## Layer 3: Claude judge (optional, recommended)
 Pattern matching cannot judge meaning. With an Anthropic API key in `.env`, messages that pass the pattern layer

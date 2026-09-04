@@ -13,6 +13,7 @@ ml/runs/
 ml/data/answers.txt
 ml/data/answers_by_date.jsonl
 ml/data/generated/
+ml/data/splits/
 ml/data/real_chat/
 ml/data/probes/
 __pycache__/

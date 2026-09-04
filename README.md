@@ -24,26 +24,34 @@ Bans today's word, plus yesterday's and tomorrow's (covers timezones).
 - `llm.js` — Claude-based meaning classifier (hints, riddles, translations, images)
 - `index.js` — Discord wiring: messages, edits, attachments, OCR, reactions, names
 - `test/detector.test.js` — 128 targeted cases + generic sweep + false-positive sweep
+- `test/attacks.json`, `test/attacks_open.json`, `test/ATTACKS.md` — red-team ledger: attacks the detector must catch, and known gaps
+- `test/eval_data.js` — runs the generated ml data through the detector (recall per style, false positives)
 
 ## What it catches
 | Technique | Example (answer: wager) |
 |---|---|
 | Plain, caps, punctuation, hashtags | `WAGER!!`, `#wager` |
-| Discord markdown | `**wager**`, `\|\|wager\|\|`, `` `wager` ``, code blocks, headers, subtext, quotes, masked links |
-| Leetspeak and symbol swaps | `W8g3r`, `w@ger`, `wa*er`, `l19h7` |
-| Separators and brackets | `w.a.g.e.r`, `w-a-g-e-r`, `w[a]ger` |
-| Spaced or split words | `w a g e r`, `wa ger`, `w 8 g 3 r` |
-| Look-alike letters | Cyrillic/Greek, fullwidth `ｗａｇｅｒ`, small caps `ᴡᴀɢᴇʀ`, 🇼🇦🇬🇪🇷, 🅦🅐🅖🅔🅡, 𝐰𝐚𝐠𝐞𝐫, full Unicode confusables table |
+| Discord markdown | `**wager**`, `\|\|wager\|\|`, `` `wager` ``, code blocks, headers, subtext, quotes, lists, masked links, per-letter links |
+| Leetspeak and symbol swaps | `W8g3r`, `w@ger`, `wa*er`, `l19h7`, math-bold digits `w𝟖g𝟑r` |
+| Separators and brackets | `w.a.g.e.r`, `w-a-g-e-r`, `w[a]ger`, any symbol `w·a·g·e·r`, `w?a?g?e?r`, emoji `w🔥a🔥g🔥e🔥r`, custom emoji between letters |
+| Spaced or split words | `w a g e r`, `wa ger`, `w 8 g 3 r`, `wa lol ger`, spaced Caesar `b f l j w` |
+| Letters with filler words | `w then a then g then e then r`, `w for whiskey a for apple ...`, `w1 a2 g3 e4 r5`, `"w" and "a" and ...` |
+| Glued to other letters | `wagerbros`, `prowager`, `itswager`, `xxwagerxx` (non-dictionary tokens only) |
+| Across word boundaries | `saw a german`, `help lane` (for plane) |
+| Capitals inside a sentence | `hoWie sAid the biG onE was Right`, `#WeAllGetEmRight` |
+| Lines, columns, diagonals | first letter of each line, letters down a column or diagonal of a code block |
+| Look-alike letters | Cyrillic/Greek, fullwidth `ｗａｇｅｒ`, small caps `ᴡᴀɢᴇʀ`, 🇼🇦🇬🇪🇷, 🅦🅐🅖🅔🅡, 𝐰𝐚𝐠𝐞𝐫, braille `⠺⠁⠛⠑⠗`, "fancy font" glyphs `山卂Ꮆ乇尺`, IPA, full Unicode confusables table |
 | Look-alike letter pairs | `vvager`, `rnoat`, `cloor` |
 | Invisible / control characters | zero-width spaces, right-to-left override, zalgo combining marks |
-| Upside-down text | `ɹǝƃɐʍ` |
-| Encodings | reversed, rot13, any Caesar shift, atbash, base64, hex, binary, a=1..z=26, ASCII codes, URL-encoding, HTML entities, morse |
-| Spoken letters | NATO `whiskey alpha golf echo romeo`, letter names `double-u ay gee ee ar` |
+| Upside-down text | `ɹǝƃɐʍ`, spaced `ɹ ǝ ƃ ɐ ʍ` |
+| Encodings | reversed (with suffix `sregaw`), rot13, any Caesar shift, atbash, base64 (any plaintext), base32, hex (`77 61 ...`, `0x7761...`, `\x77`), octal, binary, a=1..z=26 and a=0..z=25 with any separator or number words, ASCII codes, URL-encoding, HTML entities, `U+0077`, `%u0077`, phone keypad `92437`, pig latin `agerway`, keyboard shift `eshrt`, morse in any glyphs or spoken `dit dah` |
+| Spoken letters | NATO `whiskey alpha golf echo romeo`, letter names `double u ay gee ee ar`, Spanish and German letter names |
+| Edit instructions | `its wage but add an r`, `planet without the t` (near-miss dictionary word plus an instruction naming a letter) |
 | Stretched / doubled | `waaaager`, `wwaaggeerr`, `waager` |
 | Suffixes | `wagers`, `wagered`, `wagering` |
-| Typos, anagrams, vowel removal, interleaving | `wgaer`, `wsger`, `wagr`, `wgr`, `wxaxgxexr` (non-dictionary words only) |
+| Typos, anagrams, vowel removal, interleaving | `wgaer`, `wsger`, `wagr`, `wgr`, `wxaxgxexr`, reversed `rxexgxaxw` (non-dictionary words only) |
 | Phonetic spellings | `wayjer`, `waygur` (non-dictionary words only) |
-| Acrostics | `wife angle grey ear red`, `wage and real`, emoji names 🐳🍎🦒🥚🌈 |
+| Acrostics | `wife angle grey ear red`, `wage and real`, reversed initials, emoji names 🐳🍎🦒🥚🌈 with one distractor, emoji mixed with letters `w 🍎 g e r` |
 | Hidden in other content | URLs, custom emoji names, file names, embeds, link previews, polls, stickers, forwarded messages |
 | Attachments | `.txt`/`.md`/`.csv` contents, and **screenshots via OCR** |
 | Fragments across messages | `w` `a` `g` `e` `r` or `wa` `ger` as separate messages (all deleted) |
@@ -76,3 +84,5 @@ Run `npm run test:llm` to see live verdicts and per-message cost on 16 sample me
 ## Known trade-offs
 - On days the answer is a common word (`house`, `light`, `today`), normal sentences using it are deleted. Inherent to any spoiler filter.
 - Acrostic detection can misfire: `star every` on a `stare` day. Disable with `CATCH_ACROSTICS=false`.
+- The word-boundary rule misfires on rare collisions: `the mailman` on an `email` day. Measured at 5 extra hits per 73,000 benign message/answer pairs.
+- Deliberately not caught by the pattern layer, left to the LLM layer: the answer inside a real word (`delightful` on a `light` day), anagrams and homophones that are real words (`panel`, `plain` for `plane`), acrostics with many filler words, last letters of words. See `test/attacks_open.json`.

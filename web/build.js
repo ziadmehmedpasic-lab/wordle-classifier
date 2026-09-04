@@ -22,6 +22,6 @@ const js = result.outputFiles[0].text;
 const template = fs.readFileSync(path.join(dir, "template.html"), "utf8");
 if (!template.includes("<!--BUNDLE-->")) throw new Error("template.html has no <!--BUNDLE--> placeholder");
 const html = template.replace("<!--BUNDLE-->", () => `<script>${js.replace(/<\/script/gi, "<\\/script")}</script>`);
-const file = path.join(out, "playground.html");
+const file = path.join(out, "index.html");
 fs.writeFileSync(file, html);
 console.log(`${file} ${(html.length / 1e6).toFixed(2)} MB`);

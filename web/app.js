@@ -1,5 +1,5 @@
-// page logic for the playground. the detector runs in the browser; attempts go to the
-// artifact's db when it is available and the page keeps working when it is not.
+// page logic for the playground. the detector runs in the browser; attempts go to
+// /api/attempts and the page keeps working (without a record) when that is unreachable.
 const det = require("../detector");
 const WORDS = require("./words.json");
 
@@ -13,8 +13,19 @@ const tallyEl = $("tally");
 const storageEl = $("storage");
 
 let word = "";
-let db = null;
-let lastRef = null; // doc ref of the last saved attempt, for the decode note
+let storageOk = false;
+let lastId = null; // id of the last saved attempt, for the decode note
+
+const API = "/api/attempts";
+async function call(method, body) {
+  const r = await fetch(API, { method, headers: body ? { "content-type": "application/json" } : {}, body: body ? JSON.stringify(body) : undefined });
+  if (!r.ok) throw new Error(`${method} ${API}: ${r.status}`);
+  return r.json();
+}
+function storageFailed(what) {
+  storageEl.textContent = what;
+  storageEl.className = "storage warn";
+}
 
 // ---------------------------------------------------------------------
 // target word
@@ -36,7 +47,7 @@ function reroll() {
   det.setAnswers([word]);
   wordEl.replaceChildren(...tiles(word, false, false).children);
   resultEl.removeAttribute("data-state");
-  lastRef = null;
+  lastId = null;
   msgEl.value = "";
   msgEl.focus();
 }
@@ -79,30 +90,29 @@ async function send() {
   $("decode").value = "";
   $("decodestatus").textContent = "";
   resultEl.dataset.state = state;
-  lastRef = null;
+  lastId = null;
 
-  if (!db) return;
-  const doc = { word, text, intent, caught: !!hit, hit: hit || "", decode: "", nickname: nickEl.value.trim(), ts: Date.now() };
+  if (!storageOk) return;
+  const doc = { word, text, intent, caught: !!hit, hit: hit || "", decode: "", nickname: nickEl.value.trim() };
   try {
-    lastRef = await db.collection("attempts").add(doc);
+    lastId = (await call("POST", doc)).id;
+    await refresh();
   } catch (e) {
-    storageEl.textContent = e && e.code === "quota_exceeded"
-      ? "Storage is full: this attempt was not saved. Ask the maintainer to prune old attempts."
-      : `This attempt was not saved (${e && e.code ? e.code : "unknown error"}).`;
-    storageEl.className = "storage warn";
+    storageFailed(`This attempt was not saved (${e.message}).`);
   }
 }
 
 async function saveDecode() {
   const decode = $("decode").value.trim();
   const status = $("decodestatus");
-  if (!lastRef) { status.textContent = db ? "Nothing to attach this to." : "Not recorded: storage is unavailable."; return; }
+  if (!lastId) { status.textContent = storageOk ? "Nothing to attach this to." : "Not recorded: storage is unavailable."; return; }
   if (!decode) { status.textContent = "Write something first."; return; }
   try {
-    await lastRef.update({ decode });
+    await call("PATCH", { id: lastId, decode });
     status.textContent = "Saved.";
+    await refresh();
   } catch (e) {
-    status.textContent = `Not saved (${e && e.code ? e.code : "unknown error"}).`;
+    status.textContent = `Not saved (${e.message}).`;
   }
 }
 
@@ -172,19 +182,24 @@ function render(docs) {
   }));
 }
 
+const POLL_MS = 15000;
+
+async function refresh() {
+  const { attempts } = await call("GET");
+  render(attempts);
+}
+
 async function connect() {
-  db = window.claude && typeof window.claude.use === "function" ? await window.claude.use("db") : null;
-  if (!db) {
-    storageEl.textContent = "Storage is unavailable in this view. You can still test messages, but nothing is recorded.";
-    storageEl.className = "storage warn";
+  try {
+    await refresh();
+  } catch (e) {
+    storageFailed("Storage is unreachable. You can still test messages, but nothing is recorded.");
     render([]);
     return;
   }
+  storageOk = true;
   storageEl.textContent = `Shared with everyone who opens this page. Showing the last ${FEED_ROWS} of up to ${WINDOW} attempts.`;
-  db.collection("attempts").orderBy("ts", "desc").limit(WINDOW).onSnapshot(
-    (snap) => render(snap.docs.map((s) => s.data()).filter(Boolean)),
-    (e) => { storageEl.textContent = `Lost the connection to storage (${e && e.code ? e.code : "unknown error"}). Reload to reconnect.`; storageEl.className = "storage warn"; },
-  );
+  setInterval(() => refresh().catch(() => storageFailed("Lost the connection to storage. Reload to reconnect.")), POLL_MS);
 }
 
 loadNick();

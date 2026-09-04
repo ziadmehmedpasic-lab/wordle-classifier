@@ -217,6 +217,11 @@
   <section class="board">
     <div class="board-head">
       <h2>Attempts</h2>
+      <div class="seg" role="radiogroup" aria-label="Show">
+        <label><input type="radio" name="filter" value="all" checked>all</label>
+        <label><input type="radio" name="filter" value="caught">caught</label>
+        <label><input type="radio" name="filter" value="through">got through</label>
+      </div>
       <div class="tally" id="tally"></div>
     </div>
     <div class="storage" id="storage">Connecting to storage.</div>

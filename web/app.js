@@ -266,9 +266,17 @@ function deletedOf(d, n) {
   return Array(n).fill(!!d.caught);
 }
 
-function render(docs) {
+// feed filter: "caught" is anything the bot would delete, "through" anything it would leave
+let lastDocs = [];
+function filterOf() { return document.querySelector("input[name=filter]:checked").value; }
+for (const r of document.querySelectorAll("input[name=filter]")) r.addEventListener("change", () => render(lastDocs));
+
+function render(all) {
+  lastDocs = all;
   const counts = { caught: 0, through: 0, flagged: 0, passed: 0 };
-  for (const d of docs) counts[outcome(d.intent, d.caught)]++;
+  for (const d of all) counts[outcome(d.intent, d.caught)]++;
+  const f = filterOf();
+  const docs = f === "all" ? all : all.filter((d) => !!d.caught === (f === "caught"));
   tallyEl.replaceChildren(
     ...[["caught", "caught"], ["through", "got through"], ["flagged", "false positives"]].map(([k, label]) => {
       const s = document.createElement("span");
@@ -282,7 +290,7 @@ function render(docs) {
   if (!docs.length) {
     const li = document.createElement("li");
     li.className = "empty";
-    li.textContent = "No attempts yet. Yours will be the first.";
+    li.textContent = all.length ? "Nothing matches this filter." : "No attempts yet. Yours will be the first.";
     feedEl.replaceChildren(li);
     return;
   }

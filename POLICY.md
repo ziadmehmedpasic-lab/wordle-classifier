@@ -15,7 +15,10 @@ policy here first, then the code.
 
 Ordinary use of the answer word in an unrelated sentence counts as `direct`. On a day the
 answer is a common word (`house`, `light`, `today`) normal sentences will be removed; this is
-accepted.
+accepted. The answer's letters merely running across a word boundary ("who used" on a HOUSE
+day, "help lane" on a PLANE day) is not `direct`: it is indistinguishable from accidental
+text, so it is never generated as a spoiler example and the detector treats it as
+`suspicious` at most.
 
 ## Deletion
 

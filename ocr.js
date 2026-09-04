@@ -1,6 +1,7 @@
 const sharp = require("sharp");
 const detector = require("./detector");
 const { createWorker } = require("tesseract.js");
+const { decodeQr } = require("./qr");
 
 let workerPromise;
 let queue = Promise.resolve();
@@ -16,11 +17,12 @@ function ocrImage(input) {
   // a rejected job is returned to its caller; the next queued job may still run.
   const job = queue.catch(() => {}).then(async () => {
     if ((process.env.OCR_IMAGES || "true").toLowerCase() !== "true") throw new Error("OCR disabled");
+    const texts = await decodeQr(input);
+    if (detector.scan(texts.join("\n"))) return texts.join("\n");
     const worker = await getWorker();
     const source = sharp(input, { limitInputPixels: 16_000_000 });
     const metadata = await source.metadata();
     const width = Math.min(1600, Math.max(metadata.width, 640));
-    const texts = [];
     const seen = new Set();
     let timer;
     const deadline = Date.now() + 30_000;

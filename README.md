@@ -84,6 +84,12 @@ Bans today's word, plus yesterday's and tomorrow's (covers timezones). `POLICY.m
 | Webhooks and other bots | scanned too (only the bot's own warnings are skipped) |
 | Offline gap | last 50 messages per channel scanned at startup |
 
+## Layer 2: fine-tuned classifier (in progress)
+Lives in `ml/`. Labeled examples are generated per past answer with Claude across the policy's four levels and
+dozens of disguise and hint styles, including exchanges of several messages where only the final one spoils.
+A small model is fine-tuned on `(answer, recent messages, message) -> label`, calibrated, and served over HTTP
+for the bot to call before layer 3. Progress and the remaining steps are tracked in the PRs.
+
 ## Layer 3: Claude judge (optional, recommended)
 Pattern matching cannot judge meaning. With an Anthropic API key in `.env`, messages that pass the pattern layer
 are sent to Claude, which returns `spoiler`, `hint`, or `clean` with a confidence and reason. Catches:
@@ -109,12 +115,6 @@ not pay twice.
 
 Run `npm run test:audio` to transcribe a handful of synthesised clips (spoken answer, spelled letters, NATO alphabet,
 hints, clean chat) as both voice-message ogg and mp4. macOS only, it uses `say` to make the clips.
-
-## Layer 2: fine-tuned classifier (in progress)
-Lives in `ml/`. Labeled examples are generated per past answer with Claude across the policy's four levels and
-dozens of disguise and hint styles, including exchanges of several messages where only the final one spoils.
-A small model is fine-tuned on `(answer, recent messages, message) -> label`, calibrated, and served over HTTP
-for the bot to call before layer 3. Progress and the remaining steps are tracked in the PRs.
 
 ## What it cannot catch
 - Live speech in voice channels

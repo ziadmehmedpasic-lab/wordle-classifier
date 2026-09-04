@@ -58,7 +58,13 @@ for (const w of words) { d.setAnswers([w]);
     Buffer.from(w+"!").toString("base64"), Buffer.from([...w].join(" ")).toString("base64"), [...w].map(c=>(c.charCodeAt(0)-96)).join("/"), [...w].map(c=>(c.charCodeAt(0)-97)).join(" "), [...w].map(c=>c.charCodeAt(0).toString(8)).join(" "),
     [...w].map(c=>"\\x"+c.charCodeAt(0).toString(16)).join(""), "0x"+Buffer.from(w).toString("hex"), [...w].map(c=>"&#"+c.charCodeAt(0)).join(""), [...w].map(c=>"U+00"+c.charCodeAt(0).toString(16)).join(" "),
     [...w].map(c=>"22233344455566677778889999"[c.charCodeAt(0)-97]).join(""), [...w].map(c=>"⠁⠃⠉⠙⠑⠋⠛⠓⠊⠚⠅⠇⠍⠝⠕⠏⠟⠗⠎⠞⠥⠧⠺⠭⠽⠵"[c.charCodeAt(0)-97]).join(""),
-    [...w].map(c=>morse[c].replace(/\./g,"·").replace(/-/g,"–")).join(" "), [...w].map(c=>morse[c]).join("/"), [...w].map(c=>String.fromCharCode(((c.charCodeAt(0)-97+5)%26)+97)).join(" ")];
+    [...w].map(c=>morse[c].replace(/\./g,"·").replace(/-/g,"–")).join(" "), [...w].map(c=>morse[c]).join("/"), [...w].map(c=>String.fromCharCode(((c.charCodeAt(0)-97+5)%26)+97)).join(" "),
+    // red-team round 2
+    [...w].map(c=>"ho**"+c+"**ie").join(" "), [...w].map(c=>"ho*"+c+"*ie").join(" "), "ho**"+w.slice(0,2)+"**ii is **"+w.slice(2)+"**man", [...w].map(c=>"ho"+String.fromCodePoint(0x1d41a+c.charCodeAt(0)-97)+"ie").join(" "),
+    "LMAO OMG "+[...w].map(c=>"ho"+c.toUpperCase()+"ie").join(" "), [...w].map(c=>"HO"+c+"IE").join(" "), [...w].map(c=>(c.charCodeAt(0)-96)).join(" • "), [...w].map(c=>"("+(c.charCodeAt(0)-96)+")").join(""), [...w].map(c=>(c.charCodeAt(0)-96)).join(" then "),
+    [...w].map(c=>morse[c]).join("\n"), [...w].map(c=>morse[c].replace(/\./g,"dot ").replace(/-/g,"dash ").trim()).join(", "), [...w].map(c=>morse[c].replace(/\./g,"🔴").replace(/-/g,"➖")).join(" "),
+    [...w].map(c=>"<:blue_letter_"+c+":1>").join(""), [...w].map(c=>":letter_"+c+":").join(""), [...w].map(c=>String.fromCharCode(((c.charCodeAt(0)-97+13)%26)+97)).join("")+"f",
+    "```\nday 5\n"+[...w].map((c,i)=>"x".repeat(i+1)+c+"x".repeat(5-i)).join("\n")+"\n```", [...w].map(c=>c+" then").join(" ")];
   for (const t of tricks) { tot++; if (d.scan(t)===w) ok++; else console.log("MISS", w, JSON.stringify(t), "->", d.scan(t)); }
 }
 console.log(`generic tricks: ${ok}/${tot}`);

@@ -6,6 +6,7 @@ const audio = require("./audio");
 const gifs = require("./gifs");
 const frames = require("./frames");
 const { inspectMessage } = require("./inspection");
+const { ocrImage } = require("./ocr");
 
 const env = (k, d) => (process.env[k] ?? d).toString().toLowerCase() === "true";
 const TOKEN = process.env.DISCORD_TOKEN;
@@ -56,35 +57,6 @@ async function refreshAnswers(force = false) {
     console.log(`[${new Date().toISOString()}] Banned words updated (${list.length} words) for ${today}`);
     sweepMembers().catch((e) => console.error("Member sweep:", e.message)); // names set before today's word was known
   } catch (e) { console.error("Failed to refresh Wordle answer:", e.message); }
-}
-
-// ---------------------------------------------------------------------
-// OCR for screenshots (tesseract.js, lazy-loaded)
-// ---------------------------------------------------------------------
-let ocrWorker = null;
-async function getOcr() {
-  if (!OCR_IMAGES) return null;
-  if (!ocrWorker) {
-    try {
-      const { createWorker } = require("tesseract.js");
-      ocrWorker = await createWorker("eng", undefined, {
-        // Without this, tesseract.js throws inside its worker message handler on unreadable
-        // images (e.g. "Unknown format") and crashes the whole process, even though the
-        // recognize() promise is also rejected. Our try/catch in ocrImage handles that rejection.
-        errorHandler: (e) => console.warn("OCR worker error:", typeof e === "string" ? e : e?.message || e),
-      });
-      console.log("OCR ready");
-    } catch (e) { console.error("OCR unavailable:", e.message); OCR_IMAGES_FAILED = true; return null; }
-  }
-  return ocrWorker;
-}
-let OCR_IMAGES_FAILED = false;
-async function ocrImage(url) {
-  if (OCR_IMAGES_FAILED) throw new Error("OCR worker unavailable");
-  const w = await getOcr();
-  if (!w) throw new Error("OCR disabled or unavailable");
-  const { data } = await w.recognize(url);
-  return data.text || "";
 }
 
 // ---------------------------------------------------------------------
@@ -255,7 +227,6 @@ client.once(Events.ClientReady, async (c) => {
   audio.init();
   gifs.init();
   if (OCR_IMAGES) frames.init();
-  getOcr(); // warm up in background
   scanBacklog();
 });
 

@@ -83,6 +83,17 @@ Confidence is how sure you are of the verdict, from 0 to 1. Keep the reason to o
 
 async function classify({ text, answers, context = [], imageUrls = [] }, judgeClient = client) {
   if (!cfg.enabled || !judgeClient) return null;
+  if (imageUrls.length > 20) {
+    let failed = false;
+    let result = null;
+    for (let start = 0; start < imageUrls.length; start += 20) {
+      const batch = await classify({ text, answers, context, imageUrls: imageUrls.slice(start, start + 20) }, judgeClient);
+      if (!batch) failed = true;
+      else if (shouldDelete(batch)) return batch;
+      else result = batch;
+    }
+    return failed ? null : { ...result, issues: ["vision evaluated in separate batches; cross-batch visual clues may be missed"] };
+  }
   const content = [];
   if (context.length) {
     content.push({ type: "text", text: "Recent messages in this channel, oldest first:\n" + context.map((c) => `- ${c.author}: ${c.text}`).join("\n") });

@@ -94,7 +94,19 @@ async function extractDocument(bytes, { name = "attachment", ocrImage, depth = 0
     if (++budget.images > limits.pages) { result.issues.push("rendered image limit exceeded"); return result; }
     const source = sharp(bytes, { limitInputPixels: limits.pixels });
     const metadata = await source.metadata();
-    if (metadata.pages > 1) result.issues.push("only first image page inspected");
+    if (metadata.pages > 1) {
+      const count = Math.min(metadata.pages, limits.pages - budget.images + 1);
+      budget.images += count - 1;
+      if (count < metadata.pages) result.issues.push("image page limit exceeded");
+      for (let page = 0; page < count; page++) {
+        const png = await sharp(bytes, { page, pages: 1, limitInputPixels: limits.pixels }).png().toBuffer();
+        result.images.push(`data:image/png;base64,${png.toString("base64")}`);
+        try { texts.push(await ocrImage(png)); }
+        catch (error) { result.issues.push(`image page OCR failed: ${error.message}`); }
+      }
+      result.text = texts.filter(Boolean).join("\n");
+      return result;
+    }
     // native decoders interpret the content rather than the filename or MIME header.
     const png = await source.png().toBuffer();
     result.images.push(`data:image/png;base64,${png.toString("base64")}`);

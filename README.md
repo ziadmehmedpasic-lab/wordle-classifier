@@ -64,7 +64,7 @@ Bans today's word, plus yesterday's and tomorrow's (covers timezones). Moving to
 - `llm.js` — layer 3, Claude-based meaning classifier (hints, riddles, translations, images)
 - `audio.js` — speech-to-text for voice messages, audio files and video soundtracks (OpenAI)
 - `gifs.js` — Tenor/Giphy tag and description lookup for GIF links
-- `frames.js` — ffmpeg frame sampling so OCR covers every frame of a GIF or video
+- `frames.js` — bounded ffmpeg decoding with explicit coverage results
 - `index.js` — Discord wiring: messages, edits, attachments, OCR, speech-to-text, reactions, names
 - `ml/` — layer 2: data generation, training, evaluation and serving for the fine-tuned classifier (Python, `uv`); see `ml/pyproject.toml`
 - `test/detector.test.js` — 132 targeted cases + generic sweep + false-positive sweep
@@ -116,7 +116,7 @@ Attempts feed the red-team ledger: `GET /api/attempts` returns the newest 500 as
 | Hidden in other content | URLs, custom emoji names, file names, embeds, link previews, polls, stickers, forwarded messages |
 | Attachments | `.txt`/`.md`/`.csv` contents, and **screenshots via OCR** |
 | GIF links | Tenor and Giphy URLs: the slug in the link, plus the post's tags, title and description from the provider API (needs `TENOR_API_KEY` / `GIPHY_API_KEY`); the tags also go to the LLM layer |
-| GIF and video frames | uploaded GIFs, gif link previews and videos are split into frames with ffmpeg (up to 20 per clip, near-duplicates dropped) and every frame is OCR'd, so text on a later frame or one letter per frame is read. Plain OCR reads only the first frame |
+| GIF and video frames | GIFs and videos are decoded in order (up to 300 frames / 120 seconds). Only exact consecutive pixel duplicates skip OCR. Changed frames also reach vision; hitting a cap reports incomplete inspection |
 | Speech | Discord **voice messages**, uploaded audio (`mp3/ogg/wav/m4a/flac/webm`) and the soundtrack of uploaded videos (`mp4/mov/webm`) are transcribed, then run through every text check and the LLM layer |
 | Fragments across messages | `w` `a` `g` `e` `r` or `wa` `ger` as separate messages (all deleted) |
 | Edits and link previews | messages re-scanned on edit and when embeds resolve |
@@ -170,7 +170,7 @@ hints, clean chat) as both voice-message ogg and mp4. macOS only, it uses `say` 
 
 ## What it cannot catch
 - Live speech in voice channels
-- Text shown on screen inside videos (only the soundtrack is transcribed)
+- Video frames beyond the configured frame/duration limits, and additional video/subtitle tracks
 - Private DMs between members
 - Without the LLM layer: hints, riddles, synonyms, translations
 - Without the audio layer: voice messages and audio/video files
@@ -180,3 +180,5 @@ hints, clean chat) as both voice-message ogg and mp4. macOS only, it uses `say` 
 - Acrostic detection can misfire: `star every` on a `stare` day. Disable with `CATCH_ACROSTICS=false`.
 - The word-boundary rule misfires on rare collisions: `the mailman` on an `email` day. Measured at 5 extra hits per 73,000 benign message/answer pairs.
 - Deliberately not caught by the pattern layer, left to the LLM layer: the answer inside a real word (`delightful` on a `light` day), anagrams and homophones that are real words (`panel`, `plain` for `plane`), acrostics with many filler words, last letters of words. See `test/attacks_open.json`.
+
+Media inspection preserves single-frame changes and reads multi-page native images within the page cap. OCR tries rotations, light/dark transparency backgrounds, scaling and contrast normalization. It uses a serialized worker with a timeout; failures remain visible. `npm run test:ocr` exercises real Tesseract against upright, rotated, transparent, low-contrast and blank fixtures (English language data may download on the first run). Vision processes every retained image in batches of at most 20; batch boundaries are reported because clues spanning batches can be missed. Silent video does not require speech transcription. Additional audio tracks and audio beyond the duration cap remain unscanned.

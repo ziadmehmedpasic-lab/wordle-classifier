@@ -76,15 +76,21 @@ async function extractAsset(asset, { ocrImage }) {
       if (clip.contentType.startsWith("video/") || clip.contentType === "image/gif") {
         if (!frames.cfg.enabled) result.issues.push("frame inspection disabled");
         else {
-          for (const frame of await frames.sample(input, dir)) texts.push(await ocrImage(frame));
-          result.issues.push("animation inspected by sampling only");
+          const visual = await frames.inspectFile(input, ocrImage);
+          texts.push(visual.text);
+          result.images.push(...visual.images);
+          result.issues.push(...visual.issues);
         }
       }
-      if (audio.kind(clip)) {
+      const metadata = await frames.probe(input);
+      const tracks = metadata.streams.filter((stream) => stream.codec_type === "audio");
+      if (tracks.length) {
         if (!audio.cfg.enabled) result.issues.push("audio inspection disabled");
         else {
-          texts.push(await audio.transcribeFile(input, { name: clip.name }));
-          result.issues.push("audio inspected within duration cap only");
+          const duration = Number(metadata.format.duration);
+          texts.push(await audio.transcribeFile(input, { name: clip.name, duration }));
+          if (!Number.isFinite(duration) || duration > audio.cfg.maxSeconds) result.issues.push("audio duration exceeds limit or is unknown");
+          if (tracks.length > 1) result.issues.push("additional audio tracks are unscanned");
         }
       }
     } catch (error) { result.issues.push(`media inspection failed: ${error.message}`); }
@@ -124,6 +130,7 @@ async function inspectMessage(message, { ocrImage, context = [], extract = extra
     const result = await judge.classify({ text, answers: detector.getAnswers(), context, imageUrls: judge.cfg.vision ? images : [] });
     if (!result) issues.push("meaning classifier failed");
     else if (judge.shouldDelete(result)) return { status: "spoiler", hit: result.verdict, text, issues };
+    else if (result.issues) issues.push(...result.issues);
   } else if (!judge.cfg.enabled) issues.push("meaning classifier disabled");
   return { status: issues.length ? "unscanned" : "clean", text, issues };
 }

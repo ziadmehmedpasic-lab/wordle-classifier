@@ -4,10 +4,11 @@
   "description": "Discord bot that deletes Wordle spoilers: pattern matching, OCR, speech-to-text, and an LLM layer",
   "main": "index.js",
   "scripts": {
-    "test": "node test/detector.test.js && node test/attacks.test.js && node test/audio.unit.test.js && node test/gifs.test.js && node test/frames.unit.test.js && node --test test/inspection.test.js test/documents.test.js",
+    "test": "node test/detector.test.js && node test/attacks.test.js && node test/audio.unit.test.js && node test/gifs.test.js && node test/frames.unit.test.js && node --test test/inspection.test.js test/documents.test.js test/media.test.js",
     "eval:data": "node test/eval_data.js",
     "start": "node index.js",
     "test:llm": "node test/llm.test.js",
+    "test:ocr": "node --test test/ocr.test.js",
     "test:audio": "node test/audio.test.js",
     "build:web": "node web/build.js"
   },
@@ -25,6 +26,7 @@
     "dotenv": "^17.4.2",
     "double-metaphone": "^2.0.1",
     "ffmpeg-static": "^5.3.0",
+    "ffprobe-static": "^3.1.0",
     "file-type": "^22.0.2",
     "openai": "^7.10.0",
     "pdfjs-dist": "^6.3.289",

@@ -92,7 +92,7 @@ async function transcribeFile(inputPath, { name = path.basename(inputPath), dura
   const dir = await fs.promises.mkdtemp(path.join(os.tmpdir(), "wordle-audio-"));
   const out = path.join(dir, "audio.ogg");
   try {
-    const stderr = await ffmpeg(["-y", "-i", inputPath, "-vn", "-ac", "1", "-ar", "16000", "-c:a", "libopus", "-b:a", "24k", "-t", String(cfg.maxSeconds), out]);
+    const stderr = await ffmpeg(["-y", "-xerror", "-protocol_whitelist", "file,pipe", "-i", inputPath, "-map", "0:a:0", "-vn", "-ac", "1", "-ar", "16000", "-c:a", "libopus", "-b:a", "24k", "-t", String(cfg.maxSeconds), out]);
     const seconds = duration ?? parseDuration(stderr);
     const result = await client.audio.transcriptions.create({ file: fs.createReadStream(out), model: cfg.model });
     const text = (result.text || "").trim();

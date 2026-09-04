@@ -40,21 +40,21 @@ async function check(name, fn) {
   await check("distinct frames kept, held frames dropped", async () => {
     const out = fs.mkdtempSync(path.join(dir, "s1-"));
     const got = await frames.sample(five, out);
-    assert.strictEqual(got.length, 5, `got ${got.length} frames`);
+    assert.strictEqual(got.files.length, 5, `got ${got.files.length} frames`);
   });
   await check("a static gif is one frame", async () => {
     const out = fs.mkdtempSync(path.join(dir, "s2-"));
-    assert.strictEqual((await frames.sample(still, out)).length, 1);
+    assert.strictEqual((await frames.sample(still, out)).files.length, 1);
   });
   await check("mp4 samples too", async () => {
     const out = fs.mkdtempSync(path.join(dir, "s3-"));
-    assert.strictEqual((await frames.sample(mp4, out)).length, 2);
+    assert.strictEqual((await frames.sample(mp4, out)).files.length, 2);
   });
   await check("frame cap", async () => {
     const out = fs.mkdtempSync(path.join(dir, "s4-"));
     const saved = frames.cfg.maxFrames;
     frames.cfg.maxFrames = 3;
-    try { assert.strictEqual((await frames.sample(five, out)).length, 3); } finally { frames.cfg.maxFrames = saved; }
+    try { const result = await frames.sample(five, out); assert.ok(result.issues.includes("video frame limit exceeded")); assert.strictEqual(result.count, 3); } finally { frames.cfg.maxFrames = saved; }
   });
 
   // serve the gif over http and fake the per-frame ocr: frame k reads as the k-th letter of the answer
@@ -66,23 +66,24 @@ async function check(name, fn) {
   await new Promise((r) => server.listen(0, r));
   const url = `http://127.0.0.1:${server.address().port}/five.gif`;
   let calls = 0;
-  const fakeOcr = async () => "wager"[calls++] || "";
+  const fakeOcr = async () => "wager"[calls++ % 5] || "";
+  const downloadFile = async (url) => Buffer.from(await (await fetch(url)).arrayBuffer());
   await check("one letter per frame reads as the word", async () => {
-    const text = await frames.ocr(url, fakeOcr, { id: "att1", name: "five.gif" });
-    assert.strictEqual(text, "w \n a \n g \n e \n r");
+    const text = await frames.ocr(url, fakeOcr, { id: "att1", name: "five.gif", downloadFile });
+    assert.strictEqual(text, "w\na\ng\ne\nr");
     detector.setAnswers(["wager"]);
     assert.strictEqual(detector.scan(text), "wager");
   });
-  await check("cached per attachment id", async () => {
+  await check("media is re-read rather than cached by a mutable URL", async () => {
     const before = calls;
-    await frames.ocr(url, fakeOcr, { id: "att1", name: "five.gif" });
-    assert.strictEqual(calls, before);
+    await frames.ocr(url, fakeOcr, { id: "att1", name: "five.gif", downloadFile });
+    assert.ok(calls > before);
   });
   await check("oversize is skipped", async () => {
-    assert.strictEqual(await frames.ocr(url, fakeOcr, { id: "att2", name: "big.gif", size: 10 ** 9 }), "");
+    await assert.rejects(frames.ocr(url, fakeOcr, { name: "big.gif", size: 10 ** 9 }), /byte limit/);
   });
-  await check("download failure gives empty text", async () => {
-    assert.strictEqual(await frames.ocr(url.replace("five", "missing"), fakeOcr, { id: "att3" }), "");
+  await check("download failure is reported", async () => {
+    await assert.rejects(frames.ocr(url.replace("five", "missing"), fakeOcr, { downloadFile }));
   });
   server.close();
   fs.rmSync(dir, { recursive: true, force: true });

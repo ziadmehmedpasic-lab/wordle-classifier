@@ -5,6 +5,9 @@
 // Runs only after detector.js finds nothing.
 // =====================================================================
 const Anthropic = require("@anthropic-ai/sdk");
+const { readFileSync } = require("node:fs");
+const path = require("node:path");
+const prompt = readFileSync(path.join(__dirname, "prompts/moderation.md"), "utf8");
 
 const cfg = {
   enabled: false,
@@ -13,7 +16,6 @@ const cfg = {
   hintThreshold: Number(process.env.LLM_HINT_THRESHOLD || 0.7),
   vision: (process.env.LLM_VISION || "true").toLowerCase() === "true",
   contextWindowMs: 10 * 60 * 1000, // after a Wordle mention, scan every message in that channel for this long
-  maxContextMessages: 6,
   effort: process.env.LLM_EFFORT || "low",
 };
 
@@ -38,15 +40,15 @@ const channelHot = new Map(); // channelId -> timestamp of last Wordle-related m
 
 function noteContext(channelId, text) {
   if (SUSPICIOUS.test(text || "")) channelHot.set(channelId, Date.now());
+  if (channelHot.size > 1000) channelHot.delete(channelHot.keys().next().value);
 }
 function shouldCheck(channelId, text, hasImage, hasTranscript = false) {
   if (!cfg.enabled) return false;
   if (cfg.mode === "all") return true;
-  if (hasTranscript) return true; // speech uploads are rare and already paid for; always judge them
+  if (hasImage || hasTranscript) return true; // extracted media must reach the meaning check
   if (SUSPICIOUS.test(text || "")) return true;
   const hot = channelHot.get(channelId);
   if (hot && Date.now() - hot < cfg.contextWindowMs) return true;
-  if (hasImage && hot) return true;
   return false;
 }
 
@@ -59,40 +61,41 @@ const SCHEMA = {
   required: ["verdict", "confidence", "reason"],
   properties: {
     verdict: { type: "string", enum: ["spoiler", "hint", "clean"] },
-    confidence: { type: "number", minimum: 0, maximum: 1 },
+    confidence: { type: "number", description: "Confidence from 0 to 1 inclusive." },
     reason: { type: "string" },
   },
 };
 
 function systemPrompt(answers) {
-  return `You moderate a Discord server that plays the daily Wordle. Your only job is to decide whether a message gives away the Wordle answer.
-
-The current answers (today, and yesterday/tomorrow for other timezones) are: ${answers.map((a) => a.toUpperCase()).join(", ")}.
-Treat each of these as protected. Anything that lets a reader work out one of these words without playing counts.
-
-Verdicts:
-- "spoiler": the message states or unmistakably reveals a protected word. Includes the word itself in any disguise, its translation into another language, its plural or verb form, a definition that fits almost only that word, a screenshot or description of a solved grid showing the word, an anagram or cipher with the key given, or spelling the word out through initials, emoji, or a sequence of clues.
-- "hint": the message narrows the answer substantially but does not fully reveal it. Includes rhymes, synonyms, "starts with W", "double letter", "it's a gambling term", letter positions, "same as yesterday's answer but one letter off", or naming a category that contains only a few five-letter words.
-- "clean": normal conversation. Includes standard share grids (coloured squares with no letters), scores like 4/6, saying it was hard or easy, and discussion that does not narrow the answer. A message that uses a protected word's meaning coincidentally, with no Wordle framing and no way to infer the puzzle answer, is clean.
-
-Be strict about spoilers and hints that reference Wordle, the puzzle, "the word", or the day's answer. Be lenient with ordinary chat that has nothing to do with the puzzle. Consider the recent messages provided as context: a sequence of innocent-looking messages can together spell or hint at the word.
-
-Text marked [voice transcript] came from speech-to-text: letters may appear spelled out, joined, or as homophones, and non-English speech is transcribed in its original language.
-
-Confidence is how sure you are of the verdict, from 0 to 1. Keep the reason to one sentence.`;
+  return prompt.replace("{{answers}}", answers.map((answer) => answer.toUpperCase()).join(", "));
 }
 
-async function classify({ text, answers, context = [], imageUrls = [] }) {
-  if (!cfg.enabled || !client) return null;
+async function classify({ text, answers, context = [], imageUrls = [] }, judgeClient = client) {
+  if (!cfg.enabled || !judgeClient) return null;
+  if (imageUrls.length > 20) {
+    let failed = false;
+    let result = null;
+    for (let start = 0; start < imageUrls.length; start += 20) {
+      const batch = await classify({ text, answers, context, imageUrls: imageUrls.slice(start, start + 20) }, judgeClient);
+      if (!batch) failed = true;
+      else if (shouldDelete(batch)) return batch;
+      else result = batch;
+    }
+    return failed ? null : { ...result, issues: ["vision evaluated in separate batches; cross-batch visual clues may be missed"] };
+  }
   const content = [];
   if (context.length) {
-    content.push({ type: "text", text: "Recent messages in this channel, oldest first:\n" + context.map((c) => `- ${c.author}: ${c.text}`).join("\n") });
+    content.push({ type: "text", text: JSON.stringify({ recent_messages: context }) });
   }
-  for (const url of imageUrls.slice(0, 3)) content.push({ type: "image", source: { type: "url", url } });
-  content.push({ type: "text", text: `Message to judge:\n${text || "(no text, see attached image)"}` });
+  for (const url of imageUrls) {
+    const data = /^data:(image\/(?:png|jpeg|webp|gif));base64,(.+)$/.exec(url);
+    const source = data ? { type: "base64", media_type: data[1], data: data[2] } : { type: "url", url };
+    content.push({ type: "image", source });
+  }
+  content.push({ type: "text", text: JSON.stringify({ message: text || "(no text, see attached image)" }) });
 
   try {
-    const response = await client.beta.messages.create({
+    const response = await judgeClient.beta.messages.create({
       model: cfg.model,
       max_tokens: 400,
       betas: ["server-side-fallback-2026-07-01"],
@@ -100,11 +103,12 @@ async function classify({ text, answers, context = [], imageUrls = [] }) {
       output_config: { effort: cfg.effort, format: { type: "json_schema", schema: SCHEMA } },
       system: [{ type: "text", text: systemPrompt(answers), cache_control: { type: "ephemeral", ttl: "1h" } }],
       messages: [{ role: "user", content }],
-    });
-    if (response.stop_reason === "refusal") return { verdict: "clean", confidence: 0, reason: "model refused" };
+    }, { timeout: 30_000, maxRetries: 0 });
+    if (["refusal", "max_tokens"].includes(response.stop_reason)) return null;
     const block = response.content.find((b) => b.type === "text");
     if (!block) return null;
     const parsed = JSON.parse(block.text);
+    if (!parsed || !["spoiler", "hint", "clean"].includes(parsed.verdict) || typeof parsed.confidence !== "number" || !Number.isFinite(parsed.confidence) || parsed.confidence < 0 || parsed.confidence > 1 || typeof parsed.reason !== "string" || Object.keys(parsed).some((key) => !["verdict", "confidence", "reason"].includes(key))) throw new Error("invalid judge response");
     parsed.usage = response.usage;
     return parsed;
   } catch (e) {

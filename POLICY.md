@@ -32,15 +32,25 @@ text, so it is never generated as a spoiler example and the detector treats it a
   never names the rule that fired.
 - Any inference failure (scorer timeout, API error, OCR failure) keeps the message and logs
   the failure. Nothing is deleted on an error path.
+- Inspection distinguishes `clean`, `spoiler`, and `unscanned`. Unsupported content,
+  exceeded limits, disabled required layers and processing failures are reported as
+  `unscanned`, never as a successful clean scan. Positive spoiler evidence from another
+  successfully inspected part can still remove the message.
+- Captions, forwarded content, attachments, OCR and transcripts are judged together.
+  Other bots and webhooks receive the same checks as members; only this bot's own messages
+  are excluded.
 - An admin command drops the bot to log-only at runtime; `DRY_RUN=true` does the same at
   startup.
 
 ## Which answers are protected
 
 Today's answer only, where "today" is computed in the configured server timezone
-(`TIMEZONE`). `ANSWER_WINDOW_DAYS` widens this to also protect the previous N days for
+(`TIMEZONE`, default UTC). `ANSWER_WINDOW_DAYS` widens this to also protect the previous N days (0-31) for
 late-night players in other timezones; the default is 0. Yesterday's answer is fair game once
 the day rolls over. Tomorrow's answer is never fetched.
+
+If the current date's answer cannot be fetched and validated, moderation is suspended rather
+than using an answer from outside that window. Failed fetches retry after one minute.
 
 ## Detector confidence tiers
 
@@ -55,6 +65,21 @@ The pattern detector reports one of two tiers.
   own; passed to the scorer as evidence.
 
 ## Consent and data
+
+- When enabled, status/activity text and available profile avatars/banners are inspected
+  using the same layers as messages. Members must be informed of this coverage. Statuses,
+  account images and inaccessible profile fields cannot be cleared by the bot; findings
+  require moderator action. Timeout alone does not remove those fields.
+- Server channel topics/tags, event descriptions/images, role icons and emoji/sticker
+  images are inspected on changes and answer rollover. Confirmed spoilers are cleared
+  only when the bot has the necessary permissions; otherwise moderators are alerted.
+- Surface alerts contain generic outcomes and resource IDs, never spoiler text or images.
+- Incomplete scans also produce moderator alerts when `MOD_LOG_CHANNEL_ID` is configured.
+  Alerts aggregate counts, generic reason categories and up to three sample resource IDs
+  per guild at most once a minute. Failed deliveries retry; raw content is never included.
+- Bounded recent conversation is held in process memory for ten minutes (up to 24 messages
+  per channel, 4,000 characters each) to detect coordinated clues. Edits replace the old
+  content and deletions remove it. Nothing from this context buffer is persisted.
 
 - Members are told that message text, and images posted as attachments, may be sent to
   Anthropic's API and to the project's own scorer endpoint for classification.

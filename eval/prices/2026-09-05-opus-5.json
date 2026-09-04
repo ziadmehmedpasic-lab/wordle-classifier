@@ -1,0 +1,11 @@
+{
+  "model": "claude-opus-5",
+  "source": "https://platform.claude.com/docs/en/about-claude/pricing",
+  "checkedAt": "2026-09-05",
+  "unit": "USD per million tokens, standard global API",
+  "input": 5,
+  "output": 25,
+  "cacheRead": 0.5,
+  "cacheWrite5m": 6.25,
+  "cacheWrite1h": 10
+}

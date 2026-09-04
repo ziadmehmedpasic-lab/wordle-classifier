@@ -7,6 +7,7 @@ import pytest
 
 from scripts.generate import (
     EXAMPLES_SCHEMA,
+    STYLES,
     Config,
     build_prompt,
     build_request,
@@ -14,7 +15,9 @@ from scripts.generate import (
     main,
     parse_examples,
     pick_words,
+    style_plan,
 )
+from spoiler.labels import Label
 
 PAYLOAD = {
     "examples": [
@@ -56,7 +59,8 @@ def test_build_request_fills_template_and_schema():
     user = prompt.messages[0]["content"]
     assert isinstance(user, str)
     assert "WAGER" in user
-    assert "1 direct, 2 strong_hint, 3 weak_hint and 4 benign examples" in user
+    assert "Styles to produce, one example each:" in user
+    assert "- weak_hint: " in user
     assert "spoiler filter" in user
     assert "cache_control" in prompt.system[0]
     req = build_request(cfg, "wager", "evade")
@@ -64,6 +68,17 @@ def test_build_request_fills_template_and_schema():
     assert req.get("output_config") == {
         "format": {"type": "json_schema", "schema": EXAMPLES_SCHEMA}
     }
+
+
+def test_style_plan_is_deterministic_and_cycles():
+    cfg = Config(n_direct=2, n_strong=1, n_weak=9, n_benign=3, seed=4)
+    plan = style_plan(cfg, "wager", "casual")
+    assert plan == style_plan(cfg, "wager", "casual")
+    assert plan != style_plan(cfg, "stare", "casual")
+    assert len(plan[Label.DIRECT]) == 2 and len(set(plan[Label.DIRECT])) == 2
+    # only four weak styles exist, so nine picks cycle through them
+    assert len(plan[Label.WEAK_HINT]) == 9 and set(plan[Label.WEAK_HINT]) == set(STYLES[20:24])
+    assert set(plan[Label.BENIGN]) == {"wordle_chat", "chat", "hard_benign"}
 
 
 def test_parse_examples_records():

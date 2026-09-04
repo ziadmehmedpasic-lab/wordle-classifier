@@ -23,12 +23,19 @@ ML_DIR = Path(__file__).resolve().parent.parent
 PROMPTS_DIR = ML_DIR / "prompts"
 DATA_DIR = ML_DIR / "data"
 
-STYLES = [
-    "plain", "leet", "separators", "vertical", "lookalike", "emoji", "acrostic",
-    "capitalization", "hidden", "inflection", "url", "definition", "synonym", "rhyme",
-    "positional", "translation", "crossword", "rebus", "reference", "sequence", "category",
-    "letter", "count", "theme", "wordle_chat", "chat", "hard_benign",
-]  # fmt: skip
+STYLES_BY_LABEL: dict[Label, list[str]] = {
+    Label.DIRECT: [
+        "plain", "leet", "separators", "vertical", "lookalike", "emoji", "acrostic",
+        "capitalization", "hidden", "inflection", "url",
+    ],
+    Label.STRONG_HINT: [
+        "definition", "synonym", "rhyme", "positional", "translation", "crossword", "rebus",
+        "reference", "sequence",
+    ],
+    Label.WEAK_HINT: ["category", "letter", "count", "theme"],
+    Label.BENIGN: ["wordle_chat", "chat", "hard_benign"],
+}  # fmt: skip
+STYLES = [style for styles in STYLES_BY_LABEL.values() for style in styles]
 
 EXAMPLES_SCHEMA = {
     "type": "object",
@@ -105,11 +112,29 @@ def pick_words(cfg: Config) -> list[str]:
     return random.Random(cfg.seed).sample(words, cfg.n_words)
 
 
-def counts_text(cfg: Config) -> str:
-    return (
-        f"{cfg.n_direct} direct, {cfg.n_strong} strong_hint, {cfg.n_weak} weak_hint "
-        f"and {cfg.n_benign} benign examples"
-    )
+def style_plan(cfg: Config, word: str, template: str) -> dict[Label, list[str]]:
+    """which styles this request must produce, sampled per (word, template) so coverage is
+    even across a run. cycles through the label's styles when more are asked than exist."""
+    rng = random.Random(f"{cfg.seed}:{word}:{template}")
+    wanted = {
+        Label.DIRECT: cfg.n_direct,
+        Label.STRONG_HINT: cfg.n_strong,
+        Label.WEAK_HINT: cfg.n_weak,
+        Label.BENIGN: cfg.n_benign,
+    }
+    plan: dict[Label, list[str]] = {}
+    for label, n in wanted.items():
+        styles = STYLES_BY_LABEL[label]
+        picks: list[str] = []
+        while len(picks) < n:
+            picks += rng.sample(styles, min(len(styles), n - len(picks)))
+        plan[label] = picks
+    return plan
+
+
+def plan_text(plan: dict[Label, list[str]]) -> str:
+    lines = [f"- {label.value}: {', '.join(styles)}" for label, styles in plan.items()]
+    return "Styles to produce, one example each:\n" + "\n".join(lines)
 
 
 @dataclass(frozen=True)
@@ -121,7 +146,7 @@ class Prompt:
 def build_prompt(cfg: Config, word: str, template: str) -> Prompt:
     system = (PROMPTS_DIR / "gen_examples.md").read_text()
     user = (PROMPTS_DIR / "gen_templates" / f"{template}.md").read_text()
-    user = user.format(answer=word.upper(), counts=counts_text(cfg))
+    user = user.format(answer=word.upper(), plan=plan_text(style_plan(cfg, word, template)))
     return Prompt(
         system=[{"type": "text", "text": system, "cache_control": {"type": "ephemeral"}}],
         messages=[{"role": "user", "content": user}],

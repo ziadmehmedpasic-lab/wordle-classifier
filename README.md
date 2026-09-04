@@ -8,6 +8,18 @@ Swiss-cheese defense. Each layer has holes; they don't line up.
 
 Everything is turned into text first: message content, embeds, polls, names, reactions; images via OCR; voice, audio and video via speech-to-text.
 
+`inspection.js` combines captions, attachment text, OCR and speech before both pattern and
+meaning checks. It traverses forwarded snapshots and nested components, and includes embed
+images and thumbnails. Images and extracted attachments trigger the judge even in a channel
+with no previous Wordle discussion. All supplied images reach vision, including the fourth
+and later images. Bots, webhooks and startup backlog messages receive meaning checks too.
+This increases API usage compared with checking only member messages in active conversations.
+
+Inspection results are `clean`, `spoiler`, or `unscanned`. Unsupported content and incomplete
+processing are logged; they do not cause deletion. A detected spoiler in another inspected
+part still causes deletion. A clean result is a classifier decision, not a guarantee against
+every possible encoding.
+
 | layer | catches | misses |
 |---|---|---|
 | 1. Pattern detector (`detector.js`) | the answer's letters in any disguise | meaning |

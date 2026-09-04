@@ -32,6 +32,13 @@ text, so it is never generated as a spoiler example and the detector treats it a
   never names the rule that fired.
 - Any inference failure (scorer timeout, API error, OCR failure) keeps the message and logs
   the failure. Nothing is deleted on an error path.
+- Inspection distinguishes `clean`, `spoiler`, and `unscanned`. Unsupported content,
+  exceeded limits, disabled required layers and processing failures are reported as
+  `unscanned`, never as a successful clean scan. Positive spoiler evidence from another
+  successfully inspected part can still remove the message.
+- Captions, forwarded content, attachments, OCR and transcripts are judged together.
+  Other bots and webhooks receive the same checks as members; only this bot's own messages
+  are excluded.
 - An admin command drops the bot to log-only at runtime; `DRY_RUN=true` does the same at
   startup.
 

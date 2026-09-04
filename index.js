@@ -5,6 +5,7 @@ const llm = require("./llm");
 const audio = require("./audio");
 const gifs = require("./gifs");
 const frames = require("./frames");
+const { inspectMessage } = require("./inspection");
 
 const env = (k, d) => (process.env[k] ?? d).toString().toLowerCase() === "true";
 const TOKEN = process.env.DISCORD_TOKEN;
@@ -79,63 +80,11 @@ async function getOcr() {
 }
 let OCR_IMAGES_FAILED = false;
 async function ocrImage(url) {
-  if (OCR_IMAGES_FAILED) return "";
+  if (OCR_IMAGES_FAILED) throw new Error("OCR worker unavailable");
   const w = await getOcr();
-  if (!w) return "";
-  try {
-    const { data } = await w.recognize(url);
-    return data.text || "";
-  } catch (e) { console.warn("OCR failed:", e.message); return ""; }
-}
-
-// ---------------------------------------------------------------------
-// Collect every piece of text a message can carry
-// ---------------------------------------------------------------------
-function collectText(message) {
-  const bits = [message.content || ""];
-  for (const e of message.embeds || []) {
-    bits.push(e.title, e.description, e.url, e.author?.name, e.footer?.text, e.provider?.name);
-    for (const f of e.fields || []) bits.push(f.name, f.value);
-  }
-  for (const a of message.attachments?.values?.() || []) bits.push(a.name, a.description, a.title);
-  for (const s of message.stickers?.values?.() || []) bits.push(s.name, s.description);
-  if (message.poll) {
-    bits.push(message.poll.question?.text);
-    for (const ans of message.poll.answers?.values?.() || []) bits.push(ans.text);
-  }
-  for (const snap of message.messageSnapshots?.values?.() || []) bits.push(snap.content);
-  for (const c of message.components || []) for (const r of c.components || []) bits.push(r.label, r.content);
-  return bits.filter(Boolean).join(" \n ");
-}
-
-async function collectSlowText(message) {
-  const bits = [];
-  for (const a of message.attachments?.values?.() || []) {
-    const type = a.contentType || "";
-    if ((type.startsWith("text/") || /\.(txt|md|csv|json|log)$/i.test(a.name || "")) && a.size < 200_000) {
-      try { const r = await fetch(a.url); bits.push(await r.text()); } catch { /* ignore */ }
-    } else if (frames.kind(a)) {
-      bits.push(await frames.ocr(a.url, ocrImage, { id: a.id, name: a.name, size: a.size })); // every frame of a gif or video
-    } else if (/^image\/(png|jpe?g|webp|bmp)/.test(type) && a.size < 8_000_000) {
-      bits.push(await ocrImage(a.url));
-    }
-  }
-  for (const e of message.embeds || []) {
-    if (!OCR_IMAGES) break;
-    const media = frames.embedMedia(e); // gif link previews (tenor, giphy, direct .gif links)
-    const img = e.image?.url || e.thumbnail?.url;
-    if (media) bits.push(await frames.ocr(media, ocrImage, { id: media, name: media }));
-    else if (img) bits.push(await ocrImage(img));
-  }
-  return bits.filter(Boolean).join(" \n ");
-}
-
-// Voice messages, audio files and video soundtracks, as text. Link-preview videos are
-// skipped: their embed url is a player page, not a media file.
-async function collectTranscripts(message) {
-  const bits = [];
-  for (const a of message.attachments?.values?.() || []) if (audio.kind(a)) bits.push(await audio.transcribe(a));
-  return bits.filter(Boolean).join(" \n ");
+  if (!w) throw new Error("OCR disabled or unavailable");
+  const { data } = await w.recognize(url);
+  return data.text || "";
 }
 
 // ---------------------------------------------------------------------
@@ -233,53 +182,11 @@ async function handleMessage(message, { fromBacklog = false } = {}) {
   if (!detector.getAnswers().length) return;
   if (!fromBacklog) checkMember(message.member).catch((e) => console.error("Member:", e.message));
 
-  const text = collectText(message);
-
-  // Fast path: text
-  const hit = detector.scan(text);
-  if (hit) return removeMessage(message, hit, "text");
-
-  // GIF links: tags and descriptions from the Tenor/Giphy APIs, before any pixels are looked at
-  const gifText = await gifs.describe(text);
-  if (gifText) {
-    const hitGif = detector.scan(gifText);
-    if (hitGif) return removeMessage(message, hitGif, "gif tags");
-  }
-
-  // Slow path: text attachments, image OCR, speech-to-text
-  const imageUrls = [...(message.attachments?.values?.() || [])].filter((a) => /^image\/(png|jpe?g|webp|gif)/.test(a.contentType || "")).map((a) => a.url);
-  let transcript = "";
-  if (message.attachments?.size || message.embeds?.some((e) => e.image || e.thumbnail || e.video)) {
-    const slow = await collectSlowText(message);
-    const hit2 = detector.scan(slow);
-    if (hit2) return removeMessage(message, hit2, "attachment/ocr");
-    transcript = await collectTranscripts(message);
-    const hit3 = detector.scan(transcript);
-    if (hit3) return removeMessage(message, hit3, "audio");
-  }
-
-  // LLM layer: meaning-based hints, riddles, synonyms, translations, solved-grid screenshots, spoken hints
-  if (!fromBacklog && !message.author?.bot) {
-    const llmText = [text, transcript && `[voice transcript]: ${transcript}`, gifText && `[gif tags]: ${gifText}`].filter(Boolean).join("\n");
-    llm.noteContext(message.channelId, llmText);
-    const context = (channelHistory.get(message.channelId) || []).slice();
-    remember(message, llmText);
-    if (llm.shouldCheck(message.channelId, llmText, imageUrls.length > 0, Boolean(transcript))) {
-      const result = await llm.classify({ text: llmText, answers: detector.getAnswers(), context, imageUrls: llm.cfg.vision ? imageUrls : [] });
-      if (result) {
-        const u = result.usage || {};
-        console.log(`LLM verdict: ${result.verdict} (${result.confidence}) "${llmText.slice(0, 60)}" — ${result.reason} [in ${u.input_tokens ?? "?"} / cached ${u.cache_read_input_tokens ?? 0} / out ${u.output_tokens ?? "?"}]`);
-        if (llm.shouldDelete(result) && canManage(message.channel)) {
-          try {
-            await message.delete();
-            console.log(`Deleted ${result.verdict} (LLM) from ${message.author?.tag} in #${message.channel.name}`);
-            await warn(message, result.verdict === "spoiler" ? "gave away" : "hinted at");
-          } catch (e) { console.error("Failed to delete:", e.message); }
-          return;
-        }
-      }
-    }
-  }
+  const context = (channelHistory.get(message.channelId) || []).slice();
+  const result = await inspectMessage(message, { ocrImage, context });
+  if (result.issues.length) console.warn(`Incomplete inspection ${message.id}: ${result.issues.join("; ")}`);
+  if (result.status === "spoiler") return removeMessage(message, result.hit, "inspection");
+  if (!fromBacklog) remember(message, result.text);
 
   if (fromBacklog || message.author?.bot) return;
   const ids = trackFragments(message);

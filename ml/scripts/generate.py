@@ -4,6 +4,7 @@ every record keeps its answer, label, style, template and generator so splits ca
 
 import json
 import random
+import re
 import time
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
@@ -218,6 +219,28 @@ def parse_examples(text: str, word: str, template: str, model: str, prefix: str)
     return records
 
 
+def contains_answer(text: str, answer: str) -> bool:
+    """the answer or a plain inflection of it as a whole word. per POLICY.md that is direct, so a
+    non-direct example containing it is mislabeled. word-boundary runs like "saw a german" are
+    deliberately not matched."""
+    stem = answer[:-1] if answer.endswith("e") else answer
+    pattern = rf"\b(?:{answer}(?:s|es|d|ed|r|er|est|ing)?|{stem}ing)\b"
+    return re.search(pattern, text.lower()) is not None
+
+
+def drop_mislabeled(records: list[Record]) -> list[Record]:
+    """non-direct records whose text or context states the answer teach the scorer to keep
+    what the policy deletes. the generator produces a few per run despite the prompt."""
+    kept = []
+    for r in records:
+        texts = [r.text] + [c["text"] for c in r.context]
+        if r.label != Label.DIRECT and any(contains_answer(t, r.answer) for t in texts):
+            print(f"dropped {r.label}/{r.style} for {r.answer}: {r.text!r}")
+            continue
+        kept.append(r)
+    return kept
+
+
 def estimate(client: anthropic.Anthropic, cfg: Config, jobs: list[tuple[str, str]]) -> float:
     """usd for the whole run, from one real token count and a guessed output length."""
     word, template = jobs[0]
@@ -289,6 +312,7 @@ def main(cfg: Config, client: anthropic.Anthropic | None = None) -> Path | None:
     records = (
         run_direct(client, cfg, jobs) if cfg.mode == "direct" else run_batch(client, cfg, jobs)
     )
+    records = drop_mislabeled(records)
     cfg.out_dir.mkdir(parents=True, exist_ok=True)
     out = cfg.out_dir / f"{date.today().isoformat()}-{cfg.name}.jsonl"
     out.write_text("".join(r.to_json() + "\n" for r in records))

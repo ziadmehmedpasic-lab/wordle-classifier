@@ -42,7 +42,7 @@ Bans today's word, plus yesterday's and tomorrow's (covers timezones). Moving to
 - `ml/` — layer 2: data generation, training, evaluation and serving for the fine-tuned classifier (Python, `uv`); see `ml/pyproject.toml`
 - `test/detector.test.js` — 132 targeted cases + generic sweep + false-positive sweep
 - `test/attacks.json`, `test/attacks_open.json`, `test/ATTACKS.md` — red-team ledger: attacks the detector must catch, and known gaps
-- `test/eval_data.js` — runs the generated ml data through the detector (recall per style, false positives)
+- `test/eval_data.js` — runs the generated ml data through the detector (recall per style, false positives); `--write` stamps each record with `detector_hit` so the classifier is scored only on what reaches it
 - `test/audio.unit.test.js` — offline audio checks; `test/audio.test.js` — live transcription of synthesised clips
 
 ## Layer 1: what the pattern detector catches
@@ -82,6 +82,8 @@ Bans today's word, plus yesterday's and tomorrow's (covers timezones). Moving to
 
 ## Layer 2: fine-tuned classifier (in progress)
 Examples are generated per past answer with Claude, a small model is fine-tuned on `(answer, recent messages, message) -> label`, and served over HTTP for the bot. See `ml/`.
+
+Layer 1 deletes before the classifier runs, so the classifier is trained on everything but evaluated and thresholded only on records with `detector_hit: false` (about 2 in 3 generated records, and almost none of the single-message `direct` ones). Run `node test/eval_data.js --write` after generating to stamp that field.
 
 ## Layer 3: Claude judge (optional, recommended)
 Pattern matching cannot judge meaning. With an Anthropic API key in `.env`, messages that pass the pattern layer

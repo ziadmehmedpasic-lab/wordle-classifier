@@ -11,6 +11,8 @@ from scripts.generate import (
     Config,
     build_prompt,
     build_request,
+    contains_answer,
+    drop_mislabeled,
     estimate,
     main,
     parse_examples,
@@ -110,6 +112,44 @@ def test_parse_examples_records():
             "m",
             "p",
         )
+
+
+def test_contains_answer_matches_word_and_inflections_only():
+    assert contains_answer("el piano lol", "piano")
+    assert contains_answer("got craned by my boss", "crane")
+    assert contains_answer("kept staring at us", "stare")
+    assert contains_answer("keep getting ghosted", "ghost")
+    assert contains_answer("WAGERS everywhere", "wager")
+    assert not contains_answer("saw a german", "wager")
+    assert not contains_answer("wagerbros", "wager")
+    assert not contains_answer("rhymes with pager", "wager")
+
+
+def test_drop_mislabeled_keeps_direct_and_clean_records(capsys):
+    def rec(text: str, label: str, context: list[dict[str, str]] | None = None):
+        return parse_examples(
+            json.dumps(
+                {
+                    "examples": [
+                        {"text": text, "label": label, "style": "chat", "context": context or []}
+                    ]
+                }
+            ),
+            "crane",
+            "t",
+            "m",
+            "p",
+        )[0]
+
+    records = [
+        rec("crane season", "direct"),
+        rec("got craned today", "benign"),
+        rec("rhymes with plane", "strong_hint"),
+        rec("and thats it", "benign", [{"author": "a", "text": "the crane one"}]),
+    ]
+    kept = drop_mislabeled(records)
+    assert [r.text for r in kept] == ["crane season", "rhymes with plane"]
+    assert capsys.readouterr().out.count("dropped") == 2
 
 
 def test_estimate_prices_direct_and_batch(capsys):

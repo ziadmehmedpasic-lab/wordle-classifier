@@ -1942,5 +1942,13 @@
   "decode": "Backslash-slash-backslash-slash drawn as a W: wager. tokenHit strips the symbols and sees 'ager' (a dictionary word) and wildcardHit needs the token to be the answer's length.",
   "worth_catching": true,
   "fp_risk": "Very low. Add multi-character ASCII-art glyphs to the leet table before stripping: \\/\\/ and VV for w, |-| and ]-[ for h, |\\| for n, |_ for l, |\\/| for m, |) for d, |< for k, |> for p. Nothing in ordinary chat contains '\\/\\/'."
+ },
+ {
+  "answer": "wager",
+  "text": "Pager but replace the first letter with vv",
+  "technique": "letter-arithmetic-lookalike",
+  "decode": "pager with p->w = wager, but the edit letter is written as the look-alike pair vv. The arithmetic rule only accepted single-character tokens as the edit letter; it now maps look-alike pairs (vv, rn, cl) to their letter first.",
+  "worth_catching": true,
+  "fp_risk": "Very low: a standalone vv, rn or cl token next to a near-miss word and an instruction verb does not occur in ordinary chat."
  }
 ]

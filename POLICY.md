@@ -101,8 +101,8 @@ Fields: `id`, `answer`, `text`, `label`, `style`, `source`, plus `detector_hit`,
 stamped by `node test/eval_data.js --write` that says whether layer 1 deletes the message before
 any classifier runs; the classifier is benchmarked and thresholded on the records where it is
 false. Style names: `plain`, `leet`,
-`separators`, `unicode`, `emoji`, `encoding`, `acrostic`, `capitalization`, `definition`,
-`synonym`, `rhyme`, `positional`, `translation`, `crossword`, `rebus`, `category`,
+`separators`, `unicode`, `emoji`, `encoding`, `acrostic`, `capitalization`, `phonetic`, `definition`,
+`synonym`, `rhyme`, `positional`, `translation`, `crossword`, `rebus`, `edit`, `category`,
 `wordle_chat`, `chat`, `hard_benign`.
 
 ## Threshold

@@ -101,7 +101,9 @@ class Config:
     n_weak: int = 3
     n_benign: int = 7
     # multi-message exchanges per request, on top of the counts above
-    n_multi_direct: int = 1
+    # multi_direct exists but is off by default: the generator rarely gets it right, and letter
+    # fragments across messages are a bot rule anyway
+    n_multi_direct: int = 0
     n_multi_strong: int = 2
     n_multi_benign: int = 2
     model: str = "claude-opus-5"

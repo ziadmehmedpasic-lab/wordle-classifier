@@ -76,7 +76,7 @@ def test_build_request_fills_template_and_schema():
 
 
 def test_style_plan_is_deterministic_and_cycles():
-    cfg = Config(n_direct=2, n_strong=1, n_weak=9, n_benign=3, seed=4)
+    cfg = Config(n_direct=2, n_strong=1, n_weak=9, n_benign=3, n_multi_direct=1, seed=4)
     plan = style_plan(cfg, "wager", "casual")
     assert plan == style_plan(cfg, "wager", "casual")
     assert plan != style_plan(cfg, "stare", "casual")

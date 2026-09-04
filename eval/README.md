@@ -31,6 +31,11 @@ newly discovered misses in the manifest when improving coverage. Normal tests va
 metric accounting and actual fixture frame boundaries; the full OCR/API evaluation is
 an explicit command so CI needs neither API credentials nor model calls.
 
+`npm run eval:overload` submits 24 image inspections together, using real OCR with the
+judge disabled, and checks direct text during saturation. It saves queue rejections,
+queue expiry, per-request latency and the direct-text result to `eval/runs/overload.json`.
+This is a bounded local burst measurement, not a Discord throughput guarantee.
+
 ## Live Discord playground
 
 Use a dedicated test server, a moderator bot token in local `.env`, and supplied test

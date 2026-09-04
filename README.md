@@ -24,7 +24,7 @@ Bans today's word, plus yesterday's and tomorrow's (covers timezones). Moving to
 ## Setup
 1. https://discord.com/developers/applications -> New Application -> Bot.
 2. Bot tab: **Reset Token** (copy it). Enable **Message Content Intent** and **Server Members Intent**.
-3. OAuth2 URL Generator: scope `bot`; permissions **View Channels, Send Messages, Manage Messages, Manage Nicknames, Manage Threads, Manage Channels, Manage Roles, Manage Expressions, Add Reactions, Read Message History**.
+3. OAuth2 URL Generator: scope `bot`; permissions **View Channels, Send Messages, Manage Messages, Manage Nicknames, Manage Threads, Manage Channels, Manage Roles, Manage Expressions, Moderate Members, Add Reactions, Read Message History**.
 4. Invite the bot. In Server Settings -> Roles, drag the bot's role above the members it should be able to rename (Discord only lets a bot change nicknames of members below its highest role; the owner can never be renamed).
 5. Then:
    ```
@@ -100,6 +100,7 @@ Attempts feed the red-team ledger: `GET /api/attempts` returns the newest 500 as
 | Names | member display names (nickname, global name or username: a spoiler nickname is cleared, a spoiler global name or username gets a nickname set over it; rechecked on every message and when the answer changes), thread/forum titles, channel names, role names, new emoji/sticker names |
 | Webhooks and other bots | scanned too (only the bot's own warnings are skipped) |
 | Offline gap | last 50 messages per channel scanned at startup |
+| Repeat offenders | 3 removals within 10 minutes and the member is timed out for 10 minutes (`TIMEOUT_AFTER`, `TIMEOUT_WINDOW_MIN`, `TIMEOUT_MINUTES`), which also stops them hammering the OCR and LLM layers |
 
 ## Layer 2: fine-tuned classifier (in progress)
 Examples are generated per past answer with Claude, a small model is fine-tuned on `(answer, recent messages, message) -> label`, and served over HTTP for the bot. See `ml/`.

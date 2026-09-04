@@ -63,4 +63,9 @@ if (process.env.PAIRS) {
   for (const a of sample) { d.setAnswers([a]); for (const t of texts) if (d.scan(t)) hits.push([a, t]); }
   console.log(`benign pairs flagged: ${hits.length}/${sample.length * texts.length} (${sample.length} answers x ${texts.length} texts)`);
   for (const [a, t] of hits) console.log(`  ${a} <- ${JSON.stringify(t)}`);
+  // benign chat in other scripts (test/foreign_chat.json) against every answer: what the transliteration rule collides with
+  const foreign = JSON.parse(fs.readFileSync(path.join(__dirname, "foreign_chat.json"), "utf8"));
+  let n = 0;
+  for (const a of answers) { d.setAnswers([a]); for (const t of foreign) if (d.scan(t)) n++; }
+  console.log(`foreign chat pairs flagged: ${n}/${answers.length * foreign.length} (${answers.length} answers x ${foreign.length} texts)`);
 }

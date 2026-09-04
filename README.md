@@ -43,6 +43,7 @@ Useful settings in [.env.example](.env.example):
 | `MOD_LOG_CHANNEL_ID` | Send moderator alerts, including aggregated incomplete scans. |
 | `ALLOWED_CHANNEL_IDS` | Exempt selected channels from moderation. |
 | `SCAN_BACKLOG` | Check the latest 50 messages per channel at startup; defaults on. |
+| `CATCH_SCRIPTS` | Match answer spellings in other scripts. Defaults on; disable it if it causes false deletions in multilingual chat. |
 
 When enabled, the judge receives message text and images through Anthropic's API, and
 transcription sends audio to OpenAI. Tell server members which features are enabled.

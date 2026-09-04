@@ -30,6 +30,7 @@ const TIMEOUT_MINUTES = Number(process.env.TIMEOUT_MINUTES ?? 10);
 const ALLOWED_CHANNEL_IDS = new Set((process.env.ALLOWED_CHANNEL_IDS || "").split(",").map((s) => s.trim()).filter(Boolean));
 
 detector.configure({
+  scripts: env("CATCH_SCRIPTS", "true"),
   suffixes: env("CATCH_SUFFIXES", "true"),
   phonetic: env("CATCH_PHONETIC", "true"),
   acrostics: env("CATCH_ACROSTICS", "true"),

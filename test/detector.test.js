@@ -18,6 +18,8 @@ const cases = [
   ["xbhfs", C /* caesar +1 */], ["dztvi", C /* atbash */],
   // spoken letters
   ["whiskey alpha golf echo romeo", C], ["double-u ay gee ee ar", C], ["doubleyou a gee e are", C],
+  // transcript-shaped (what speech-to-text emits for spoken letters, the audio layer relies on these)
+  ["W-A-G-E-R", C], ["W, A, G, E, R.", C], ["Whiskey, Alpha, Golf, Echo, Romeo.", C], ["The answer is Wager.", C],
   // stretching / suffixes / typos / anagrams / vowels / interleave
   ["waaaager", C], ["wwaaggeerr", C], ["waager", C], ["wagers", C], ["wagered", C], ["wagering", C],
   ["wgaer", C], ["wager" .split("").reverse().join(""), C], ["wagr", C], ["wagger", N /* real word */], ["wsger", C], ["wgr", C], ["wxaxgxexr", C], ["wtaogdear", C],

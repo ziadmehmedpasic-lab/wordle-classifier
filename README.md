@@ -184,6 +184,9 @@ Run `npm run test:audio` to transcribe a handful of synthesised clips (spoken an
 hints, clean chat) as both voice-message ogg and mp4. macOS only, it uses `say` to make the clips.
 
 ## What it cannot catch
+For repeatable attack measurements, run `npm run eval:attacks`; see [eval/README.md](eval/README.md)
+for live judge calls, dated pricing, saved results and the Discord playground protocol.
+
 - Account fields Discord does not expose to the bot (including bios), unavailable presence
   updates, and Lottie sticker rendering. Profile/status findings require moderator action.
 - Live speech in voice channels

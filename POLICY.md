@@ -74,6 +74,9 @@ The pattern detector reports one of two tiers.
   images are inspected on changes and answer rollover. Confirmed spoilers are cleared
   only when the bot has the necessary permissions; otherwise moderators are alerted.
 - Surface alerts contain generic outcomes and resource IDs, never spoiler text or images.
+- Incomplete scans also produce moderator alerts when `MOD_LOG_CHANNEL_ID` is configured.
+  Alerts aggregate counts, generic reason categories and up to three sample resource IDs
+  per guild at most once a minute. Failed deliveries retry; raw content is never included.
 - Bounded recent conversation is held in process memory for ten minutes (up to 24 messages
   per channel, 4,000 characters each) to detect coordinated clues. Edits replace the old
   content and deletions remove it. Nothing from this context buffer is persisted.

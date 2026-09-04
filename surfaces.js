@@ -63,7 +63,7 @@ class SurfaceModerator {
       if (this.seen.size > 1000) this.seen.delete(this.seen.keys().next().value);
     }
     if (result.status !== "spoiler") {
-      if (result.issues.length) await this.report({ guild: target.guild, kind, id: target.id || target.userId, status: "unscanned" });
+      if (result.issues.length) await this.report({ guild: target.guild, kind, id: target.id || target.userId, status: "unscanned", issues: result.issues });
       return result;
     }
     let status = "requires moderator action";

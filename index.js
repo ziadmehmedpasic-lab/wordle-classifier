@@ -10,7 +10,9 @@ const { ocrImage } = require("./ocr");
 const { SurfaceModerator } = require("./surfaces");
 const { Conversation } = require("./conversation");
 const { Answers } = require("./answers");
+const { InspectionAlerts } = require("./alerts");
 const answers = new Answers();
+const inspectionAlerts = new InspectionAlerts();
 const conversation = new Conversation();
 const versions = new Map();
 
@@ -81,8 +83,9 @@ const client = new Client({
 
 const surfaces = new SurfaceModerator({
   ocrImage, profiles: POLICE_PROFILES, presences: POLICE_PRESENCES, allowedChannels: ALLOWED_CHANNEL_IDS, isCurrent: hasCurrentAnswers,
-  report: async ({ guild, kind, id, status }) => {
+  report: async ({ guild, kind, id, status, issues = [] }) => {
     console.warn(`Surface moderation ${guild.id}/${kind}/${id}: ${status}`);
+    if (status === "unscanned") { reportIncomplete({ guild, id }, { status, issues }, kind); return; }
     const channel = guild.channels.cache.get(process.env.MOD_LOG_CHANNEL_ID);
     if (channel?.isTextBased() && typeof channel.send === "function") {
       await channel.send({ content: `Wordle moderation: ${kind} ${id}: ${status.startsWith("moderation failed") ? "moderation failed; check bot logs" : status}.`, allowedMentions: { parse: [] } });
@@ -90,9 +93,20 @@ const surfaces = new SurfaceModerator({
   },
 });
 
+/** @param {object} target @param {object} result @param {string} kind @returns {void} */
+function reportIncomplete(target, result, kind = "message") {
+  if (result.status !== "unscanned") return;
+  inspectionAlerts.record({ guild: target.guild, id: target.id, kind, issues: result.issues });
+  inspectionAlerts.flush().catch((error) => console.error("Inspection alerts:", error.message));
+}
+
 /** @param {object} target @param {string} kind @returns {Promise<void>} */
 async function checkSurface(target, kind) {
-  try { await refreshAnswers(); await surfaces.check(target, kind); }
+  try {
+    await refreshAnswers();
+    if (!hasCurrentAnswers()) { reportIncomplete(target, { status: "unscanned", issues: ["current answer unavailable"] }, kind); return; }
+    await surfaces.check(target, kind);
+  }
   catch (error) { console.error(`Surface ${kind}:`, error.message); }
 }
 
@@ -147,7 +161,8 @@ async function handleMessage(message, { fromBacklog = false } = {}) {
   versions.set(message.id, version);
   try {
     await refreshAnswers();
-    if (!hasCurrentAnswers() || versions.get(message.id) !== version) return;
+    if (versions.get(message.id) !== version) return;
+    if (!hasCurrentAnswers()) { reportIncomplete(message, { status: "unscanned", issues: ["current answer unavailable"] }); return; }
     const inspectedAnswers = detector.getAnswers().join(",");
     if (!fromBacklog) checkMember(message.member).catch((e) => console.error("Member:", e.message));
 
@@ -156,6 +171,7 @@ async function handleMessage(message, { fromBacklog = false } = {}) {
     const result = await inspectMessage(message, { ocrImage, context });
     if (versions.get(message.id) !== version || !hasCurrentAnswers() || inspectedAnswers !== detector.getAnswers().join(",")) return;
     if (result.issues.length) console.warn(`Incomplete inspection ${message.id}: ${result.issues.join("; ")}`);
+    reportIncomplete(message, result);
     if (result.status === "spoiler") return removeMessage(message, result.hit, "inspection");
     conversation.remember(message, result.text, result.fragmentText ?? result.text);
     const ids = conversation.fragments(message.channelId, message.id);
@@ -221,6 +237,7 @@ client.once(Events.ClientReady, async (c) => {
   if (OCR_IMAGES) frames.init();
   await refreshAnswers(true);
   setInterval(() => refreshAnswers(), 60_000);
+  setInterval(() => inspectionAlerts.flush().catch((error) => console.error("Inspection alerts:", error.message)), 10_000).unref();
   scanBacklog();
 });
 
@@ -249,7 +266,10 @@ client.on(Events.MessageReactionAdd, async (reaction, user) => {
       const result = await inspectMessage({ channelId: msg.channelId, content: reaction.emoji.name || "", attachments: [{ url, name: "reaction emoji" }] }, { ocrImage });
       if (!hasCurrentAnswers() || inspectedAnswers !== detector.getAnswers().join(",")) return;
       if (result.status === "spoiler") await reaction.remove();
-      else if (result.issues.length) console.warn(`Incomplete reaction inspection ${msg.id}`);
+      else if (result.issues.length) {
+        console.warn(`Incomplete reaction inspection ${msg.id}`);
+        reportIncomplete(msg, result, "reaction");
+      }
     }
     const letters = [];
     for (const r of msg.reactions.cache.values()) {

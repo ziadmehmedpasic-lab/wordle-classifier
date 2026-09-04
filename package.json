@@ -4,14 +4,15 @@
   "description": "Discord bot that deletes Wordle spoilers: pattern matching, OCR, speech-to-text, and an LLM layer",
   "main": "index.js",
   "scripts": {
-    "test": "node test/detector.test.js && node test/attacks.test.js && node test/audio.unit.test.js && node test/gifs.test.js && node test/frames.unit.test.js && node --test test/inspection.test.js test/documents.test.js test/media.test.js test/surfaces.test.js test/conversation.test.js test/judge.test.js test/limits.test.js test/messages.test.js test/evaluation.test.js test/evaluation-fixtures.test.js test/answers.test.js",
+    "test": "node test/detector.test.js && node test/attacks.test.js && node test/audio.unit.test.js && node test/gifs.test.js && node test/frames.unit.test.js && node --test test/inspection.test.js test/documents.test.js test/media.test.js test/surfaces.test.js test/conversation.test.js test/judge.test.js test/limits.test.js test/messages.test.js test/evaluation.test.js test/evaluation-fixtures.test.js test/answers.test.js test/alerts.test.js",
     "eval:data": "node test/eval_data.js",
     "start": "node index.js",
     "test:llm": "node test/llm.test.js",
     "test:ocr": "node --test test/ocr.test.js",
     "test:audio": "node test/audio.test.js",
     "build:web": "node web/build.js",
-    "eval:attacks": "node eval/run.js"
+    "eval:attacks": "node eval/run.js",
+    "eval:overload": "node eval/overload.js"
   },
   "keywords": [],
   "author": "",

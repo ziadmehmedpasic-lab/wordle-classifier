@@ -7,7 +7,7 @@ import pytest
 
 from scripts.generate import (
     EXAMPLES_SCHEMA,
-    STYLES,
+    STYLES_BY_LABEL,
     Config,
     build_prompt,
     build_request,
@@ -82,7 +82,7 @@ def test_style_plan_is_deterministic_and_cycles():
     assert plan != style_plan(cfg, "stare", "casual")
     assert len(plan[Label.DIRECT]) == 3 and len(set(plan[Label.DIRECT][:2])) == 2
     # only four weak styles exist, so nine picks cycle through them
-    assert len(plan[Label.WEAK_HINT]) == 9 and set(plan[Label.WEAK_HINT]) == set(STYLES[20:24])
+    assert len(plan[Label.WEAK_HINT]) == 9 and set(plan[Label.WEAK_HINT]) == set(STYLES_BY_LABEL[Label.WEAK_HINT])
     assert set(plan[Label.BENIGN]) == {"wordle_chat", "chat", "hard_benign", "multi_benign"}
     assert plan[Label.DIRECT][-1] == "multi_direct" and plan[Label.STRONG_HINT][-2:] == [
         "multi_strong",

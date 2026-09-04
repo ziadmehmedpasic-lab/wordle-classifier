@@ -26,8 +26,8 @@ DATA_DIR = ML_DIR / "data"
 STYLES_BY_LABEL: dict[Label, list[str]] = {
     Label.DIRECT: [
         "plain", "leet", "separators", "vertical", "lookalike", "emoji", "acrostic",
-        "capitalization", "hidden", "inflection", "url",
-    ],
+        "capitalization", "inflection", "url",
+    ],  # "hidden" (letters across a word boundary) is deliberately absent: see POLICY.md
     Label.STRONG_HINT: [
         "definition", "synonym", "rhyme", "positional", "translation", "crossword", "rebus",
         "reference", "sequence",

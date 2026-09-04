@@ -71,7 +71,7 @@ async function extractAsset(asset, { ocrImage }) {
   for (const clip of result.clips) {
     const dir = await fs.mkdtemp(path.join(os.tmpdir(), "wordle-attachment-"));
     try {
-      const input = path.join(dir, "input");
+      const input = path.join(dir, clip.contentType === "image/gif" ? "input.gif" : "input");
       await fs.writeFile(input, clip.bytes);
       if (clip.contentType.startsWith("video/") || clip.contentType === "image/gif") {
         if (!frames.cfg.enabled) result.issues.push("frame inspection disabled");

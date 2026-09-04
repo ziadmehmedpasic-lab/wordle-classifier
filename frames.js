@@ -120,8 +120,9 @@ async function ocr(url, ocrImage, { name = "media", size = 0, downloadFile = dow
   if (size > cfg.maxBytes) throw new Error("media exceeds byte limit");
   const dir = await fs.mkdtemp(path.join(os.tmpdir(), "wordle-frames-"));
   try {
-    const input = path.join(dir, "input");
-    await fs.writeFile(input, await downloadFile(url, { maxBytes: cfg.maxBytes }));
+    const bytes = await downloadFile(url, { maxBytes: cfg.maxBytes });
+    const input = path.join(dir, /^GIF8[79]a/.test(bytes.subarray(0, 6).toString()) ? "input.gif" : "input");
+    await fs.writeFile(input, bytes);
     const result = await inspectFile(input, ocrImage);
     if (result.issues.length) throw new Error(`${name}: ${result.issues.join("; ")}`);
     return result.text;

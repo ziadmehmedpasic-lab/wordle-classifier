@@ -25,13 +25,14 @@ Bans today's word, plus yesterday's and tomorrow's (covers timezones). Moving to
 1. https://discord.com/developers/applications -> New Application -> Bot.
 2. Bot tab: **Reset Token** (copy it). Enable **Message Content Intent** and **Server Members Intent**.
 3. OAuth2 URL Generator: scope `bot`; permissions **View Channels, Send Messages, Manage Messages, Manage Nicknames, Manage Threads, Manage Channels, Manage Roles, Manage Expressions, Add Reactions, Read Message History**.
-4. Invite the bot, then:
+4. Invite the bot. In Server Settings -> Roles, drag the bot's role above the members it should be able to rename (Discord only lets a bot change nicknames of members below its highest role; the owner can never be renamed).
+5. Then:
    ```
    cp .env.example .env      # paste your token into .env
    npm install
    npm start
    ```
-5. `npm test` runs the detector test suite.
+6. `npm test` runs the detector test suite.
 
 ## Layout
 - `POLICY.md` — the moderation policy: labels, what is deleted, which answers are protected, data handling
@@ -96,7 +97,7 @@ Attempts feed the red-team ledger: `GET /api/attempts` returns the newest 500 as
 | Fragments across messages | `w` `a` `g` `e` `r` or `wa` `ger` as separate messages (all deleted) |
 | Edits and link previews | messages re-scanned on edit and when embeds resolve |
 | Reactions | 🇼🇦🇬🇪🇷 reactions spelling the word are removed |
-| Names | nicknames, thread/forum titles, channel names, role names, new emoji/sticker names |
+| Names | member display names (nickname, global name or username: a spoiler nickname is cleared, a spoiler global name or username gets a nickname set over it; rechecked on every message and when the answer changes), thread/forum titles, channel names, role names, new emoji/sticker names |
 | Webhooks and other bots | scanned too (only the bot's own warnings are skipped) |
 | Offline gap | last 50 messages per channel scanned at startup |
 

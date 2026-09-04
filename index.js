@@ -49,6 +49,7 @@ async function refreshAnswers(force = false) {
     detector.setAnswers(list);
     lastFetchedDate = today;
     console.log(`[${new Date().toISOString()}] Banned words updated (${list.length} words) for ${today}`);
+    sweepMembers().catch((e) => console.error("Member sweep:", e.message)); // names set before today's word was known
   } catch (e) { console.error("Failed to refresh Wordle answer:", e.message); }
 }
 
@@ -210,6 +211,7 @@ async function handleMessage(message, { fromBacklog = false } = {}) {
   if (ALLOWED_CHANNEL_IDS.has(message.channelId)) return;
   await refreshAnswers();
   if (!detector.getAnswers().length) return;
+  if (!fromBacklog) checkMember(message.member).catch((e) => console.error("Member:", e.message));
 
   const text = collectText(message);
 
@@ -287,13 +289,35 @@ async function scanBacklog() {
 
 async function checkName(target, kind) {
   await refreshAnswers();
-  const name = target.name || target.nickname;
-  if (!name || !detector.scan(name)) return;
+  if (!detector.scan(target.name)) return;
   try {
-    if (kind === "nickname") await target.setNickname(null, "Wordle spoiler");
-    else await target.setName("spoiler-removed", "Wordle spoiler");
-    console.log(`Renamed ${kind} "${name}"`);
+    await target.setName("spoiler-removed", "Wordle spoiler");
+    console.log(`Renamed ${kind} "${target.name}"`);
   } catch (e) { console.error(`${kind} rename failed:`, e.message); }
+}
+
+// what shows next to a member's messages is the nickname, else the global display name,
+// else the username. only the nickname is ours to change, so a bad global name or
+// username gets a nickname set over it
+async function checkMember(member) {
+  if (!POLICE_NICKNAMES || !member) return;
+  await refreshAnswers();
+  const shown = member.displayName;
+  if (!detector.scan(shown)) return;
+  if (!member.manageable) { console.warn(`Cannot rename ${member.user.tag} ("${shown}"): the bot's role must be above theirs`); return; }
+  const replacement = detector.scan(member.user.displayName) ? "spoiler-removed" : null;
+  try {
+    await member.setNickname(replacement, "Wordle spoiler");
+    console.log(`Renamed member "${shown}" -> "${replacement ?? member.user.displayName}"`);
+  } catch (e) { console.error("Member rename failed:", e.message); }
+}
+
+async function sweepMembers() {
+  if (!POLICE_NICKNAMES) return;
+  for (const guild of client.guilds.cache.values()) {
+    const members = await guild.members.fetch();
+    for (const m of members.values()) await checkMember(m);
+  }
 }
 
 client.once(Events.ClientReady, async (c) => {
@@ -331,7 +355,14 @@ client.on(Events.MessageReactionAdd, async (reaction, user) => {
   } catch (e) { console.error("Reaction:", e.message); }
 });
 
-client.on(Events.GuildMemberUpdate, (_o, m) => POLICE_NICKNAMES && m.nickname && m.manageable && checkName(m, "nickname"));
+client.on(Events.GuildMemberUpdate, (_o, m) => checkMember(m).catch((e) => console.error("Member:", e.message)));
+client.on(Events.GuildMemberAdd, (m) => checkMember(m).catch((e) => console.error("Member:", e.message)));
+client.on(Events.UserUpdate, async (_o, u) => {
+  // global display name or username changed: recheck the member in every server we share
+  for (const guild of client.guilds.cache.values()) {
+    try { await checkMember(await guild.members.fetch(u.id)); } catch (e) { console.error("User:", e.message); }
+  }
+});
 client.on(Events.ThreadCreate, (t) => t.manageable && checkName(t, "thread"));
 client.on(Events.ThreadUpdate, (_o, t) => t.manageable && checkName(t, "thread"));
 client.on(Events.ChannelCreate, (ch) => ch.manageable && checkName(ch, "channel"));

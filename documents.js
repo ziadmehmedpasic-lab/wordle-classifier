@@ -4,7 +4,17 @@ const { SaxesParser } = require("saxes");
 const path = require("node:path");
 const { readLimited } = require("./download");
 
-const limits = { bytes: 32_000_000, expandedBytes: 32_000_000, entries: 64, depth: 2, pages: 10, pixels: 16_000_000, text: 200_000 };
+const limits = { bytes: 32_000_000, expandedBytes: 32_000_000, entries: 64, depth: 2, pages: 10, pixels: 16_000_000, text: 200_000, imageBytes: 16_000_000 };
+
+/** @param {object} result @param {Buffer} png @param {object} budget @returns {void} */
+function addImage(result, png, budget) {
+  budget.imageBytes += png.length;
+  if (budget.imageBytes > limits.imageBytes) {
+    if (!result.issues.includes("document image byte limit exceeded")) result.issues.push("document image byte limit exceeded");
+    return;
+  }
+  result.images.push(`data:image/png;base64,${png.toString("base64")}`);
+}
 
 /** @param {Buffer} bytes @returns {string} */
 function decodeText(bytes) {
@@ -34,7 +44,7 @@ function xmlText(xml) {
 }
 
 /** @param {Buffer} bytes @param {object} options @returns {Promise<object>} */
-async function extractDocument(bytes, { name = "attachment", ocrImage, depth = 0, budget = { bytes: 0, entries: 0, images: 0 } } = {}) {
+async function extractDocument(bytes, { name = "attachment", ocrImage, depth = 0, budget = { bytes: 0, entries: 0, images: 0, imageBytes: 0 } } = {}) {
   const result = { text: "", images: [], issues: [], clips: [] };
   const texts = [];
   if (depth > limits.depth) { result.issues.push("archive nesting limit exceeded"); return result; }
@@ -82,7 +92,7 @@ async function extractDocument(bytes, { name = "attachment", ocrImage, depth = 0
         try {
           await page.render({ canvasContext: canvas.context, viewport }).promise;
           const png = canvas.canvas.toBuffer("image/png");
-          result.images.push(`data:image/png;base64,${png.toString("base64")}`);
+          addImage(result, png, budget);
           try { texts.push(await ocrImage(png)); }
           catch (error) { result.issues.push(`PDF page OCR failed: ${error.message}`); }
         } finally { pdf.canvasFactory.destroy(canvas); page.cleanup(); }
@@ -100,7 +110,7 @@ async function extractDocument(bytes, { name = "attachment", ocrImage, depth = 0
       if (count < metadata.pages) result.issues.push("image page limit exceeded");
       for (let page = 0; page < count; page++) {
         const png = await sharp(bytes, { page, pages: 1, limitInputPixels: limits.pixels }).png().toBuffer();
-        result.images.push(`data:image/png;base64,${png.toString("base64")}`);
+        addImage(result, png, budget);
         try { texts.push(await ocrImage(png)); }
         catch (error) { result.issues.push(`image page OCR failed: ${error.message}`); }
       }
@@ -109,7 +119,7 @@ async function extractDocument(bytes, { name = "attachment", ocrImage, depth = 0
     }
     // native decoders interpret the content rather than the filename or MIME header.
     const png = await source.png().toBuffer();
-    result.images.push(`data:image/png;base64,${png.toString("base64")}`);
+    addImage(result, png, budget);
     try { texts.push(await ocrImage(png)); }
     catch (error) { result.issues.push(`image OCR failed: ${error.message}`); }
   } else if (!type || type.mime === "application/xml") {

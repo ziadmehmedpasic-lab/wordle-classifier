@@ -8,6 +8,9 @@ const { extractDocument } = require("./documents");
 const fs = require("node:fs/promises");
 const os = require("node:os");
 const path = require("node:path");
+const limits = { assets: 32, text: 200_000, images: 100, imageBytes: 24_000_000, concurrent: 2, waiting: 16, waitMs: 30_000 };
+let active = 0;
+const waiting = [];
 
 /** @param {object} message @returns {{text: string, assets: object[], issues: string[]}} */
 function collectContent(message) {
@@ -17,6 +20,7 @@ function collectContent(message) {
   const seen = new Set();
   const pending = [{ value: message, depth: 0 }];
   while (pending.length) {
+    if (seen.size >= 1000) { issues.push("content node limit exceeded"); break; }
     const { value, depth } = pending.pop();
     if (!value || seen.has(value)) continue;
     seen.add(value);
@@ -111,36 +115,75 @@ async function extractAsset(asset, { ocrImage }) {
 async function inspectMessage(message, { ocrImage, context = [], extract = extractAsset, judge = llm, describe = gifs.describe, forceJudge = false }) {
   const content = collectContent(message);
   const texts = [content.text];
+  const fragments = [message.content || ""];
   const images = [];
   const issues = [...content.issues];
   let hit = detector.scan(content.text);
   if (hit) return { status: "spoiler", hit, text: content.text, issues };
-  const tags = await describe(content.text);
-  if (tags) texts.push(tags);
-  for (const asset of content.assets) {
-    try {
-      const result = await extract(asset, { ocrImage });
-      texts.push(result.text);
-      images.push(...result.images);
-      issues.push(...result.issues.map((issue) => `${asset.id || asset.name || "media"}: ${issue}`));
-    } catch (error) {
-      issues.push(`media inspection failed: ${error.message}`);
+  if (active >= limits.concurrent) {
+    if (waiting.length >= limits.waiting) return { status: "unscanned", text: content.text, issues: [...issues, "inspection queue full"] };
+    const admitted = await new Promise((resolve) => {
+      const grant = () => { clearTimeout(timer); resolve(true); };
+      const timer = setTimeout(() => {
+        const index = waiting.indexOf(grant);
+        if (index >= 0) { waiting.splice(index, 1); resolve(false); }
+      }, limits.waitMs);
+      waiting.push(grant);
+    });
+    if (!admitted) return { status: "unscanned", text: content.text, issues: [...issues, "inspection queue wait expired"] };
+  } else active++;
+  try {
+    let textLength = content.text.length;
+    let imageBytes = 0;
+    if (content.text.length > limits.text) { texts[0] = content.text.slice(0, limits.text); issues.push("message text limit exceeded"); }
+    if (context.some((row) => row.truncated)) issues.push("context text was truncated");
+    if (/https?:\/\/\S+/i.test(content.text)) issues.push("external linked pages are not certified by media inspection");
+    if (content.assets.length > limits.assets) issues.push("message attachment limit exceeded");
+    const tags = await describe(content.text);
+    if (tags) { texts.push(tags.slice(0, Math.max(0, limits.text - textLength))); textLength += tags.length; }
+    for (const asset of content.assets.slice(0, limits.assets)) {
+      try {
+        const result = await extract(asset, { ocrImage });
+        const assetHit = detector.scan(result.text);
+        if (assetHit) return { status: "spoiler", hit: assetHit, text: result.text, issues: [...issues, ...result.issues] };
+        const remaining = Math.max(0, limits.text - textLength);
+        texts.push(result.text.slice(0, remaining));
+        fragments.push(result.text.slice(0, remaining));
+        textLength += result.text.length;
+        if (result.text.length > remaining) issues.push("combined extracted text limit exceeded");
+        for (const image of result.images) {
+          imageBytes += Buffer.byteLength(image);
+          if (images.length >= limits.images || imageBytes > limits.imageBytes) {
+            issues.push("message vision limit exceeded");
+            break;
+          }
+          images.push(image);
+        }
+        issues.push(...result.issues.map((issue) => `${asset.id || asset.name || "media"}: ${issue}`));
+      } catch (error) {
+        issues.push(`media inspection failed: ${error.message}`);
+      }
+      // check the combined caption, files, OCR and speech after each asset.
+      hit = detector.scan(texts.filter(Boolean).join("\n"));
+      if (hit) return { status: "spoiler", hit, text: texts.filter(Boolean).join("\n"), issues };
     }
-    // check the combined caption, files, OCR and speech after each asset.
-    hit = detector.scan(texts.filter(Boolean).join("\n"));
-    if (hit) return { status: "spoiler", hit, text: texts.filter(Boolean).join("\n"), issues };
+    const text = texts.filter(Boolean).join("\n");
+    hit = detector.scan(text);
+    if (hit) return { status: "spoiler", hit, text, issues };
+    if (images.length && !judge.cfg.vision) issues.push("vision inspection disabled");
+    judge.noteContext(message.channelId, text);
+    if ((forceJudge && judge.cfg.enabled) || judge.shouldCheck(message.channelId, text, images.length > 0, content.assets.length > 0)) {
+      const result = await judge.classify({ text, answers: detector.getAnswers(), context, imageUrls: judge.cfg.vision ? images : [] });
+      if (!result) issues.push("meaning classifier failed");
+      else if (judge.shouldDelete(result)) return { status: "spoiler", hit: result.verdict, text, issues };
+      else if (result.issues) issues.push(...result.issues);
+    } else if (!judge.cfg.enabled) issues.push("meaning classifier disabled");
+    return { status: issues.length ? "unscanned" : "clean", text, fragmentText: fragments.filter(Boolean).join("\n"), issues: [...new Set(issues)] };
+  } finally {
+    const next = waiting.shift();
+    if (next) next();
+    else active--;
   }
-  const text = texts.filter(Boolean).join("\n");
-  hit = detector.scan(text);
-  if (hit) return { status: "spoiler", hit, text, issues };
-  judge.noteContext(message.channelId, text);
-  if ((forceJudge && judge.cfg.enabled) || judge.shouldCheck(message.channelId, text, images.length > 0, content.assets.length > 0)) {
-    const result = await judge.classify({ text, answers: detector.getAnswers(), context, imageUrls: judge.cfg.vision ? images : [] });
-    if (!result) issues.push("meaning classifier failed");
-    else if (judge.shouldDelete(result)) return { status: "spoiler", hit: result.verdict, text, issues };
-    else if (result.issues) issues.push(...result.issues);
-  } else if (!judge.cfg.enabled) issues.push("meaning classifier disabled");
-  return { status: issues.length ? "unscanned" : "clean", text, issues };
 }
 
-module.exports = { collectContent, extractAsset, inspectMessage };
+module.exports = { collectContent, extractAsset, inspectMessage, limits };

@@ -100,6 +100,17 @@ test("PDF page cap reports incomplete coverage", async () => {
   assert.ok(result.issues.includes("PDF page limit exceeded"));
 });
 
+test("rendered image bytes are bounded before retaining vision payloads", async () => {
+  const saved = limits.imageBytes;
+  limits.imageBytes = 1;
+  try {
+    const result = await extractDocument(await fs.readFile("test/fixtures/spoiler.svg"), { ocrImage: async () => "WAGER" });
+    assert.equal(result.images.length, 0);
+    assert.ok(result.issues.includes("document image byte limit exceeded"));
+    assert.equal(result.text, "WAGER");
+  } finally { limits.imageBytes = saved; }
+});
+
 test("download limits check actual streamed bytes and reject off-host redirects", async () => {
   const url = "https://cdn.discordapp.com/attachments/test";
   await assert.rejects(download(url, { maxBytes: 4, fetchImpl: async () => new Response("WAGER") }), /byte limit/);

@@ -5,6 +5,7 @@ const llm = require("./llm");
 const audio = require("./audio");
 const gifs = require("./gifs");
 const frames = require("./frames");
+const docs = require("./docs");
 
 const env = (k, d) => (process.env[k] ?? d).toString().toLowerCase() === "true";
 const TOKEN = process.env.DISCORD_TOKEN;
@@ -107,12 +108,12 @@ async function collectSlowText(message) {
   const bits = [];
   for (const a of message.attachments?.values?.() || []) {
     const type = a.contentType || "";
-    if ((type.startsWith("text/") || /\.(txt|md|csv|json|log)$/i.test(a.name || "")) && a.size < 200_000) {
-      try { const r = await fetch(a.url); bits.push(await r.text()); } catch { /* ignore */ }
-    } else if (frames.kind(a)) {
+    if (frames.kind(a)) {
       bits.push(await frames.ocr(a.url, ocrImage, { id: a.id, name: a.name, size: a.size })); // every frame of a gif or video
     } else if (/^image\/(png|jpe?g|webp|bmp)/.test(type) && a.size < 8_000_000) {
       bits.push(await ocrImage(a.url));
+    } else if (docs.kind(a)) {
+      bits.push(await docs.read(a.url, ocrImage, { id: a.id, name: a.name, size: a.size })); // text files, office documents, pdfs, zips, anything else
     }
   }
   for (const e of message.embeds || []) {

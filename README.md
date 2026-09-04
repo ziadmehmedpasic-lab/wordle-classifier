@@ -41,6 +41,7 @@ Bans today's word, plus yesterday's and tomorrow's (covers timezones). Moving to
 - `audio.js` — speech-to-text for voice messages, audio files and video soundtracks (OpenAI)
 - `gifs.js` — Tenor/Giphy tag and description lookup for GIF links
 - `frames.js` — ffmpeg frame sampling so OCR covers every frame of a GIF or video
+- `docs.js` — text (and pictures, for OCR) out of document attachments: office files, PDF, RTF, HTML, zips, legacy binaries
 - `index.js` — Discord wiring: messages, edits, attachments, OCR, speech-to-text, reactions, names
 - `ml/` — layer 2: data generation, training, evaluation and serving for the fine-tuned classifier (Python, `uv`); see `ml/pyproject.toml`
 - `test/detector.test.js` — 159 targeted cases + generic sweep + false-positive sweep (English and nine other scripts)
@@ -49,6 +50,7 @@ Bans today's word, plus yesterday's and tomorrow's (covers timezones). Moving to
 - `test/audio.unit.test.js` — offline audio checks; `test/audio.test.js` — live transcription of synthesised clips
 - `test/gifs.test.js` — offline GIF tag checks with a mocked API
 - `test/frames.unit.test.js` — offline frame sampling checks (ffmpeg-built fixtures, faked OCR); `test/frames.test.js` — real tesseract over text fixtures
+- `test/docs.unit.test.js` — offline document checks: generated docx/pptx/xlsx/odt/pdf/rtf/html/zip/binary fixtures, faked OCR
 - `web/` — the playground page: `detector.js` bundled for the browser; `api/attempts.js` — its attempt store on Vercel
 
 ## Playground
@@ -91,7 +93,7 @@ Attempts feed the red-team ledger: `GET /api/attempts` returns the newest 500 as
 | Other scripts, read by sound | Arabic `وايجر`, Hebrew `וייג׳ר`, Cyrillic `вейджер`, Greek `γουέιτζερ`, katakana `ウェイジャー` / `ワゲル`, hangul `웨이저`, Devanagari `वेजर`, Georgian, Armenian; letter by letter or the loanword spelling; spaced letters `و ا ي ج ر` |
 | Acrostics | `wife angle grey ear red`, `wage and real`, reversed initials, emoji names 🐳🍎🦒🥚🌈 with one distractor, emoji mixed with letters `w 🍎 g e r` |
 | Hidden in other content | URLs, custom emoji names, file names, embeds, link previews, polls, stickers, forwarded messages |
-| Attachments | `.txt`/`.md`/`.csv` contents, and **screenshots via OCR** |
+| Attachments | **screenshots via OCR**; text files in any encoding; Word, PowerPoint and Excel files (`docx`/`pptx`/`xlsx`, slide notes and sheet names included, and every picture inside them OCR'd); OpenDocument; PDF (text layer, embedded images OCR'd, pages rendered for OCR when the file is short or has no text layer); RTF, HTML, SVG, EPUB; zips and gzips of any of these (one level deep); legacy `doc`/`xls`/`ppt` and any other file type via their readable strings |
 | GIF links | Tenor and Giphy URLs: the slug in the link, plus the post's tags, title and description from the provider API (needs `TENOR_API_KEY` / `GIPHY_API_KEY`); the tags also go to the LLM layer |
 | GIF and video frames | uploaded GIFs, gif link previews and videos are split into frames with ffmpeg (up to 20 per clip, near-duplicates dropped) and every frame is OCR'd, so text on a later frame or one letter per frame is read. Plain OCR reads only the first frame |
 | Speech | Discord **voice messages**, uploaded audio (`mp3/ogg/wav/m4a/flac/webm`) and the soundtrack of uploaded videos (`mp4/mov/webm`) are transcribed, then run through every text check and the LLM layer |
@@ -156,4 +158,5 @@ hints, clean chat) as both voice-message ogg and mp4. macOS only, it uses `say` 
 - Acrostic detection can misfire: `star every` on a `stare` day. Disable with `CATCH_ACROSTICS=false`.
 - The word-boundary rule misfires on rare collisions: `the mailman` on an `email` day. Measured at 5 extra hits per 73,000 benign message/answer pairs.
 - Reading other scripts by sound collides with ordinary chat in those languages at about the same rate as the rest of the detector does with English: 0.24% of (answer, message) pairs over 185 sentences of Arabic, Hebrew, Russian, Greek, Japanese, Korean, Hindi, Georgian and Armenian chat, on top of 0.07% before the rule. Disable with `configure({ scripts: false })`.
+- Legacy `doc`/`xls`/`ppt` files and unknown binaries are read as raw strings, so structural text inside them (font names, property names) is scanned too; the common ones are filtered out.
 - Deliberately not caught by the pattern layer, left to the LLM layer: the answer inside a real word (`delightful` on a `light` day), anagrams and homophones that are real words (`panel`, `plain` for `plane`), acrostics with many filler words, last letters of words. See `test/attacks_open.json`.

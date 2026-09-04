@@ -41,9 +41,12 @@ websites are not fetched or certified safe.
 Errors never delete. Labels and what gets deleted are defined in `POLICY.md`.
 
 ## How it finds the answer
-Fetches the official New York Times endpoint every 15 minutes:
+Checks the configured server date on events and every minute, fetching the official New York Times endpoint when needed:
 `https://www.nytimes.com/svc/wordle/v2/YYYY-MM-DD.json`
-Bans today's word, plus yesterday's and tomorrow's (covers timezones). Moving to today only, see `POLICY.md`.
+Protects today's word in `TIMEZONE` (default `UTC`). `ANSWER_WINDOW_DAYS` adds 0-31 previous
+days (default 0). Tomorrow is never fetched. This replaces `CHECK_YESTERDAY`.
+Failed rollover fetches suspend moderation until the current answer is available, with a
+one-minute retry delay. Old answers cannot cause deletion after their protected date window.
 
 ## Setup
 1. https://discord.com/developers/applications -> New Application -> Bot.

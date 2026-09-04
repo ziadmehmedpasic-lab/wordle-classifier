@@ -44,6 +44,19 @@ Bans today's word, plus yesterday's and tomorrow's (covers timezones). Moving to
 - `test/attacks.json`, `test/attacks_open.json`, `test/ATTACKS.md` — red-team ledger: attacks the detector must catch, and known gaps
 - `test/eval_data.js` — runs the generated ml data through the detector (recall per style, false positives); `--write` stamps each record with `detector_hit` so the classifier is scored only on what reaches it
 - `test/audio.unit.test.js` — offline audio checks; `test/audio.test.js` — live transcription of synthesised clips
+- `web/` — the playground page: `detector.js` bundled for the browser, published as a Claude artifact
+
+## Playground
+
+A web page where testers try to leak a random target word past the pattern layer. It shows five tiles, takes a message, runs `scan` in the browser and says whether the bot would have deleted it. Every attempt is stored with the tester's declared intent (leak or innocent), the verdict, and an optional one-line decode note when a leak gets through. Only layer 1 runs there; the judge and scorer are not wired in yet.
+
+    npm run build:web    # web/dist/playground.html, one self-contained file
+
+The page is published as a Claude artifact with the `db` capability, which is where attempts live: https://claude.ai/code/artifact/3e0de996-2be9-405c-b91e-56dab22d0139. Share that link with testers; they need a Claude account. To republish after a change, rebuild and publish the same file to the same artifact URL from Claude Code.
+
+Targets come from `web/words.json`, a curated list of common five-letter words, all in the detector's dictionary. The NYT answer list never enters the page.
+
+Attempts feed the red-team ledger: read the `attempts` collection from Claude Code (`read_db`), and move the misses worth catching into `test/attacks_open.json` in its entry shape. The `decode` note maps straight onto the ledger's `decode` field.
 
 ## Layer 1: what the pattern detector catches
 | Technique | Example (answer: wager) |

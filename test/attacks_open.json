@@ -1,0 +1,242 @@
+[
+ {
+  "answer": "light",
+  "text": "that was delightful honestly",
+  "technique": "substring-of-real-word",
+  "decode": "'delightful' literally contains l-i-g-h-t. The detector's fuzzy layer skips any token that is a dictionary word, so a real word that contains the answer is never examined.",
+  "worth_catching": false,
+  "fp_risk": "every dictionary word containing the answer (delightful, ghostbusters) would be deleted; 300+ words contain light or house"
+ },
+ {
+  "answer": "wager",
+  "text": "wow haha omg bye later",
+  "technique": "last-letters",
+  "decode": "Last letter of each word: woW, hahA, omG, byE, lateR.",
+  "worth_catching": false,
+  "fp_risk": "five ordinary words' last letters spell an answer far too often"
+ },
+ {
+  "answer": "light",
+  "text": "cool confetti big ugh chat",
+  "technique": "last-letters",
+  "decode": "cooL confettI biG ugH chaT.",
+  "worth_catching": false,
+  "fp_risk": "five ordinary words' last letters spell an answer far too often"
+ },
+ {
+  "answer": "wager",
+  "text": "awesome day again her friend",
+  "technique": "second-letters",
+  "decode": "Second letter of each word: aWesome, dAy, aGain, hEr, fRiend.",
+  "worth_catching": false,
+  "fp_risk": "high collision rate, unnatural to construct"
+ },
+ {
+  "answer": "wager",
+  "text": "well anyone in here got this easy today right",
+  "technique": "inline-acrostic-4-fillers",
+  "decode": "Word initials with the filler words skipped: Well Anyone [in here] Got [this] Easy [today] Right. The detector's acrostic search hard-codes a budget of 2 skipped words.",
+  "worth_catching": false,
+  "fp_risk": "a skip budget of four finds the answer inside most 12-word messages"
+ },
+ {
+  "answer": "light",
+  "text": "lol i know its a good one honestly a tough one",
+  "technique": "inline-acrostic-4-fillers",
+  "decode": "Lol I [know its a] Good [one] Honestly [a] Tough.",
+  "worth_catching": false,
+  "fp_risk": "a skip budget of four finds the answer inside most 12-word messages"
+ },
+ {
+  "answer": "wager",
+  "text": "we can all do great things every day right now",
+  "technique": "every-other-word-acrostic",
+  "decode": "Initials of every second word: We [can] All [do] Great [things] Every [day] Right.",
+  "worth_catching": false,
+  "fp_risk": "a skip budget of four finds the answer inside most 12-word messages"
+ },
+ {
+  "answer": "wager",
+  "text": "wag lol ok so er",
+  "technique": "split-with-3-fillers",
+  "decode": "Concatenate the two real fragments across the junk in between: wag + er. The joiner requires adjacency, and 3 fillers exceed the acrostic's 2-skip budget.",
+  "worth_catching": false,
+  "fp_risk": "joining pieces across three arbitrary words collides with ordinary chat"
+ },
+ {
+  "answer": "ghost",
+  "text": "gho um idk st",
+  "technique": "split-with-3-fillers",
+  "decode": "gho + st with three filler tokens skipped.",
+  "worth_catching": false,
+  "fp_risk": "joining pieces across three arbitrary words collides with ordinary chat"
+ },
+ {
+  "answer": "plane",
+  "text": "check the panel",
+  "technique": "dictionary-word-anagram",
+  "decode": "Unscramble: panel -> plane. The anagram check in fuzzyHit is explicitly skipped for dictionary words, so any anagram that is itself a real word slides through.",
+  "worth_catching": false,
+  "fp_risk": "the anagram rule skips dictionary words on purpose; panel/plane collisions are ordinary chat"
+ },
+ {
+  "answer": "stare",
+  "text": "the rates are bad today",
+  "technique": "dictionary-word-anagram",
+  "decode": "rates -> stare. Also tears, aster, taser, resat.",
+  "worth_catching": false,
+  "fp_risk": "the anagram rule skips dictionary words on purpose; panel/plane collisions are ordinary chat"
+ },
+ {
+  "answer": "plane",
+  "text": "so plain today",
+  "technique": "real-word-homophone",
+  "decode": "'plain' is pronounced identically to 'plane'. The phonetic (double-metaphone) check refuses to run on dictionary words, so real-word homophones are a blind spot even though the detector advertises phonetic matching.",
+  "worth_catching": false,
+  "fp_risk": "the sounds-like rule skips dictionary words on purpose; plain/plane collisions are ordinary chat"
+ },
+ {
+  "answer": "light",
+  "text": "its lite",
+  "technique": "real-word-homophone",
+  "decode": "'lite' is the answer spelled by sound; it is in the dictionary so all fuzzy and phonetic checks are skipped.",
+  "worth_catching": false,
+  "fp_risk": "the sounds-like rule skips dictionary words on purpose; plain/plane collisions are ordinary chat"
+ },
+ {
+  "answer": "wager",
+  "text": "way jer",
+  "technique": "phonetic-split-across-tokens",
+  "decode": "Say it out loud: way-jer. The cross-token joiner produces 'wayjer', but the joined-string path only runs exactHit / wildcard / leet - it never applies the phonetic or fuzzy checks that would catch 'wayjer' as a single token (the test suite asserts 'Wayjer' IS caught).",
+  "worth_catching": false,
+  "fp_risk": "sounds-like on joined tokens flagged 15 extra benign pairs (is it -> arise)"
+ },
+ {
+  "answer": "crane",
+  "text": "cray n",
+  "technique": "phonetic-split-across-tokens",
+  "decode": "cray + n = 'crayn', a phonetic spelling of crane. Joined but never phonetically checked.",
+  "worth_catching": false,
+  "fp_risk": "sounds-like on joined tokens flagged 15 extra benign pairs (is it -> arise)"
+ },
+ {
+  "answer": "wager",
+  "text": "waxxaxxgxxexxr",
+  "technique": "stride-3-interleave",
+  "decode": "Take every third letter. The interleave check only tries stride 2 (even/odd positions) and only for tokens of length 2L-1 to 2L+1.",
+  "worth_catching": false,
+  "fp_risk": "nobody types it"
+ },
+ {
+  "answer": "light",
+  "text": "```\n#      #   ####  #   #  #####\n#      #  #      #   #    #  \n#      #  #  ##  #####    #  \n#      #  #   #  #   #    #  \n#####  #   ####  #   #    #  \n```",
+  "technique": "ascii-art-banner",
+  "decode": "Figlet-style block letters spelling LIGHT in a code block.",
+  "worth_catching": false,
+  "fp_risk": "needs rendering; OCR of a screenshot would catch it, the text layer cannot"
+ },
+ {
+  "answer": "crane",
+  "text": "cr lol ane",
+  "technique": "split-with-filler-word",
+  "decode": "Two chunks of the word with a filler word between: cr ... ane.",
+  "worth_catching": true,
+  "fp_risk": "Moderate: joining across a filler produces many nonsense strings; restrict to chunks that are non-words and whose concatenation is exactly the answer."
+ },
+ {
+  "answer": "light",
+  "text": "all hi bag oh at",
+  "technique": "telestich-last-letters",
+  "decode": "Last letter of each word: l i g h t.",
+  "worth_catching": false,
+  "fp_risk": "five ordinary words' last letters spell an answer far too often"
+ },
+ {
+  "answer": "crane",
+  "text": "enarcs",
+  "technique": "reversed-plus-suffix",
+  "decode": "'cranes' reversed. Reversal plus a suffix is not in the exact set and edit distance is 2.",
+  "worth_catching": false,
+  "fp_risk": "marginal readability"
+ },
+ {
+  "answer": "wager",
+  "text": "ωαγερ",
+  "technique": "greek-phonetic",
+  "decode": "Greek letters read by sound: omega alpha gamma epsilon rho",
+  "worth_catching": false,
+  "fp_risk": "greek and cyrillic letters are mapped by shape, and a sound-value table would conflict with it"
+ },
+ {
+  "answer": "house",
+  "text": "ηουσε",
+  "technique": "greek-phonetic",
+  "decode": "Greek letters read by sound: eta omicron upsilon sigma epsilon",
+  "worth_catching": false,
+  "fp_risk": "greek and cyrillic letters are mapped by shape, and a sound-value table would conflict with it"
+ },
+ {
+  "answer": "wager",
+  "text": "вагер",
+  "technique": "cyrillic-phonetic",
+  "decode": "Cyrillic transliteration read by sound (v-a-g-e-r)",
+  "worth_catching": false,
+  "fp_risk": "greek and cyrillic letters are mapped by shape, and a sound-value table would conflict with it"
+ },
+ {
+  "answer": "ghost",
+  "text": "гхост",
+  "technique": "cyrillic-phonetic",
+  "decode": "Cyrillic transliteration read by sound (g-kh-o-s-t)",
+  "worth_catching": false,
+  "fp_risk": "greek and cyrillic letters are mapped by shape, and a sound-value table would conflict with it"
+ },
+ {
+  "answer": "wager",
+  "text": "wxxaxxgxxexxr",
+  "technique": "interleave-double-noise",
+  "decode": "every third letter; the interleave rule only handles single-letter noise",
+  "worth_catching": false,
+  "fp_risk": "nobody types it"
+ },
+ {
+  "answer": "wager",
+  "text": "10111 00001 00111 00101 10010",
+  "technique": "binary-5bit-a1z26",
+  "decode": "5-bit binary of a=1..z=26; binary rule requires 7 or 8 bits",
+  "worth_catching": false,
+  "fp_risk": "not decodable by a reader without tools"
+ },
+ {
+  "answer": "wager",
+  "text": "XXIII I VII V XVIII",
+  "technique": "a1z26-roman",
+  "decode": "roman numerals then a=1..z=26",
+  "worth_catching": false,
+  "fp_risk": "not decodable by a reader without tools"
+ },
+ {
+  "answer": "wager",
+  "text": "9 2 4 33 777",
+  "technique": "phone-multitap",
+  "decode": "old-phone multi-tap key presses (2=a 22=b 222=c)",
+  "worth_catching": false,
+  "fp_risk": "nobody types multitap"
+ },
+ {
+  "answer": "wager",
+  "text": "52 11 22 15 42",
+  "technique": "polybius-tap-code",
+  "decode": "Polybius square / tap code row-column pairs",
+  "worth_catching": false,
+  "fp_risk": "not decodable by a reader without tools"
+ },
+ {
+  "answer": "wager",
+  "text": "base36 55131075",
+  "technique": "base36",
+  "decode": "base36 integer",
+  "worth_catching": false,
+  "fp_risk": "not decodable by a reader without tools"
+ }
+]

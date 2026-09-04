@@ -1302,5 +1302,645 @@
   "decode": "morse spoken as dit and dah",
   "worth_catching": true,
   "fp_risk": "none"
+ },
+ {
+  "answer": "ghost",
+  "text": "gho um idk st",
+  "technique": "split-with-3-fillers",
+  "decode": "gho + st with three filler tokens skipped.",
+  "worth_catching": false,
+  "fp_risk": "joining pieces across three arbitrary words collides with ordinary chat"
+ },
+ {
+  "answer": "crane",
+  "text": "cr lol ane",
+  "technique": "split-with-filler-word",
+  "decode": "Two chunks of the word with a filler word between: cr ... ane.",
+  "worth_catching": true,
+  "fp_risk": "Moderate: joining across a filler produces many nonsense strings; restrict to chunks that are non-words and whose concatenation is exactly the answer."
+ },
+ {
+  "answer": "wager",
+  "text": "ho**w**ie s**a**id the bi**g** on**e** was **r**ight",
+  "technique": "emphasis-marked-letters",
+  "decode": "Read the bold letters in order: w a g e r. This is the internal-capitals trick with markdown instead of case. normalize() deletes ** before anything looks at the text, so the marked letters merge back into their words and the message becomes plain 'howie said the big one was right'.",
+  "worth_catching": true,
+  "fp_risk": "Very low. Collect the text inside each emphasis span (** __ ~~ ` || and single * or _) and, when there are 3+ spans of 1-2 letters, join them in order and run streamHit. Nobody bolds single letters inside words innocently."
+ },
+ {
+  "answer": "house",
+  "text": "t**h**e d**o**g y**u**p **s**o **e**h",
+  "technique": "emphasis-marked-letters",
+  "decode": "Bold letters: h o u s e.",
+  "worth_catching": true,
+  "fp_risk": "As above."
+ },
+ {
+  "answer": "wager",
+  "text": "ho*w*ie s*a*id the bi*g* on*e* was *r*ight",
+  "technique": "emphasis-marked-letters",
+  "decode": "Italic letters (single asterisk) in order: w a g e r. Single * is not stripped by normalize at all; tokenHit later strips it inside each token, so the marking is invisible to every rule.",
+  "worth_catching": true,
+  "fp_risk": "As above; single * and _ inside words are also markdown in Discord and should be treated as spans."
+ },
+ {
+  "answer": "wager",
+  "text": "ho__w__ie s__a__id the bi__g__ on__e__ was __r__ight",
+  "technique": "emphasis-marked-letters",
+  "decode": "Underlined letters: w a g e r.",
+  "worth_catching": true,
+  "fp_risk": "As above."
+ },
+ {
+  "answer": "wager",
+  "text": "ho||w||ie s||a||id the bi||g|| on||e|| was ||r||ight",
+  "technique": "emphasis-marked-letters",
+  "decode": "Each hidden letter is its own spoiler; tap them in order: w a g e r.",
+  "worth_catching": true,
+  "fp_risk": "As above."
+ },
+ {
+  "answer": "wager",
+  "text": "ho**wa**ii is **ger**man",
+  "technique": "emphasis-marked-chunks",
+  "decode": "Bold chunks joined in order: wa + ger. Same gap as the single-letter version but with 2-3 letter pieces; the boundary rule does not see it because 'howaii is german' has no straddling 'wager'.",
+  "worth_catching": true,
+  "fp_risk": "Low. Join the emphasised spans in order and test exactHit; people bolding two unrelated fragments that happen to concatenate to the answer is rare."
+ },
+ {
+  "answer": "wager",
+  "text": "ho𝐰ie s𝐚id the bi𝐠 on𝐞 was 𝐫ight",
+  "technique": "unicode-styled-letters-in-words",
+  "decode": "The mathematical-bold letters stand out from the ASCII ones; read them in order: w a g e r. mapFancyLetters folds them into plain letters before anything can notice they were different.",
+  "worth_catching": true,
+  "fp_risk": "Very low. Before folding fancy letters, collect letters whose code point is outside ASCII while sitting inside an otherwise ASCII word, and run streamHit on them in order. Whole words typed in a fancy font (already caught) do not trigger this because every letter is styled."
+ },
+ {
+  "answer": "wager",
+  "text": "hoＷie sＡid the biＧ onＥ was Ｒight",
+  "technique": "unicode-styled-letters-in-words",
+  "decode": "Fullwidth letters inside ASCII words: W A G E R. NFKD maps them to plain ASCII before any rule runs.",
+  "worth_catching": true,
+  "fp_risk": "As above."
+ },
+ {
+  "answer": "wager",
+  "text": "HOwIE SaID THE BIg ONe WAS rIGHT",
+  "technique": "lowercase-in-caps",
+  "decode": "Mirror of internal-capitals: the message is shouted and the odd lowercase letters spell w a g e r. capitalStreams collects the capitals, gets 24 of them, and gives up because the stream is longer than 12.",
+  "worth_catching": true,
+  "fp_risk": "Low. When a message is mostly uppercase, collect the lowercase letters as the stream instead. Innocent shouting with a few lowercase letters (LOL i CANT) only fires if those letters spell the answer in order."
+ },
+ {
+  "answer": "wager",
+  "text": "LMAOOO OMG hoWie sAid the biG onE was Right",
+  "technique": "internal-capitals-plus-shouting",
+  "decode": "Skip the obviously shouted words, then read the odd capitals: W A G E R. capitalStreams caps the stream at 12 capitals and 'LMAOOO OMG' alone contributes 9, so the whole check is skipped.",
+  "worth_catching": true,
+  "fp_risk": "Low. Drop all-caps words of 2+ letters from the capital stream before the length gate, or drop the length gate and rely on the substring check. Same false-positive profile as the existing capitals rule."
+ },
+ {
+  "answer": "wager",
+  "text": "hoWie sAid the NBA biG onE was Right",
+  "technique": "internal-capitals-plus-shouting",
+  "decode": "Ignore the acronym and read the mid-word capitals: W A G E R. The capital stream is WANBAGER, which no longer contains the answer contiguously.",
+  "worth_catching": true,
+  "fp_risk": "As above: dropping all-caps words fixes both examples."
+ },
+ {
+  "answer": "house",
+  "text": "LMFAOOOO wHy nOt jUst Say Everything",
+  "technique": "internal-capitals-plus-shouting",
+  "decode": "Capitals after the shouted word: H O U S E.",
+  "worth_catching": true,
+  "fp_risk": "As above."
+ },
+ {
+  "answer": "wager",
+  "text": "wa and then ge and then r",
+  "technique": "chunks-with-two-word-gaps",
+  "decode": "Three pieces of the word with a two-word gap between them: wa + ge + r. fillerJoin only joins two pieces across exactly one filler, the acrostic budget is 2 skips total (this needs 4), and the boundary rule needs the letters contiguous.",
+  "worth_catching": true,
+  "fp_risk": "Moderate. Extend fillerJoin to up to three non-word pieces (or pieces of 2 letters or fewer) with gaps of up to two tokens, and require the concatenation to be an exact answer. Junk pieces like 'so um ok' rarely concatenate to a five-letter answer, but the candidate count grows with message length."
+ },
+ {
+  "answer": "house",
+  "text": "ho and then us and then e",
+  "technique": "chunks-with-two-word-gaps",
+  "decode": "ho + us + e.",
+  "worth_catching": true,
+  "fp_risk": "As above. Note 'us' is a dictionary word, so a non-word gate would need a length exception for 1-2 letter pieces."
+ },
+ {
+  "answer": "light",
+  "text": "li and then gh and then t",
+  "technique": "chunks-with-two-word-gaps",
+  "decode": "li + gh + t.",
+  "worth_catching": true,
+  "fp_risk": "As above."
+ },
+ {
+  "answer": "house",
+  "text": "h then 0 then u then 5 then 3",
+  "technique": "leet-with-connectors",
+  "decode": "Drop the connector word, then read the leet: h 0 u 5 3 = house. Two caught tricks combined: the letter stream only keeps single letters (so it sees 'hu'), and the leet join only works on adjacent tokens.",
+  "worth_catching": true,
+  "fp_risk": "Very low. Let letterStream keep single leet digits/symbols as well as letters, then run leetVariants on the stream. Lone digits appear in chat but rarely five of them interleaved with lone letters."
+ },
+ {
+  "answer": "light",
+  "text": "l then 1 then g then h then 7",
+  "technique": "leet-with-connectors",
+  "decode": "l 1 g h 7 = light.",
+  "worth_catching": true,
+  "fp_risk": "As above."
+ },
+ {
+  "answer": "wager",
+  "text": "whiskey then alpha then golf then echo then romeo",
+  "technique": "nato-with-connectors",
+  "decode": "NATO words with a connector between each: w a g e r. decodeSpokenLetters flushes its run at the first non-NATO word, so no run reaches 3 letters, and the acrostic needs 4 skips.",
+  "worth_catching": true,
+  "fp_risk": "Very low. Let decodeSpokenLetters skip a small filler set (then, and, next, comma) between letter words, or collect every NATO/letter-name token in the message in order when there are 3+ of them. Five NATO words in one message is never innocent."
+ },
+ {
+  "answer": "house",
+  "text": "hotel, then oscar, then uniform, then sierra, then echo",
+  "technique": "nato-with-connectors",
+  "decode": "h o u s e.",
+  "worth_catching": true,
+  "fp_risk": "As above."
+ },
+ {
+  "answer": "wager",
+  "text": "double u then ay then gee then ee then arr",
+  "technique": "nato-with-connectors",
+  "decode": "Letter names with connectors: w a g e r.",
+  "worth_catching": true,
+  "fp_risk": "As above; letter names like 'ay', 'are', 'you' are real words, so the collect-all variant should require 3+ unambiguous letter words (NATO or spelled names like gee/arr) in the run."
+ },
+ {
+  "answer": "house",
+  "text": "aitch then oh then you then ess then ee",
+  "technique": "nato-with-connectors",
+  "decode": "h o u s e.",
+  "worth_catching": true,
+  "fp_risk": "As above."
+ },
+ {
+  "answer": "crane",
+  "text": "sea are aye en ee",
+  "technique": "letter-name-homophones-missing",
+  "decode": "Say it aloud: sea=c, are=r, aye=a, en=n, ee=e. LETTER_NAMES has see/cee and ay/eh but not sea, aye, pea, owe, ewe, yew, dub; the run breaks at the first missing word.",
+  "worth_catching": true,
+  "fp_risk": "Low. Add the missing homophones to LETTER_NAMES. 'sea', 'aye', 'owe', 'pea' are ordinary words, but the decoder already requires a run of 3+ letter words so a single one in chat is harmless."
+ },
+ {
+  "answer": "house",
+  "text": "aitch owe you ess ee",
+  "technique": "letter-name-homophones-missing",
+  "decode": "aitch=h, owe=o, you=u, ess=s, ee=e.",
+  "worth_catching": true,
+  "fp_risk": "As above."
+ },
+ {
+  "answer": "wager",
+  "text": "dub ay gee ee arr",
+  "technique": "letter-name-homophones-missing",
+  "decode": "dub=w (as in dub-ya), ay, gee, ee, arr. 'dubs' and 'dubya' are mapped but 'dub' is not.",
+  "worth_catching": true,
+  "fp_risk": "As above."
+ },
+ {
+  "answer": "wager",
+  "text": "23 then 1 then 7 then 5 then 18",
+  "technique": "a1z26-word-connectors",
+  "decode": "a=1..z=26 with a word between each number: 23=w 1=a 7=g 5=e 18=r. decodeNumbers splits the text into groups on any character outside [0-9a-f and a few separators], so 'then' (t, h, n) cuts every number into its own group and no group reaches the 3-number minimum.",
+  "worth_catching": true,
+  "fp_risk": "Low. Collect all standalone 1-2 digit numbers in the message in order (ignoring words between) and try the a=1 decoding when there are 4+ in range. Messages with five bare numbers under 27 in a row are uncommon; scores like '3/6' are already tolerated as filler."
+ },
+ {
+  "answer": "wager",
+  "text": "letter 1 = 23, letter 2 = 1, letter 3 = 7, letter 4 = 5, letter 5 = 18",
+  "technique": "a1z26-word-connectors",
+  "decode": "Position = alphabet index: 23 1 7 5 18 = wager. The position numbers 1-5 sit in front of each code, so a reader ignores them; the detector never gets a group with 3 numbers.",
+  "worth_catching": true,
+  "fp_risk": "As above; a rule that collects all numbers gets '1 23 2 1 3 7 4 5 5 18' and needs to try dropping the alternating position numbers, or accept 'wager' as a substring of the decoded stream."
+ },
+ {
+  "answer": "light",
+  "text": "first letter is 12, second is 9, third is 7, fourth is 8, fifth is 20",
+  "technique": "a1z26-word-connectors",
+  "decode": "12 9 7 8 20 = light.",
+  "worth_catching": true,
+  "fp_risk": "As above."
+ },
+ {
+  "answer": "wager",
+  "text": "23 • 1 • 7 • 5 • 18",
+  "technique": "a1z26-punct-separators",
+  "decode": "a=1..z=26 separated by bullets. decodeNumbers only keeps - . , : ; | / + _ # as separators; • · → > ~ ( ) [ ] ! ? & * = and quotes all split the group so no group has 3 numbers.",
+  "worth_catching": true,
+  "fp_risk": "None. Treat every non-alphanumeric character as a separator instead of a group boundary; only letters (other than hex digits) should break a number group."
+ },
+ {
+  "answer": "crane",
+  "text": "3 → 18 → 1 → 14 → 5",
+  "technique": "a1z26-punct-separators",
+  "decode": "Arrows between the numbers: 3 18 1 14 5 = crane.",
+  "worth_catching": true,
+  "fp_risk": "As above."
+ },
+ {
+  "answer": "house",
+  "text": "(8)(15)(21)(19)(5)",
+  "technique": "a1z26-punct-separators",
+  "decode": "Each number in parentheses: 8 15 21 19 5 = house.",
+  "worth_catching": true,
+  "fp_risk": "As above."
+ },
+ {
+  "answer": "wager",
+  "text": "[23] [1] [7] [5] [18]",
+  "technique": "a1z26-punct-separators",
+  "decode": "Bracketed numbers: 23 1 7 5 18.",
+  "worth_catching": true,
+  "fp_risk": "As above."
+ },
+ {
+  "answer": "wager",
+  "text": "twenty-three one seven five eighteen",
+  "technique": "number-words-hyphenated",
+  "decode": "Number words with the standard English hyphen in the compound: 23 1 7 5 18. numberWordsToDigits splits on whitespace and commas only, so 'twenty-three' is not recognised; the rest decodes to 'ager', which is a dictionary word and therefore skipped by fuzzyHit.",
+  "worth_catching": true,
+  "fp_risk": "None. Split number words on hyphens too."
+ },
+ {
+  "answer": "house",
+  "text": "eight fifteen twenty-one nineteen five",
+  "technique": "number-words-hyphenated",
+  "decode": "8 15 21 19 5 = house.",
+  "worth_catching": true,
+  "fp_risk": "As above."
+ },
+ {
+  "answer": "wager",
+  "text": "twenty-third, first, seventh, fifth, eighteenth",
+  "technique": "ordinal-words",
+  "decode": "Ordinals name the alphabet positions: 23rd=w 1st=a 7th=g 5th=e 18th=r. The digit forms '23rd 1st' are handled but the spelled ordinals are not in UNITS/TENS.",
+  "worth_catching": true,
+  "fp_risk": "Low. Add first..twentieth plus the -th forms of the tens to the number-word table. A run of five ordinal words is rare in chat."
+ },
+ {
+  "answer": "light",
+  "text": "twelfth, ninth, seventh, eighth, twentieth",
+  "technique": "ordinal-words",
+  "decode": "12 9 7 8 20 = light.",
+  "worth_catching": true,
+  "fp_risk": "As above."
+ },
+ {
+  "answer": "wager",
+  "text": "twenty three, then one, then seven, then five, then eighteen",
+  "technique": "number-words-connectors",
+  "decode": "Same as the digit version with a connector word: 23 1 7 5 18. numberWordsToDigits does convert the words, but the resulting '23 then 1 then 7 ...' hits the same group-splitting problem as a1z26-word-connectors.",
+  "worth_catching": true,
+  "fp_risk": "Fixed by the same collect-all-numbers change."
+ },
+ {
+  "answer": "wager",
+  "text": ".--\n.-\n--.\n.\n.-.",
+  "technique": "morse-per-line",
+  "decode": "One morse letter per line, the most natural way to type morse on a phone. morseForms only recognises spaces, commas, / and | as letter separators; a newline is neither turned into a space nor treated as a separator, so the joined form never equals the space-separated pattern.",
+  "worth_catching": true,
+  "fp_risk": "None. Treat newlines (and tabs) as letter separators in morseForms."
+ },
+ {
+  "answer": "house",
+  "text": "....\n---\n..-\n...\n.",
+  "technique": "morse-per-line",
+  "decode": "h o u s e, one letter per line.",
+  "worth_catching": true,
+  "fp_risk": "As above."
+ },
+ {
+  "answer": "wager",
+  "text": "dot dash dash, dot dash, dash dash dot, dot, dot dash dot",
+  "technique": "morse-dot-dash-words",
+  "decode": "Spoken morse with the words 'dot' and 'dash': .-- .- --. . .-. = wager. The spoken-morse mapping only knows dit/dah/di/da.",
+  "worth_catching": true,
+  "fp_risk": "None. Add dot/dash (and 'short'/'long') to the spoken-morse substitution."
+ },
+ {
+  "answer": "light",
+  "text": "dot dash dot dot / dot dot / dash dash dot / dot dot dot dot / dash",
+  "technique": "morse-dot-dash-words",
+  "decode": ".-.. .. --. .... - = light.",
+  "worth_catching": true,
+  "fp_risk": "As above."
+ },
+ {
+  "answer": "wager",
+  "text": "🔴➖➖ 🔴➖ ➖➖🔴 🔴 🔴➖🔴",
+  "technique": "morse-emoji",
+  "decode": "Red circle = dot, heavy minus = dash: .-- .- --. . .-. = wager. Both glyphs are emoji, so normalize turns them into spaces before the morse check, and the raw-text morse pass does not map them either.",
+  "worth_catching": true,
+  "fp_risk": "Very low. Map circle/dot emoji (🔴 ⚫ ⚪ 🟡 🟢 🟠 🟣 ⏺) to '.' and ➖ ➡ ⬛-style bar emoji to '-' before the emoji-to-space step, and only when the run has both kinds. A row of red circles alone does not decode to anything."
+ },
+ {
+  "answer": "light",
+  "text": "⚫➖⚫⚫ ⚫⚫ ➖➖⚫ ⚫⚫⚫⚫ ➖",
+  "technique": "morse-emoji",
+  "decode": "Black circle = dot, heavy minus = dash: light.",
+  "worth_catching": true,
+  "fp_risk": "As above."
+ },
+ {
+  "answer": "wager",
+  "text": "●−− ●− −−● ● ●−●",
+  "technique": "morse-unmapped-glyphs",
+  "decode": "Black circle (U+25CF) as dot, minus sign as dash. morseForms maps · • ∙ ⋅ to '.' but not ●, ○, ⚫ or *.",
+  "worth_catching": true,
+  "fp_risk": "None. Extend the dot map (● ○ ▪ ■ *) and the dash map (‐ ‑ ‒ ― ー)."
+ },
+ {
+  "answer": "wager",
+  "text": "*-- *- --* * *-*",
+  "technique": "morse-unmapped-glyphs",
+  "decode": "Asterisk as dot: .-- .- --. . .-.",
+  "worth_catching": true,
+  "fp_risk": "As above; single asterisks are also markdown, so map them only inside a run that contains dashes."
+ },
+ {
+  "answer": "house",
+  "text": "●●●● ――― ●●― ●●● ●",
+  "technique": "morse-unmapped-glyphs",
+  "decode": "Black circle as dot, horizontal bar (U+2015) as dash: house.",
+  "worth_catching": true,
+  "fp_risk": "As above."
+ },
+ {
+  "answer": "wager",
+  "text": "its wage and then an r stuck on the end",
+  "technique": "arithmetic-unlisted-verb",
+  "decode": "wage + r. The near-miss word and the standalone letter are both present, but the INSTRUCTION regex needs one of add/drop/remove/... and this phrasing uses none of them; the acrostic path needs 3+ skips so it misses too.",
+  "worth_catching": true,
+  "fp_risk": "Low. The gate could be loosened to: a dictionary word within one edit of the answer AND a standalone letter token in the same message that is exactly the letter which turns one into the other. That condition alone is rare in chat and no verb list is needed."
+ },
+ {
+  "answer": "wager",
+  "text": "its wage but theres an r at the end too",
+  "technique": "arithmetic-unlisted-verb",
+  "decode": "wage + r on the end.",
+  "worth_catching": true,
+  "fp_risk": "As above."
+ },
+ {
+  "answer": "house",
+  "text": "its mouse but the first letter is h",
+  "technique": "arithmetic-unlisted-verb",
+  "decode": "mouse with h in front: house.",
+  "worth_catching": true,
+  "fp_risk": "As above."
+ },
+ {
+  "answer": "wager",
+  "text": "like pager but with a w",
+  "technique": "arithmetic-unlisted-verb",
+  "decode": "pager with p replaced by w. 'pager' is one substitution from the answer; 'with' is not in the verb list.",
+  "worth_catching": true,
+  "fp_risk": "As above: 'pager' plus a standalone 'w' is the whole signal."
+ },
+ {
+  "answer": "crane",
+  "text": "its crate but the t is an n",
+  "technique": "arithmetic-unlisted-verb",
+  "decode": "crate with t -> n.",
+  "worth_catching": true,
+  "fp_risk": "As above."
+ },
+ {
+  "answer": "plane",
+  "text": "its plant but e not t",
+  "technique": "arithmetic-unlisted-verb",
+  "decode": "plant with the t swapped for e.",
+  "worth_catching": true,
+  "fp_risk": "As above."
+ },
+ {
+  "answer": "brain",
+  "text": "its bran but add an i",
+  "technique": "arithmetic-letter-a-or-i",
+  "decode": "bran + i. The verb is in the list, but the letter regex is [b-hj-z] so that 'a' and 'i' as ordinary words do not trigger it; when the missing letter IS a or i the rule never fires.",
+  "worth_catching": true,
+  "fp_risk": "Low. Allow 'a' and 'i' when they directly follow 'an'/'a'/'the letter'/'add'/'swap ... for', or simply check whether the edit between the near-miss word and the answer is exactly the letter named anywhere in the message (a or i included)."
+ },
+ {
+  "answer": "raise",
+  "text": "its rise but add an a",
+  "technique": "arithmetic-letter-a-or-i",
+  "decode": "rise + a = raise.",
+  "worth_catching": true,
+  "fp_risk": "As above."
+ },
+ {
+  "answer": "light",
+  "text": "lighten up lol",
+  "technique": "inflection-suffix-unlisted",
+  "decode": "The answer plus -en. 'lighten' is a dictionary word so substringHit and fuzzyHit skip it, and 'en' is not in SUFFIXES. The project labels inflections as direct, so this is a gap in the suffix list rather than the accepted substring-of-real-word gap.",
+  "worth_catching": true,
+  "fp_risk": "Bounded: extend SUFFIXES with the derivational set (en, ment, able, ity, ify, ize, hood, ship, ward, wise, ish already there). On a 'light' day 'lighten up' gets deleted, which is the same trade the existing suffix rule already makes for 'lights'."
+ },
+ {
+  "answer": "place",
+  "text": "placement",
+  "technique": "inflection-suffix-unlisted",
+  "decode": "place + ment.",
+  "worth_catching": true,
+  "fp_risk": "As above."
+ },
+ {
+  "answer": "short",
+  "text": "shorten it",
+  "technique": "inflection-suffix-unlisted",
+  "decode": "short + en.",
+  "worth_catching": true,
+  "fp_risk": "As above."
+ },
+ {
+  "answer": "wager",
+  "text": "wow ok\nabsolutely brutal\ngot it eventually\nended on 5\nreally annoying\nso yeah\nthat was rough\nanyone else\ni hate this\nmy streak lives\nok bye\ngg\nlol",
+  "technique": "line-acrostic-over-12-lines",
+  "decode": "Initials of the first five lines: w a g e r; the rest is padding. streamHit only does the substring check when the stream is 12 letters or shorter, and 13 lines make a 13-letter stream, so only an exact match is tried. (Capitalising the line starts would be caught by capitalStreams, so the lines are lowercase.)",
+  "worth_catching": true,
+  "fp_risk": "Low. Drop the 12-letter cap for line initials, or check every window of the stream. Long multi-line messages whose first N line initials spell the answer are as rare as the 5-line case the existing rule already accepts."
+ },
+ {
+  "answer": "light",
+  "text": "lol ok\nidk man\ngot it late\nhard one\ntoday was fine\nso yeah\nthat was rough\nanyone else\nmy streak lives\nok bye\ngg\nbrb\nlater",
+  "technique": "line-acrostic-over-12-lines",
+  "decode": "First five line initials: l i g h t.",
+  "worth_catching": true,
+  "fp_risk": "As above."
+ },
+ {
+  "answer": "light",
+  "text": "```\nday 5\nlxxxx\nxixxx\nxxgxx\nxxxhx\nxxxxt\n```",
+  "technique": "diagonal-with-header-line",
+  "decode": "Read the diagonal of the letter grid: l i g h t. gridStreams reads the main diagonal as row i, column i over all lines, so a header line above the grid shifts every row by one and the diagonal comes out as 'dxxxxx'.",
+  "worth_catching": true,
+  "fp_risk": "None. Compute diagonals starting from every row and every column (or only over the rows that look like a grid: same length, no spaces), not just from the top-left corner."
+ },
+ {
+  "answer": "house",
+  "text": "```\nguess 4\nhxxxx\nxoxxx\nxxuxx\nxxxsx\nxxxxe\n```",
+  "technique": "diagonal-with-header-line",
+  "decode": "Diagonal under the 'guess 4' header: h o u s e.",
+  "worth_catching": true,
+  "fp_risk": "As above."
+ },
+ {
+  "answer": "light",
+  "text": "```\nxlxxxx\nxxixxx\nxxxgxx\nxxxxhx\nxxxxxt\n```",
+  "technique": "diagonal-offset-column",
+  "decode": "Diagonal starting one column in: l i g h t. Only the diagonal through (0,0) and the anti-diagonal through the last column are checked.",
+  "worth_catching": true,
+  "fp_risk": "None; same fix as above."
+ },
+ {
+  "answer": "house",
+  "text": "```\nxhxxxx\nxxoxxx\nxxxuxx\nxxxxsx\nxxxxxe\n```",
+  "technique": "diagonal-offset-column",
+  "decode": "Diagonal starting at column 1: h o u s e.",
+  "worth_catching": true,
+  "fp_risk": "As above."
+ },
+ {
+  "answer": "wager",
+  "text": "<:blue_letter_w:1><:blue_letter_a:2><:blue_letter_g:3><:blue_letter_e:4><:blue_letter_r:5>",
+  "technique": "custom-emoji-multi-segment-name",
+  "decode": "Letter emoji pack whose names have two prefix segments: the trailing letter of each name spells wager. LETTER_EMOJI allows exactly one prefix segment ([a-z0-9]+_), so 'blue_letter_w' falls through to the generic name expansion and the token 'blue_letter_w' is never reduced to w.",
+  "worth_catching": true,
+  "fp_risk": "Very low. Match any custom emoji name whose last (or first) underscore-separated segment is a single letter, regardless of how many other segments there are."
+ },
+ {
+  "answer": "house",
+  "text": "<:blue_letter_h:1><:blue_letter_o:2><:blue_letter_u:3><:blue_letter_s:4><:blue_letter_e:5>",
+  "technique": "custom-emoji-multi-segment-name",
+  "decode": "Trailing letters: h o u s e.",
+  "worth_catching": true,
+  "fp_risk": "As above."
+ },
+ {
+  "answer": "wager",
+  "text": "<:letterw:1><:lettera:2><:letterg:3><:lettere:4><:letterr:5>",
+  "technique": "custom-emoji-multi-segment-name",
+  "decode": "Emoji names 'letterw', 'lettera', ... with no underscore; read the last character of each name. Neither the letter-emoji regex nor the acrostic (initials are all l) sees it.",
+  "worth_catching": true,
+  "fp_risk": "Low. Also strip a leading 'letter'/'alpha'/'regional_indicator' word from custom emoji names before looking for a single remaining letter."
+ },
+ {
+  "answer": "wager",
+  "text": "`:letter_w: :letter_a: :letter_g: :letter_e: :letter_r:`",
+  "technique": "emoji-shortcode-literal",
+  "decode": "Custom-emoji shortcodes shown as text inside a code span (Discord does not convert them there); read the letter at the end of each shortcode. Only :regional_indicator_x: is mapped when written literally; :letter_x: and friends survive as the token 'letter_w', which no rule reduces to a letter.",
+  "worth_catching": true,
+  "fp_risk": "Very low. Apply the same single-letter-segment rule to bare :name: shortcodes as to <:name:id> emoji."
+ },
+ {
+  "answer": "light",
+  "text": ":letter_l::letter_i::letter_g::letter_h::letter_t:",
+  "technique": "emoji-shortcode-literal",
+  "decode": "Shortcodes typed for an emoji pack the server does not have stay literal in Discord: l i g h t.",
+  "worth_catching": true,
+  "fp_risk": "As above."
+ },
+ {
+  "answer": "wager",
+  "text": "ᏔᎪᎶᎬᎡ",
+  "technique": "fancy-font-unmapped-scripts",
+  "decode": "Cherokee-letter 'fancy font' from a text generator; the glyphs look like W A G E R. Not in the confusables table or FANCY_FONTS.",
+  "worth_catching": true,
+  "fp_risk": "None once mapped; real Cherokee text does not line up with English answers. Add the generator alphabets for Cherokee (ᏔᎪᎶᎬᎡ...), Yi (ꐏꑡ...) and the Limbu/Tai Viet 'aesthetic' set to FANCY_FONTS."
+ },
+ {
+  "answer": "house",
+  "text": "ꃅꂦꀎꌗꍟ",
+  "technique": "fancy-font-unmapped-scripts",
+  "decode": "Yi-syllable 'squiggle' font from a generator: H O U S E by shape.",
+  "worth_catching": true,
+  "fp_risk": "As above."
+ },
+ {
+  "answer": "crane",
+  "text": "ᥴ᥅ᥲᥒᥱ",
+  "technique": "fancy-font-unmapped-scripts",
+  "decode": "Limbu-letter 'aesthetic' font: c r a n e by shape.",
+  "worth_catching": true,
+  "fp_risk": "As above."
+ },
+ {
+  "answer": "light",
+  "text": "ꪶⅈᧁꫝꪻ",
+  "technique": "fancy-font-unmapped-scripts",
+  "decode": "Tai Viet / mixed 'aesthetic' font: l i g h t by shape.",
+  "worth_catching": true,
+  "fp_risk": "As above."
+ },
+ {
+  "answer": "wager",
+  "text": "aXTigJlzIHdhZ2Vy",
+  "technique": "base64-with-non-ascii",
+  "decode": "base64 of \"it’s wager\" with the curly apostrophe a phone keyboard inserts automatically. The decoded bytes contain a non-ASCII character, so the printable-ASCII gate discards the whole decode before it is rescanned.",
+  "worth_catching": true,
+  "fp_risk": "None. Decode as UTF-8 and rescan whenever the result has 3+ ASCII letters, instead of requiring the whole string to be printable ASCII."
+ },
+ {
+  "answer": "house",
+  "text": "aG91c2Ug8J+YgA==",
+  "technique": "base64-with-non-ascii",
+  "decode": "base64 of \"house 😀\". Same gate.",
+  "worth_catching": true,
+  "fp_risk": "As above."
+ },
+ {
+  "answer": "light",
+  "text": "yvtugf",
+  "technique": "caesar-inflected",
+  "decode": "rot13 of 'lights'. The Caesar check requires the token length to equal the answer length, and the suffix rule only runs on the plain answer, so any inflected form under any shift slips through.",
+  "worth_catching": true,
+  "fp_risk": "Low. Strip SUFFIXES from non-dictionary tokens before the Caesar/atbash comparison. Random six-letter junk hitting a shift of an inflected answer is about as unlikely as the existing five-letter case."
+ },
+ {
+  "answer": "house",
+  "text": "ubhfrf",
+  "technique": "caesar-inflected",
+  "decode": "rot13 of 'houses'.",
+  "worth_catching": true,
+  "fp_risk": "As above."
+ },
+ {
+  "answer": "wager",
+  "text": "really easy lol game and win",
+  "technique": "reversed-acrostic-with-skip",
+  "decode": "Initials r e [l] g a w, drop the filler and read backwards: wager. The reversed-initials check allows no skips while the forward one allows two.",
+  "worth_catching": true,
+  "fp_risk": "Same order as the forward acrostic: run the same DFS on the reversed word list with the same skip budget. Doubles the acrostic candidate count, so re-run the chat sweep."
+ },
+ {
+  "answer": "light",
+  "text": "the horrible lol game i lost",
+  "technique": "reversed-acrostic-with-skip",
+  "decode": "t h [l] g i l reversed with the filler dropped: light.",
+  "worth_catching": true,
+  "fp_risk": "As above."
+ },
+ {
+  "answer": "wager",
+  "text": "\\/\\/ager",
+  "technique": "ascii-art-letter",
+  "decode": "Backslash-slash-backslash-slash drawn as a W: wager. tokenHit strips the symbols and sees 'ager' (a dictionary word) and wildcardHit needs the token to be the answer's length.",
+  "worth_catching": true,
+  "fp_risk": "Very low. Add multi-character ASCII-art glyphs to the leet table before stripping: \\/\\/ and VV for w, |-| and ]-[ for h, |\\| for n, |_ for l, |\\/| for m, |) for d, |< for k, |> for p. Nothing in ordinary chat contains '\\/\\/'."
  }
 ]

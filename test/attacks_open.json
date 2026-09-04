@@ -64,14 +64,6 @@
   "fp_risk": "joining pieces across three arbitrary words collides with ordinary chat"
  },
  {
-  "answer": "ghost",
-  "text": "gho um idk st",
-  "technique": "split-with-3-fillers",
-  "decode": "gho + st with three filler tokens skipped.",
-  "worth_catching": false,
-  "fp_risk": "joining pieces across three arbitrary words collides with ordinary chat"
- },
- {
   "answer": "plane",
   "text": "check the panel",
   "technique": "dictionary-word-anagram",
@@ -134,14 +126,6 @@
   "decode": "Figlet-style block letters spelling LIGHT in a code block.",
   "worth_catching": false,
   "fp_risk": "needs rendering; OCR of a screenshot would catch it, the text layer cannot"
- },
- {
-  "answer": "crane",
-  "text": "cr lol ane",
-  "technique": "split-with-filler-word",
-  "decode": "Two chunks of the word with a filler word between: cr ... ane.",
-  "worth_catching": true,
-  "fp_risk": "Moderate: joining across a filler produces many nonsense strings; restrict to chunks that are non-words and whose concatenation is exactly the answer."
  },
  {
   "answer": "light",
@@ -238,5 +222,21 @@
   "decode": "base36 integer",
   "worth_catching": false,
   "fp_risk": "not decodable by a reader without tools"
+ },
+ {
+  "answer": "wager",
+  "text": "howwie saaid the bigg onee was rright",
+  "technique": "doubled-letters-marking",
+  "decode": "Each word has one doubled letter; the doubled letters in order are w a g e r.",
+  "worth_catching": false,
+  "fp_risk": "doubled letters inside real words collide with ordinary typos and emphasis"
+ },
+ {
+  "answer": "wager",
+  "text": "🐳🍎🔥🔥🦒🥚🌈",
+  "technique": "emoji-acrostic-two-distractors",
+  "decode": "whale apple [fire fire] giraffe egg rainbow; ignore the two fires. The emoji-name DFS allows exactly one skipped emoji.",
+  "worth_catching": false,
+  "fp_risk": "two skips in an emoji-name acrostic collides with ordinary emoji strings"
  }
 ]

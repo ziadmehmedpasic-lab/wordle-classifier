@@ -60,7 +60,12 @@ async function getOcr() {
   if (!ocrWorker) {
     try {
       const { createWorker } = require("tesseract.js");
-      ocrWorker = await createWorker("eng");
+      ocrWorker = await createWorker("eng", undefined, {
+        // Without this, tesseract.js throws inside its worker message handler on unreadable
+        // images (e.g. "Unknown format") and crashes the whole process, even though the
+        // recognize() promise is also rejected. Our try/catch in ocrImage handles that rejection.
+        errorHandler: (e) => console.warn("OCR worker error:", typeof e === "string" ? e : e?.message || e),
+      });
       console.log("OCR ready");
     } catch (e) { console.error("OCR unavailable:", e.message); OCR_IMAGES_FAILED = true; return null; }
   }

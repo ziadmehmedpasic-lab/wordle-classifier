@@ -1,0 +1,3 @@
+# Force the Node provider. The repo also contains a Python subproject (ml/), which
+# Nixpacks could otherwise pick up. ffmpeg-static ships its own binary, so no apt packages needed.
+providers = ["node"]

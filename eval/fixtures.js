@@ -24,6 +24,9 @@ async function buildFixtures(directory) {
     "benign-qr.png": await QRCode.toBuffer("coffee", { width: 320 }),
     "text.bin": Buffer.concat([Buffer.from([0xff, 0xfe]), Buffer.from("WAGER", "utf16le")]),
   };
+  for (const [name, right] of [["adjacent-qr.png", images["qr.png"]], ["benign-adjacent-qr.png", images["benign-qr.png"]]]) {
+    images[name] = await sharp({ create: { width: 680, height: 340, channels: 3, background: "white" } }).composite([{ input: images["benign-qr.png"], left: 10, top: 10 }, { input: right, left: 350, top: 10 }]).png().toBuffer();
+  }
   for (const [name, bytes] of Object.entries(images)) await fs.writeFile(path.join(directory, name), bytes);
   for (const [name, pages] of [["image.pdf", 1], ["long.pdf", 11]]) {
     const pdf = await PDFDocument.create();

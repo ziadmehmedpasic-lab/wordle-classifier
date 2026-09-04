@@ -86,7 +86,7 @@ async function decode(input, onFrame) {
     // some GIF demuxers omit duration; a full frame count can still prove coverage.
     if (!Number.isFinite(seconds) && count !== Number(video.nb_read_frames)) issues.push("video duration unknown and full frame coverage unverified");
     if (Number.isFinite(Number(video.nb_read_frames)) && count < Number(video.nb_read_frames)) issues.push("not all source frames were decoded");
-    return { issues, count: Math.min(count, cfg.maxFrames) };
+    return { issues, count: Math.min(count, cfg.maxFrames), subtitleStreams: metadata.streams.filter((stream) => stream.codec_type === "subtitle") };
   } finally { clearTimeout(timer); child.kill("SIGKILL"); await finished; }
 }
 
@@ -114,7 +114,24 @@ async function inspectFile(input, ocrImage) {
     try { texts.push(await ocrImage(png)); }
     catch (error) { issues.push(`frame OCR failed: ${error.message}`); }
   });
-  return { text: texts.filter(Boolean).join("\n"), images, issues: [...issues, ...result.issues] };
+  const subtitles = await readSubtitles(input, result.subtitleStreams);
+  texts.push(subtitles.text);
+  return { text: texts.filter(Boolean).join("\n"), images, issues: [...issues, ...result.issues.filter((issue) => issue !== "subtitle tracks are unscanned"), ...subtitles.issues] };
+}
+
+/** @param {string} input @param {object[]} streams @returns {Promise<{text: string, issues: string[]}>} */
+async function readSubtitles(input, streams) {
+  const texts = [];
+  const issues = [];
+  if (streams.length > 8) issues.push("subtitle track limit exceeded");
+  for (const stream of streams.slice(0, 8)) {
+    if (!["subrip", "ass", "ssa", "webvtt", "mov_text", "text"].includes(stream.codec_name)) { issues.push(`unsupported subtitle codec: ${stream.codec_name}`); continue; }
+    try {
+      const { stdout } = await promisify(execFile)(ffmpegPath, ["-v", "error", "-xerror", "-protocol_whitelist", "file,pipe", "-i", input, "-map", `0:${stream.index}`, "-c:s", "srt", "-f", "srt", "pipe:1"], { timeout: 15_000, maxBuffer: 200_000 });
+      texts.push(stdout);
+    } catch (error) { issues.push(`subtitle extraction failed: ${error.message}`); }
+  }
+  return { text: texts.join("\n"), issues };
 }
 
 /** @param {string} url @param {Function} ocrImage @param {object} options @returns {Promise<string>} */
@@ -132,4 +149,4 @@ async function ocr(url, ocrImage, { name = "media", size = 0, downloadFile = dow
   } finally { await fs.rm(dir, { recursive: true, force: true }); }
 }
 
-module.exports = { init, cfg, kind, embedMedia, probe, decode, sample, inspectFile, ocr };
+module.exports = { init, cfg, kind, embedMedia, probe, decode, sample, inspectFile, readSubtitles, ocr };

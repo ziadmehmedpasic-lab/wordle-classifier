@@ -36,6 +36,14 @@ judge disabled, and checks direct text during saturation. It saves queue rejecti
 queue expiry, per-request latency and the direct-text result to `eval/runs/overload.json`.
 This is a bounded local burst measurement, not a Discord throughput guarantee.
 
+QR fixtures exercise literal payload decoding as well as the judge's interpretation.
+QR decoding examines the full image and overlapping halves on light/dark backgrounds,
+scaled within 1024 pixels, with at most eight located codes per region. The original
+image still reaches OCR and vision. General barcode
+formats, overlapping/unlocatable codes and dense codes lost during scaling remain gaps.
+Text subtitles are extracted from up to eight tracks (200 kB and 15 seconds per track).
+Bitmap subtitle codecs remain explicitly unscanned.
+
 ## Live Discord playground
 
 Use a dedicated test server, a moderator bot token in local `.env`, and supplied test

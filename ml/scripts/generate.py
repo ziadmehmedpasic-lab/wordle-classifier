@@ -5,6 +5,7 @@ every record keeps its answer, label, style, template and generator so splits ca
 import json
 import random
 import time
+from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
 from datetime import date
 from pathlib import Path
@@ -78,6 +79,8 @@ class Config:
     estimate_only: bool = False
     out_dir: Path = DATA_DIR / "generated"
     poll_s: float = 15.0
+    # parallel requests in direct mode
+    concurrency: int = 8
 
 
 @dataclass(frozen=True)
@@ -178,13 +181,16 @@ def estimate(client: anthropic.Anthropic, cfg: Config, jobs: list[tuple[str, str
 def run_direct(
     client: anthropic.Anthropic, cfg: Config, jobs: list[tuple[str, str]]
 ) -> list[Record]:
-    records: list[Record] = []
-    for word, template in tqdm(jobs, desc="generating"):
+    def one(job: tuple[str, str]) -> list[Record]:
+        word, template = job
         response = client.messages.create(**build_request(cfg, word, template))
         assert response.stop_reason != "refusal", f"refused on {word}/{template}"
         text = next(block.text for block in response.content if block.type == "text")
-        records += parse_examples(text, word, template, cfg.model, f"{word}-{template}")
-    return records
+        return parse_examples(text, word, template, cfg.model, f"{word}-{template}")
+
+    with ThreadPoolExecutor(max_workers=cfg.concurrency) as pool:
+        batches = list(tqdm(pool.map(one, jobs), total=len(jobs), desc="generating"))
+    return [record for batch in batches for record in batch]
 
 
 def run_batch(

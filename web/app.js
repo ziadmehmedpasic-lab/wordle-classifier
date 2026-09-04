@@ -42,14 +42,30 @@ function tiles(w, hit, small) {
   return box;
 }
 
-function reroll() {
-  word = WORDS[Math.floor(Math.random() * WORDS.length)];
+function setWord(w) {
+  word = w;
   det.setAnswers([word]);
   wordEl.replaceChildren(...tiles(word, false, false).children);
   resultEl.removeAttribute("data-state");
   lastId = null;
   msgEl.value = "";
+  clearFragments();
   msgEl.focus();
+}
+
+function reroll() {
+  $("pickstatus").textContent = "";
+  setWord(WORDS[Math.floor(Math.random() * WORDS.length)]);
+}
+
+function pickWord(e) {
+  e.preventDefault();
+  const w = $("custom").value.trim().toLowerCase();
+  const status = $("pickstatus");
+  if (!/^[a-z]{5}$/.test(w)) { status.textContent = "Five letters, a to z."; return; }
+  status.textContent = det.isWord(w) ? "" : "Not in the dictionary, but fine.";
+  $("custom").value = "";
+  setWord(w);
 }
 
 // ---------------------------------------------------------------------
@@ -61,6 +77,39 @@ function loadNick() {
 nickEl.addEventListener("change", () => {
   try { localStorage.setItem("nick", nickEl.value.trim()); } catch { /* storage blocked */ }
 });
+
+// ---------------------------------------------------------------------
+// multi-message spelling, mirrors trackFragments in index.js: messages of three
+// characters or fewer from one author are joined for three minutes, twelve at most
+// ---------------------------------------------------------------------
+const FRAG_WINDOW_MS = 3 * 60 * 1000;
+const FRAG_MAX = 12;
+let fragments = [];
+
+function renderFragments() {
+  const box = $("frags");
+  if (!fragments.length) { box.hidden = true; return; }
+  box.hidden = false;
+  $("fraglist").textContent = fragments.map((f) => f.text).join(" · ");
+}
+
+function trackFragment(text) {
+  const t = det.normalize(text).replace(/[^a-z0-9]/g, "");
+  if (!t || t.length > 3) return null;
+  const now = Date.now();
+  fragments = fragments.filter((f) => now - f.at < FRAG_WINDOW_MS);
+  fragments.push({ text: t, at: now });
+  while (fragments.length > FRAG_MAX) fragments.shift();
+  const parts = fragments.map((f) => f.text);
+  const hit = det.scan(parts.join("")) || det.scan(parts.join(" "));
+  if (!hit) return null;
+  const count = fragments.length;
+  fragments = [];
+  return { hit, count };
+}
+
+function clearFragments() { fragments = []; renderFragments(); }
+$("clearfrags").addEventListener("click", clearFragments);
 
 // ---------------------------------------------------------------------
 // sending an attempt
@@ -82,18 +131,24 @@ async function send() {
   const text = msgEl.value;
   if (!text.trim()) { msgEl.focus(); return; }
   const intent = document.querySelector("input[name=intent]:checked").value;
-  const hit = det.scan(text);
+  let hit = det.scan(text);
+  let messages = 1;
+  if (!hit) {
+    const joined = trackFragment(text);
+    if (joined) { hit = joined.hit; messages = joined.count; }
+  }
+  renderFragments();
   const state = outcome(intent, hit);
 
-  $("verdict").textContent = VERDICT[state][0];
-  $("detail").textContent = VERDICT[state][1];
+  $("verdict").textContent = messages > 1 ? `${VERDICT[state][0].replace(/\.$/, "")} across ${messages} messages.` : VERDICT[state][0];
+  $("detail").textContent = messages > 1 ? "The bot joins short messages from one author and would delete all of them." : VERDICT[state][1];
   $("decode").value = "";
   $("decodestatus").textContent = "";
   resultEl.dataset.state = state;
   lastId = null;
 
   if (!storageOk) return;
-  const doc = { word, text, intent, caught: !!hit, hit: hit || "", decode: "", nickname: nickEl.value.trim() };
+  const doc = { word, text, intent, caught: !!hit, hit: hit || "", messages, decode: "", nickname: nickEl.value.trim() };
   try {
     lastId = (await call("POST", doc)).id;
     await refresh();
@@ -119,6 +174,7 @@ async function saveDecode() {
 $("send").addEventListener("click", send);
 $("savedecode").addEventListener("click", saveDecode);
 $("reroll").addEventListener("click", reroll);
+$("pick").addEventListener("submit", pickWord);
 msgEl.addEventListener("keydown", (e) => { if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) { e.preventDefault(); send(); } });
 
 // ---------------------------------------------------------------------
@@ -169,7 +225,8 @@ function render(docs) {
     meta.className = "meta";
     meta.append(tiles(String(d.word || ""), d.caught, true));
     const who = document.createElement("span");
-    who.textContent = `${d.nickname || "anonymous"} · ${d.intent === "innocent" ? "innocent" : "leak"} · ${timeAgo(Number(d.ts) || 0)}`;
+    const joined = Number(d.messages) > 1 ? ` · joined from ${d.messages} messages` : "";
+    who.textContent = `${d.nickname || "anonymous"} · ${d.intent === "innocent" ? "innocent" : "leak"}${joined} · ${timeAgo(Number(d.ts) || 0)}`;
     meta.append(who);
     li.append(badge, msg, meta);
     if (d.decode) {

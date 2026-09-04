@@ -27,6 +27,7 @@ function parseAttempt(body) {
     intent: body.intent === "innocent" ? "innocent" : "leak",
     caught: body.caught === true,
     hit: str(body.hit, LIMITS.word),
+    messages: Number.isInteger(body.messages) && body.messages >= 1 && body.messages <= 12 ? body.messages : 1,
     decode: str(body.decode, LIMITS.decode),
     nickname: str(body.nickname, LIMITS.nickname).trim(),
   };

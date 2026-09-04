@@ -76,6 +76,8 @@
   .tile.hit { background: var(--green); border-color: var(--green); color: var(--green-ink); }
   .link { background: none; border: 0; padding: 0; color: var(--ink-soft); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
   .link:hover { color: var(--ink); }
+  .pick { display: flex; align-items: center; gap: 8px; margin: 0; }
+  .pick input { width: 6.5ch; font-family: var(--mono); text-transform: lowercase; padding: 6px 8px; }
 
   .who { display: flex; gap: 20px; flex-wrap: wrap; align-items: end; }
   .field { display: flex; flex-direction: column; gap: 6px; }
@@ -103,6 +105,8 @@
   }
   .primary:disabled { opacity: 0.5; cursor: default; }
 
+  .frags { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+  .fraglist { font-family: var(--mono); font-size: 13px; }
   .result { display: none; padding: 14px 16px; gap: 4px; flex-direction: column; border-left: 6px solid var(--line); background: var(--bg-sunk); }
   .result[data-state] { display: flex; }
   .result[data-state="caught"], .result[data-state="passed"] { border-color: var(--green); }
@@ -156,6 +160,12 @@
   <section class="target" aria-label="Target word">
     <div class="tiles" id="word" aria-live="polite"></div>
     <button type="button" class="link" id="reroll">New word</button>
+    <form class="pick" id="pick">
+      <label for="custom" class="hint">or choose one</label>
+      <input type="text" id="custom" maxlength="5" autocomplete="off" spellcheck="false" placeholder="5 letters">
+      <button type="submit" class="secondary">Use</button>
+      <span class="hint" id="pickstatus"></span>
+    </form>
   </section>
 
   <section class="who">
@@ -176,7 +186,12 @@
     <textarea id="msg" spellcheck="false" placeholder="Type it the way you'd post it in the channel"></textarea>
     <div class="row">
       <button type="button" class="primary" id="send">Send</button>
-      <span class="hint">Ctrl+Enter also sends. Line breaks count, so acrostics work.</span>
+      <span class="hint">Ctrl+Enter also sends. Line breaks count, so acrostics work. Messages of three characters or fewer are joined with your earlier ones for three minutes, as in the channel, so you can spell a word one message at a time.</span>
+    </div>
+    <div class="frags" id="frags" hidden>
+      <span class="hint">Short messages the bot is holding:</span>
+      <span class="fraglist" id="fraglist"></span>
+      <button type="button" class="link" id="clearfrags">clear</button>
     </div>
     <div class="result" id="result">
       <strong id="verdict"></strong>

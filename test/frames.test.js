@@ -25,21 +25,15 @@ const { clip, font } = require("./fixtures");
   let fails = 0;
   for (const [name, texts] of cases) {
     const file = clip(path.join(dir, name), texts, { text: true });
-    const server = require("http").createServer((req, res) => fs.createReadStream(file).pipe(res));
-    await new Promise((r) => server.listen(0, r));
-    const url = `http://127.0.0.1:${server.address().port}/${name}`;
-    const text = await frames.ocr(url, ocrImage, { id: name, name });
-    server.close();
+    const { text, issues } = await frames.inspectFile(file, ocrImage);
+    assert.deepStrictEqual(issues, []);
     const hit = detector.scan(text);
     console.log(`${hit === "wager" ? "ok  " : "MISS"} ${name}: ${JSON.stringify(text.replace(/\s+/g, " "))}`);
     if (hit !== "wager") fails++;
   }
   // a gif with no text on any frame must not hit
   const blank = clip(path.join(dir, "blank.gif"), ["red", "blue", "green"]);
-  const server = require("http").createServer((req, res) => fs.createReadStream(blank).pipe(res));
-  await new Promise((r) => server.listen(0, r));
-  const blankText = await frames.ocr(`http://127.0.0.1:${server.address().port}/blank.gif`, ocrImage, { id: "blank" });
-  server.close();
+  const { text: blankText } = await frames.inspectFile(blank, ocrImage);
   if (detector.scan(blankText)) { fails++; console.log("MISS blank.gif hit:", JSON.stringify(blankText)); }
   await worker.terminate();
   fs.rmSync(dir, { recursive: true, force: true });

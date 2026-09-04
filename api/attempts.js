@@ -6,7 +6,7 @@ const { Redis } = require("@upstash/redis");
 const crypto = require("crypto");
 
 const WINDOW = 500;
-const LIMITS = { word: 5, text: 2000, decode: 300, nickname: 24 };
+const LIMITS = { word: 5, text: 2000, decode: 300, nickname: 24, messages: 12 };
 
 function redis() {
   const url = process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL;
@@ -17,17 +17,24 @@ function redis() {
 
 const str = (v, max) => (typeof v === "string" ? v.slice(0, max) : "");
 
+// an attempt is a short sequence of messages sent in order; `deleted` says which ones the
+// bot removed. `text` keeps the joined form for the ledger and for older readers.
 function parseAttempt(body) {
   const word = typeof body.word === "string" ? body.word.toLowerCase() : "";
-  const text = str(body.text, LIMITS.text);
-  if (!/^[a-z]{5}$/.test(word) || !text.trim()) return null;
+  const raw = Array.isArray(body.messages) ? body.messages : [body.text];
+  const flags = Array.isArray(body.deleted) && body.deleted.length === raw.length ? body.deleted : raw.map(() => body.caught === true);
+  const kept = raw.map((m, i) => [str(m, LIMITS.text), Boolean(flags[i])]).filter(([m]) => m.trim()).slice(0, LIMITS.messages);
+  const messages = kept.map(([m]) => m);
+  const deleted = kept.map(([, d]) => d);
+  if (!/^[a-z]{5}$/.test(word) || !messages.length) return null;
   return {
     word,
-    text,
+    messages,
+    text: messages.join("\n"),
+    deleted,
     intent: body.intent === "innocent" ? "innocent" : "leak",
-    caught: body.caught === true,
+    caught: deleted.some(Boolean),
     hit: str(body.hit, LIMITS.word),
-    messages: Number.isInteger(body.messages) && body.messages >= 1 && body.messages <= 12 ? body.messages : 1,
     decode: str(body.decode, LIMITS.decode),
     nickname: str(body.nickname, LIMITS.nickname).trim(),
   };

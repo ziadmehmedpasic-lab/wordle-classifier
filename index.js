@@ -3,6 +3,7 @@ const { Client, GatewayIntentBits, Partials, Events, PermissionsBitField, Channe
 const detector = require("./detector");
 const llm = require("./llm");
 const audio = require("./audio");
+const gifs = require("./gifs");
 
 const env = (k, d) => (process.env[k] ?? d).toString().toLowerCase() === "true";
 const TOKEN = process.env.DISCORD_TOKEN;
@@ -205,6 +206,13 @@ async function handleMessage(message, { fromBacklog = false } = {}) {
   const hit = detector.scan(text);
   if (hit) return removeMessage(message, hit, "text");
 
+  // GIF links: tags and descriptions from the Tenor/Giphy APIs, before any pixels are looked at
+  const gifText = await gifs.describe(text);
+  if (gifText) {
+    const hitGif = detector.scan(gifText);
+    if (hitGif) return removeMessage(message, hitGif, "gif tags");
+  }
+
   // Slow path: text attachments, image OCR, speech-to-text
   const imageUrls = [...(message.attachments?.values?.() || [])].filter((a) => /^image\/(png|jpe?g|webp|gif)/.test(a.contentType || "")).map((a) => a.url);
   let transcript = "";
@@ -219,7 +227,7 @@ async function handleMessage(message, { fromBacklog = false } = {}) {
 
   // LLM layer: meaning-based hints, riddles, synonyms, translations, solved-grid screenshots, spoken hints
   if (!fromBacklog && !message.author?.bot) {
-    const llmText = transcript ? `${text}\n[voice transcript]: ${transcript}` : text;
+    const llmText = [text, transcript && `[voice transcript]: ${transcript}`, gifText && `[gif tags]: ${gifText}`].filter(Boolean).join("\n");
     llm.noteContext(message.channelId, llmText);
     const context = (channelHistory.get(message.channelId) || []).slice();
     remember(message, llmText);
@@ -283,6 +291,7 @@ client.once(Events.ClientReady, async (c) => {
   setInterval(() => refreshAnswers(), 15 * 60 * 1000);
   llm.init();
   audio.init();
+  gifs.init();
   getOcr(); // warm up in background
   scanBacklog();
 });

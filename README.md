@@ -20,6 +20,18 @@ processing are logged; they do not cause deletion. A detected spoiler in another
 part still causes deletion. A clean result is a classifier decision, not a guarantee against
 every possible encoding.
 
+File inspection identifies content from bytes, ignoring misleading extensions and MIME
+headers. It supports UTF-8/UTF-16 text, native image formats and SVG, PDF text plus rendered
+pages, and ZIP containers including Office XML/text and embedded images. Office documents
+are not rendered as whole pages; layout-only clues may remain undetected. Legacy binary
+Office formats, encrypted files and external document resources are reported as unscanned.
+
+Bounds are explicit: 32 MB downloaded/expanded bytes, 64 archive entries, two nested archive
+levels, ten rendered images/pages, 16 million pixels per image, and 200,000 extracted text
+characters. Crossing a bound reports incomplete inspection. Downloads use approved HTTPS
+media hosts, recheck redirects, and enforce byte limits on streamed data. Arbitrary linked
+websites are not fetched or certified safe.
+
 | layer | catches | misses |
 |---|---|---|
 | 1. Pattern detector (`detector.js`) | the answer's letters in any disguise | meaning |

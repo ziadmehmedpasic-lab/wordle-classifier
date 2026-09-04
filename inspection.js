@@ -3,6 +3,11 @@ const llm = require("./llm");
 const audio = require("./audio");
 const frames = require("./frames");
 const gifs = require("./gifs");
+const { download } = require("./download");
+const { extractDocument } = require("./documents");
+const fs = require("node:fs/promises");
+const os = require("node:os");
+const path = require("node:path");
 
 /** @param {object} message @returns {{text: string, assets: object[], issues: string[]}} */
 function collectContent(message) {
@@ -60,41 +65,32 @@ function collectContent(message) {
 
 /** @param {object} asset @param {object} options @returns {Promise<{text: string, images: string[], issues: string[]}>} */
 async function extractAsset(asset, { ocrImage }) {
-  const issues = [];
-  const texts = [];
-  const images = [];
-  const type = asset.contentType || "";
-  if ((type.startsWith("text/") || /\.(txt|md|csv|json|log)$/i.test(asset.name || ""))) {
-    if (asset.size >= 200_000) issues.push("text exceeds byte limit");
-    else {
-      const response = await fetch(asset.url, { signal: AbortSignal.timeout(30_000) });
-      if (!response.ok) throw new Error(`attachment download returned ${response.status}`);
-      const text = await response.text();
-      if (Buffer.byteLength(text) >= 200_000) issues.push("text exceeds byte limit");
-      else texts.push(text);
-    }
-  } else if (frames.kind(asset)) {
-    if (!frames.cfg.enabled) issues.push("frame inspection disabled");
-    else {
-      texts.push(await frames.ocr(asset.url, ocrImage, asset));
-      issues.push("animation inspected by sampling only");
-    }
-  } else if (/^image\/(png|jpe?g|webp|bmp)/.test(type)) {
-    images.push(asset.url);
-    if (asset.size >= 8_000_000) issues.push("image exceeds OCR byte limit");
-    else {
-      try { texts.push(await ocrImage(asset.url)); }
-      catch (error) { issues.push(`OCR failed: ${error.message}`); }
-    }
-  } else if (!audio.kind(asset)) issues.push("unsupported attachment format");
-  if (audio.kind(asset)) {
-    if (!audio.cfg.enabled) issues.push("audio inspection disabled");
-    else {
-      texts.push(await audio.transcribe(asset));
-      if (!asset.duration || asset.duration > audio.cfg.maxSeconds) issues.push("audio duration exceeds limit or is unknown");
-    }
+  const bytes = await download(asset.url);
+  const result = await extractDocument(bytes, { name: asset.name, ocrImage });
+  const texts = [result.text];
+  for (const clip of result.clips) {
+    const dir = await fs.mkdtemp(path.join(os.tmpdir(), "wordle-attachment-"));
+    try {
+      const input = path.join(dir, "input");
+      await fs.writeFile(input, clip.bytes);
+      if (clip.contentType.startsWith("video/") || clip.contentType === "image/gif") {
+        if (!frames.cfg.enabled) result.issues.push("frame inspection disabled");
+        else {
+          for (const frame of await frames.sample(input, dir)) texts.push(await ocrImage(frame));
+          result.issues.push("animation inspected by sampling only");
+        }
+      }
+      if (audio.kind(clip)) {
+        if (!audio.cfg.enabled) result.issues.push("audio inspection disabled");
+        else {
+          texts.push(await audio.transcribeFile(input, { name: clip.name }));
+          result.issues.push("audio inspected within duration cap only");
+        }
+      }
+    } catch (error) { result.issues.push(`media inspection failed: ${error.message}`); }
+    finally { await fs.rm(dir, { recursive: true, force: true }); }
   }
-  return { text: texts.filter(Boolean).join("\n"), images, issues };
+  return { text: texts.filter(Boolean).join("\n"), images: result.images, issues: result.issues };
 }
 
 /** @param {object} message @param {object} options @returns {Promise<object>} */

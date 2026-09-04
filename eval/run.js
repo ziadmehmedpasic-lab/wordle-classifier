@@ -39,6 +39,7 @@ async function main() {
         request.usage = response.usage;
         request.stopReason = response.stop_reason;
         request.model = response.model;
+        request.output = response.content.filter((block) => block.type === "text").map((block) => block.text).join("\n");
         return response;
       } catch (error) { request.error = { name: error.name, status: error.status || null }; throw error; }
     } } } };

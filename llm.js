@@ -61,7 +61,7 @@ const SCHEMA = {
   required: ["verdict", "confidence", "reason"],
   properties: {
     verdict: { type: "string", enum: ["spoiler", "hint", "clean"] },
-    confidence: { type: "number", minimum: 0, maximum: 1 },
+    confidence: { type: "number", description: "Confidence from 0 to 1 inclusive." },
     reason: { type: "string" },
   },
 };

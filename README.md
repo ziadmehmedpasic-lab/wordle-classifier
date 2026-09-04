@@ -52,21 +52,22 @@ Bans today's word, plus yesterday's and tomorrow's (covers timezones). Moving to
 | Discord markdown | `**wager**`, `\|\|wager\|\|`, `` `wager` ``, code blocks, headers, subtext, quotes, lists, masked links, per-letter links |
 | Leetspeak and symbol swaps | `W8g3r`, `w@ger`, `wa*er`, `l19h7`, math-bold digits `w𝟖g𝟑r` |
 | Separators and brackets | `w.a.g.e.r`, `w-a-g-e-r`, `w[a]ger`, any symbol `w·a·g·e·r`, `w?a?g?e?r`, emoji `w🔥a🔥g🔥e🔥r`, custom emoji between letters |
-| Spaced or split words | `w a g e r`, `wa ger`, `w 8 g 3 r`, `wa lol ger`, spaced Caesar `b f l j w` |
+| Spaced or split words | `w a g e r`, `wa ger`, `w 8 g 3 r`, `wa lol ger`, `wa and then ge and then r`, spaced Caesar `b f l j w` |
 | Letters with filler words | `w then a then g then e then r`, `w for whiskey a for apple ...`, `w1 a2 g3 e4 r5`, `"w" and "a" and ...` |
 | Glued to other letters | `wagerbros`, `prowager`, `itswager`, `xxwagerxx` (non-dictionary tokens only) |
 | Across word boundaries | `saw a german`, `help lane` (for plane) |
-| Capitals inside a sentence | `hoWie sAid the biG onE was Right`, `#WeAllGetEmRight` |
-| Lines, columns, diagonals | first letter of each line, letters down a column or diagonal of a code block |
+| Capitals inside a sentence | `hoWie sAid the biG onE was Right`, `#WeAllGetEmRight`, lowercase inside shouting `HOwIE SaID`, shouted words ignored |
+| Marked or styled letters | `ho**w**ie s**a**id the bi**g** on**e** was **r**ight`, `ho𝐰ie s𝐚id`, spoilers, italics, code spans |
+| Lines, columns, diagonals | first letter of each line, letters down a column or any diagonal of a code block |
 | Look-alike letters | Cyrillic/Greek, fullwidth `ｗａｇｅｒ`, small caps `ᴡᴀɢᴇʀ`, 🇼🇦🇬🇪🇷, 🅦🅐🅖🅔🅡, 𝐰𝐚𝐠𝐞𝐫, braille `⠺⠁⠛⠑⠗`, "fancy font" glyphs `山卂Ꮆ乇尺`, IPA, full Unicode confusables table |
 | Look-alike letter pairs | `vvager`, `rnoat`, `cloor` |
 | Invisible / control characters | zero-width spaces, right-to-left override, zalgo combining marks |
 | Upside-down text | `ɹǝƃɐʍ`, spaced `ɹ ǝ ƃ ɐ ʍ` |
-| Encodings | reversed (with suffix `sregaw`), rot13, any Caesar shift, atbash, base64 (any plaintext), base32, hex (`77 61 ...`, `0x7761...`, `\x77`), octal, binary, a=1..z=26 and a=0..z=25 with any separator or number words, ASCII codes, URL-encoding, HTML entities, `U+0077`, `%u0077`, phone keypad `92437`, pig latin `agerway`, keyboard shift `eshrt`, morse in any glyphs or spoken `dit dah` |
-| Spoken letters | NATO `whiskey alpha golf echo romeo`, letter names `double u ay gee ee ar`, Spanish and German letter names |
-| Edit instructions | `its wage but add an r`, `planet without the t` (near-miss dictionary word plus an instruction naming a letter) |
+| Encodings | reversed (with suffix `sregaw`), rot13, any Caesar shift (also of `wagers`), atbash, base64 (any plaintext), base32, hex (`77 61 ...`, `0x7761...`, `\x77`), octal, binary, a=1..z=26 and a=0..z=25 with any separator, filler words, number words or ordinals, ASCII codes, URL-encoding, HTML entities, `U+0077`, `%u0077`, phone keypad `92437`, pig latin `agerway`, keyboard shift `eshrt`, morse in any glyphs, emoji, one letter per line, or spoken `dit dah` / `dot dash` |
+| Spoken letters | NATO `whiskey alpha golf echo romeo` (also `whiskey then alpha then ...`), letter names `double u ay gee ee ar`, homophones `sea aye owe dub`, Spanish and German letter names |
+| Edit instructions | `its wage but add an r`, `planet without the t`, `its crate but the t is an n` (near-miss dictionary word plus the edit letter on its own) |
 | Stretched / doubled | `waaaager`, `wwaaggeerr`, `waager` |
-| Suffixes | `wagers`, `wagered`, `wagering` |
+| Suffixes | `wagers`, `wagered`, `wagering`, `lighten`, `placement` |
 | Typos, anagrams, vowel removal, interleaving | `wgaer`, `wsger`, `wagr`, `wgr`, `wxaxgxexr`, reversed `rxexgxaxw` (non-dictionary words only) |
 | Phonetic spellings | `wayjer`, `waygur` (non-dictionary words only) |
 | Acrostics | `wife angle grey ear red`, `wage and real`, reversed initials, emoji names 🐳🍎🦒🥚🌈 with one distractor, emoji mixed with letters `w 🍎 g e r` |

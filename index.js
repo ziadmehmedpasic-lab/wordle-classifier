@@ -9,12 +9,13 @@ const { inspectMessage } = require("./inspection");
 const { ocrImage } = require("./ocr");
 const { SurfaceModerator } = require("./surfaces");
 const { Conversation } = require("./conversation");
+const { Answers } = require("./answers");
+const answers = new Answers();
 const conversation = new Conversation();
 const versions = new Map();
 
 const env = (k, d) => (process.env[k] ?? d).toString().toLowerCase() === "true";
 const TOKEN = process.env.DISCORD_TOKEN;
-const CHECK_YESTERDAY = env("CHECK_YESTERDAY", "true");
 const POLICE_NICKNAMES = env("POLICE_NICKNAMES", "true");
 const POLICE_PROFILES = env("POLICE_PROFILES", "false");
 const POLICE_PRESENCES = env("POLICE_PRESENCES", "false");
@@ -39,31 +40,25 @@ if (require.main === module && !TOKEN) { console.error("Missing DISCORD_TOKEN in
 // ---------------------------------------------------------------------
 // Daily answer from the New York Times
 // ---------------------------------------------------------------------
-let lastFetchedDate = "";
-function dateString(offset = 0) {
-  const d = new Date(); d.setDate(d.getDate() + offset);
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+/** @returns {boolean} */
+function hasCurrentAnswers() {
+  const current = answers.get();
+  return current.length > 0 && current.join(",") === detector.getAnswers().join(",");
 }
-async function fetchAnswer(date) {
-  const res = await fetch(`https://www.nytimes.com/svc/wordle/v2/${date}.json`, { headers: { "User-Agent": "Mozilla/5.0 (wordle-spoiler-bot)" } });
-  if (!res.ok) throw new Error(`NYT returned ${res.status} for ${date}`);
-  const data = await res.json();
-  if (!data.solution) throw new Error(`No solution for ${date}`);
-  return data.solution.toLowerCase();
-}
+
+/** @param {boolean} force @returns {Promise<void>} */
 async function refreshAnswers(force = false) {
-  const today = dateString(0);
-  if (!force && today === lastFetchedDate) return;
-  try {
-    const list = [await fetchAnswer(today)];
-    if (CHECK_YESTERDAY) { try { list.push(await fetchAnswer(dateString(-1))); } catch (e) { console.warn("Yesterday:", e.message); } }
-    try { list.push(await fetchAnswer(dateString(1))); } catch { /* not yet published */ }
-    detector.setAnswers(list);
-    lastFetchedDate = today;
-    console.log(`[${new Date().toISOString()}] Banned words updated (${list.length} words) for ${today}`);
-    sweepMembers().catch((e) => console.error("Member sweep:", e.message));
-    for (const guild of client.guilds.cache.values()) surfaces.sweep(guild).catch((e) => console.error("Surface sweep:", e.message)); // names set before today's word was known
-  } catch (e) { console.error("Failed to refresh Wordle answer:", e.message); }
+  try { await answers.refresh({ force }); }
+  catch (error) { console.error("Failed to refresh Wordle answer:", error.message); }
+  const list = answers.get();
+  if (list.join(",") === detector.getAnswers().join(",")) return;
+  detector.setAnswers(list);
+  conversation.channels.clear();
+  surfaces.inFlight.clear();
+  if (!list.length) { console.warn("Current Wordle answer unavailable; moderation suspended"); return; }
+  console.log(`Protected answers updated for ${answers.date} (${answers.timeZone}, ${list.length} words)`);
+  sweepMembers().catch((e) => console.error("Member sweep:", e.message));
+  for (const guild of client.guilds.cache.values()) surfaces.sweep(guild).catch((e) => console.error("Surface sweep:", e.message));
 }
 
 // ---------------------------------------------------------------------
@@ -85,7 +80,7 @@ const client = new Client({
 });
 
 const surfaces = new SurfaceModerator({
-  ocrImage, profiles: POLICE_PROFILES, presences: POLICE_PRESENCES, allowedChannels: ALLOWED_CHANNEL_IDS,
+  ocrImage, profiles: POLICE_PROFILES, presences: POLICE_PRESENCES, allowedChannels: ALLOWED_CHANNEL_IDS, isCurrent: hasCurrentAnswers,
   report: async ({ guild, kind, id, status }) => {
     console.warn(`Surface moderation ${guild.id}/${kind}/${id}: ${status}`);
     const channel = guild.channels.cache.get(process.env.MOD_LOG_CHANNEL_ID);
@@ -152,13 +147,14 @@ async function handleMessage(message, { fromBacklog = false } = {}) {
   versions.set(message.id, version);
   try {
     await refreshAnswers();
-    if (!detector.getAnswers().length || versions.get(message.id) !== version) return;
+    if (!hasCurrentAnswers() || versions.get(message.id) !== version) return;
+    const inspectedAnswers = detector.getAnswers().join(",");
     if (!fromBacklog) checkMember(message.member).catch((e) => console.error("Member:", e.message));
 
     conversation.remember(message, message.content || "");
     const context = conversation.get(message.channelId).filter((row) => row.id !== message.id);
     const result = await inspectMessage(message, { ocrImage, context });
-    if (versions.get(message.id) !== version) return;
+    if (versions.get(message.id) !== version || !hasCurrentAnswers() || inspectedAnswers !== detector.getAnswers().join(",")) return;
     if (result.issues.length) console.warn(`Incomplete inspection ${message.id}: ${result.issues.join("; ")}`);
     if (result.status === "spoiler") return removeMessage(message, result.hit, "inspection");
     conversation.remember(message, result.text, result.fragmentText ?? result.text);
@@ -195,9 +191,10 @@ async function scanBacklog() {
 async function checkMember(member) {
   if (!member) return;
   await refreshAnswers();
+  if (!hasCurrentAnswers()) return;
   await surfaces.check(member, "profile");
   if (POLICE_PRESENCES && member.presence) await surfaces.check(member.presence, "presence");
-  if (!POLICE_NICKNAMES) return;
+  if (!POLICE_NICKNAMES || !hasCurrentAnswers()) return;
   const shown = member.displayName;
   if (!detector.scan(shown)) return;
   if (!member.manageable) { console.warn(`Cannot rename ${member.user.tag} ("${shown}"): the bot's role must be above theirs`); return; }
@@ -223,7 +220,7 @@ client.once(Events.ClientReady, async (c) => {
   gifs.init();
   if (OCR_IMAGES) frames.init();
   await refreshAnswers(true);
-  setInterval(() => refreshAnswers(), 15 * 60 * 1000);
+  setInterval(() => refreshAnswers(), 60_000);
   scanBacklog();
 });
 
@@ -245,9 +242,12 @@ client.on(Events.MessageReactionAdd, async (reaction, user) => {
     const msg = reaction.message.partial ? await reaction.message.fetch() : reaction.message;
     if (!msg.guild || ALLOWED_CHANNEL_IDS.has(msg.channelId) || !canManage(msg.channel)) return;
     await refreshAnswers();
+    if (!hasCurrentAnswers()) return;
+    const inspectedAnswers = detector.getAnswers().join(",");
     if (reaction.emoji.id) {
       const url = reaction.emoji.imageURL({ size: 256, extension: reaction.emoji.animated ? "gif" : "png" });
       const result = await inspectMessage({ channelId: msg.channelId, content: reaction.emoji.name || "", attachments: [{ url, name: "reaction emoji" }] }, { ocrImage });
+      if (!hasCurrentAnswers() || inspectedAnswers !== detector.getAnswers().join(",")) return;
       if (result.status === "spoiler") await reaction.remove();
       else if (result.issues.length) console.warn(`Incomplete reaction inspection ${msg.id}`);
     }

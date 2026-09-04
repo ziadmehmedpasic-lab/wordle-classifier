@@ -45,9 +45,12 @@ text, so it is never generated as a spoiler example and the detector treats it a
 ## Which answers are protected
 
 Today's answer only, where "today" is computed in the configured server timezone
-(`TIMEZONE`). `ANSWER_WINDOW_DAYS` widens this to also protect the previous N days for
+(`TIMEZONE`, default UTC). `ANSWER_WINDOW_DAYS` widens this to also protect the previous N days (0-31) for
 late-night players in other timezones; the default is 0. Yesterday's answer is fair game once
 the day rolls over. Tomorrow's answer is never fetched.
+
+If the current date's answer cannot be fetched and validated, moderation is suspended rather
+than using an answer from outside that window. Failed fetches retry after one minute.
 
 ## Detector confidence tiers
 

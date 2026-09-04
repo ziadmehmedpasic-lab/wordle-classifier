@@ -10,7 +10,7 @@ function message(id, content, channel) {
 
 test("Discord handling removes cooperating bot messages and preserves unrelated messages", async () => {
   const original = global.fetch;
-  global.fetch = async () => Response.json({ solution: "wager" });
+  global.fetch = async (url) => Response.json({ solution: "wager", print_date: String(url).slice(-15, -5) });
   const channel = { deleted: [], guild: { members: { me: {} } }, permissionsFor: () => ({ has: () => true }), bulkDelete: async (ids) => channel.deleted.push(...ids) };
   try {
     await handleMessage(message("1", "hi", channel));
@@ -25,7 +25,7 @@ test("a slow scan cannot delete a newer clean edit", async () => {
   const original = global.fetch;
   let release;
   global.fetch = async (url) => {
-    if (String(url).includes("nytimes.com")) return Response.json({ solution: "wager" });
+    if (String(url).includes("nytimes.com")) return Response.json({ solution: "wager", print_date: String(url).slice(-15, -5) });
     return new Promise((resolve) => { release = resolve; });
   };
   const channel = { deleted: [], guild: { members: { me: {} } }, permissionsFor: () => ({ has: () => true }) };
@@ -44,4 +44,28 @@ test("a slow scan cannot delete a newer clean edit", async () => {
     assert.equal(conversation.get("channel").length, 0);
     assert.equal(versions.size, 0);
   } finally { global.fetch = original; conversation.channels.clear(); }
+});
+
+test("a scan crossing midnight cannot delete for yesterday's answer", async (t) => {
+  const original = global.fetch;
+  t.mock.timers.enable({ apis: ["Date"], now: new Date("2026-09-05T23:59:59Z") });
+  let release;
+  global.fetch = async (url) => {
+    if (String(url).includes("nytimes.com")) return Response.json({ solution: String(url).includes("09-05") ? "wager" : "house", print_date: String(url).slice(-15, -5) });
+    return new Promise((resolve) => { release = resolve; });
+  };
+  const channel = { deleted: [], guild: { members: { me: {} } }, permissionsFor: () => ({ has: () => true }) };
+  try {
+    const old = message("5", "", channel);
+    old.attachments = [{ url: "https://cdn.discordapp.com/attachments/test", name: "text.txt" }];
+    const running = handleMessage(old);
+    await new Promise((resolve) => setImmediate(resolve));
+    assert.equal(typeof release, "function");
+    t.mock.timers.tick(2000);
+    release(new Response("WAGER"));
+    await running;
+    assert.deepEqual(channel.deleted, []);
+    await handleMessage(message("6", "WAGER", channel));
+    assert.deepEqual(channel.deleted, []);
+  } finally { global.fetch = original; conversation.channels.clear(); t.mock.timers.reset(); }
 });

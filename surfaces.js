@@ -16,10 +16,11 @@ function profileAssets(member) {
 
 class SurfaceModerator {
   /** @param {object} options */
-  constructor({ ocrImage, inspect = inspectMessage, report = async (event) => console.warn("Surface moderation:", event.kind, event.id, event.status), allowedChannels = new Set(), profiles = false, presences = false }) {
+  constructor({ ocrImage, inspect = inspectMessage, report = async (event) => console.warn("Surface moderation:", event.kind, event.id, event.status), allowedChannels = new Set(), profiles = false, presences = false, isCurrent = () => true }) {
     this.ocrImage = ocrImage;
     this.inspect = inspect;
     this.report = report;
+    this.isCurrent = isCurrent;
     this.allowedChannels = allowedChannels;
     this.profiles = profiles;
     this.presences = presences;
@@ -29,7 +30,7 @@ class SurfaceModerator {
 
   /** @param {object} target @param {string} kind @returns {Promise<object | null>} */
   async check(target, kind) {
-    if (!target?.guild || !detector.getAnswers().length) return null;
+    if (!target?.guild || !detector.getAnswers().length || !this.isCurrent()) return null;
     if (kind === "profile" && !this.profiles) return null;
     if (kind === "presence" && !this.presences) return null;
     if ([target.id, target.channelId, target.parentId].some((id) => this.allowedChannels.has(id))) return null;
@@ -55,7 +56,7 @@ class SurfaceModerator {
     let result;
     try {
       result = await this.inspect({ id: target.id || target.userId, channelId: key, content, attachments }, { ocrImage: this.ocrImage, forceJudge: true });
-      if (this.inFlight.get(key) !== fingerprint) return null;
+      if (this.inFlight.get(key) !== fingerprint || !this.isCurrent()) return null;
     } finally { if (this.inFlight.get(key) === fingerprint) this.inFlight.delete(key); }
     if (result.status !== "unscanned") {
       this.seen.set(key, fingerprint);

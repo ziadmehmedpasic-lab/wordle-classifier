@@ -163,7 +163,7 @@ are sent to Claude, which returns `spoiler`, `hint`, or `clean` with a confidenc
 - rhymes, synonyms, definitions, riddles ("rhymes with pager", "a gambling term")
 - letter clues ("starts with W", "double letter", "same as yesterday but one letter off")
 - translations into other languages
-- multi-message hints (the last 6 channel messages are sent as context)
+- multi-message hints (up to 24 channel messages from the last ten minutes are sent as context)
 - screenshots of solved grids (image sent to the model when OCR finds nothing)
 
 Cost control: by default only Wordle-looking messages are checked, plus every message in a channel for
@@ -193,6 +193,20 @@ hints, clean chat) as both voice-message ogg and mp4. macOS only, it uses `say` 
 - Without the audio layer: voice messages and audio/video files
 
 ## Known trade-offs
+- Coordinated fragments are matched exactly across authors within three minutes. Only the
+  contributing messages are removed. Longer interruptions end a fragment sequence; the
+  meaning classifier uses up to 24 recent messages from the last ten minutes. Context is
+  held only in memory, is updated on edits/deletions, and is cleared when answers change.
+- Images/files, nested content, extracted text and vision payloads have explicit limits.
+  At most two slow inspections run at once, with 16 waiting jobs and a 30-second queue wait.
+  Saturated or expired inspections are reported as unscanned and retained. Direct text
+  detection still runs before this queue. This preserves the keep-on-error policy and
+  does not guarantee protection while the bot is overloaded or unavailable.
+- Judge instructions live in `prompts/moderation.md`. User text and context are serialized
+  as evidence, and refusals, truncated responses and invalid outputs remain unscanned.
+  These measures reduce prompt-injection opportunities; live adversarial model accuracy
+  still needs evaluation. Deletion also cannot undo a spoiler already seen in chat or a
+  notification before the bot reacts.
 - On days the answer is a common word (`house`, `light`, `today`), normal sentences using it are deleted. Inherent to any spoiler filter.
 - Acrostic detection can misfire: `star every` on a `stare` day. Disable with `CATCH_ACROSTICS=false`.
 - The word-boundary rule misfires on rare collisions: `the mailman` on an `email` day. Measured at 5 extra hits per 73,000 benign message/answer pairs.

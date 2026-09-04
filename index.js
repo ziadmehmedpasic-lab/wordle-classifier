@@ -1,4 +1,4 @@
-require("dotenv").config();
+if (require.main === module) require("dotenv").config();
 const { Client, GatewayIntentBits, Partials, Events, PermissionsBitField, Routes } = require("discord.js");
 const detector = require("./detector");
 const llm = require("./llm");
@@ -8,6 +8,9 @@ const frames = require("./frames");
 const { inspectMessage } = require("./inspection");
 const { ocrImage } = require("./ocr");
 const { SurfaceModerator } = require("./surfaces");
+const { Conversation } = require("./conversation");
+const conversation = new Conversation();
+const versions = new Map();
 
 const env = (k, d) => (process.env[k] ?? d).toString().toLowerCase() === "true";
 const TOKEN = process.env.DISCORD_TOKEN;
@@ -31,7 +34,7 @@ detector.configure({
   fuzzy: env("CATCH_FUZZY", "true"),
 });
 
-if (!TOKEN) { console.error("Missing DISCORD_TOKEN in .env"); process.exit(1); }
+if (require.main === module && !TOKEN) { console.error("Missing DISCORD_TOKEN in .env"); process.exit(1); }
 
 // ---------------------------------------------------------------------
 // Daily answer from the New York Times
@@ -61,28 +64,6 @@ async function refreshAnswers(force = false) {
     sweepMembers().catch((e) => console.error("Member sweep:", e.message));
     for (const guild of client.guilds.cache.values()) surfaces.sweep(guild).catch((e) => console.error("Surface sweep:", e.message)); // names set before today's word was known
   } catch (e) { console.error("Failed to refresh Wordle answer:", e.message); }
-}
-
-// ---------------------------------------------------------------------
-// Multi-message spelling: "w" "a" "g" "e" "r" or "wa" "ger" as separate messages
-// ---------------------------------------------------------------------
-const recent = new Map();
-const WINDOW_MS = 3 * 60 * 1000;
-function trackFragments(message) {
-  const text = detector.normalize(message.content || "").replace(/[^a-z0-9]/g, "");
-  if (!text || text.length > 3) return [];
-  const key = `${message.channelId}:${message.author.id}`;
-  const now = Date.now();
-  const list = (recent.get(key) || []).filter((m) => now - m.at < WINDOW_MS);
-  list.push({ id: message.id, text, at: now });
-  while (list.length > 12) list.shift();
-  recent.set(key, list);
-  const joined = list.map((m) => m.text).join("");
-  if (detector.scan(joined) || detector.scan(list.map((m) => m.text).join(" "))) {
-    recent.delete(key);
-    return list.map((m) => m.id);
-  }
-  return [];
 }
 
 // ---------------------------------------------------------------------
@@ -157,43 +138,40 @@ async function removeMessage(message, hit, how) {
   if (!canManage(message.channel)) { console.warn(`No Manage Messages permission in #${message.channel.name}`); return; }
   try {
     await message.delete();
+    conversation.forget(message.channelId, message.id);
     console.log(`Deleted spoiler (${how}) from ${message.author?.tag} in #${message.channel.name} (word: ${hit})`);
     await warn(message);
   } catch (e) { console.error("Failed to delete:", e.message); }
-}
-
-// Recent messages per channel, fed to the LLM as context so multi-message hints are visible
-const channelHistory = new Map();
-function remember(message, text) {
-  const list = channelHistory.get(message.channelId) || [];
-  list.push({ author: message.author?.username || "user", text: text.slice(0, 300), at: Date.now() });
-  while (list.length > llm.cfg.maxContextMessages) list.shift();
-  channelHistory.set(message.channelId, list);
 }
 
 async function handleMessage(message, { fromBacklog = false } = {}) {
   if (!message.guild) return;
   if (message.author?.id === client.user?.id) return; // never our own warnings
   if (ALLOWED_CHANNEL_IDS.has(message.channelId)) return;
-  await refreshAnswers();
-  if (!detector.getAnswers().length) return;
-  if (!fromBacklog) checkMember(message.member).catch((e) => console.error("Member:", e.message));
+  const version = Symbol(message.id);
+  versions.set(message.id, version);
+  try {
+    await refreshAnswers();
+    if (!detector.getAnswers().length || versions.get(message.id) !== version) return;
+    if (!fromBacklog) checkMember(message.member).catch((e) => console.error("Member:", e.message));
 
-  const context = (channelHistory.get(message.channelId) || []).slice();
-  const result = await inspectMessage(message, { ocrImage, context });
-  if (result.issues.length) console.warn(`Incomplete inspection ${message.id}: ${result.issues.join("; ")}`);
-  if (result.status === "spoiler") return removeMessage(message, result.hit, "inspection");
-  if (!fromBacklog) remember(message, result.text);
-
-  if (fromBacklog || message.author?.bot) return;
-  const ids = trackFragments(message);
-  if (ids.length && canManage(message.channel)) {
-    try {
-      await message.channel.bulkDelete(ids, true);
-      console.log(`Deleted ${ids.length} fragment messages from ${message.author.tag}`);
-      await warn(message);
-    } catch (e) { console.error("Bulk delete:", e.message); }
-  }
+    conversation.remember(message, message.content || "");
+    const context = conversation.get(message.channelId).filter((row) => row.id !== message.id);
+    const result = await inspectMessage(message, { ocrImage, context });
+    if (versions.get(message.id) !== version) return;
+    if (result.issues.length) console.warn(`Incomplete inspection ${message.id}: ${result.issues.join("; ")}`);
+    if (result.status === "spoiler") return removeMessage(message, result.hit, "inspection");
+    conversation.remember(message, result.text, result.fragmentText ?? result.text);
+    const ids = conversation.fragments(message.channelId, message.id);
+    if (ids.length && canManage(message.channel)) {
+      try {
+        await message.channel.bulkDelete(ids, true);
+        for (const id of ids) { conversation.forget(message.channelId, id); versions.delete(id); }
+        console.log(`Deleted ${ids.length} fragment messages from ${message.author.tag}`);
+        await warn(message);
+      } catch (e) { console.error("Bulk delete:", e.message); }
+    }
+  } finally { if (versions.get(message.id) === version) versions.delete(message.id); }
 }
 
 async function scanBacklog() {
@@ -204,7 +182,7 @@ async function scanBacklog() {
       if (!ch.isTextBased?.() || !ch.viewable || ALLOWED_CHANNEL_IDS.has(ch.id)) continue;
       try {
         const msgs = await ch.messages.fetch({ limit: 50 });
-        for (const m of msgs.values()) { scanned++; await handleMessage(m, { fromBacklog: true }); }
+        for (const m of [...msgs.values()].sort((a, b) => a.createdTimestamp - b.createdTimestamp)) { scanned++; await handleMessage(m, { fromBacklog: true }); }
       } catch { /* no access */ }
     }
   }
@@ -252,6 +230,13 @@ client.once(Events.ClientReady, async (c) => {
 client.on(Events.MessageCreate, (m) => handleMessage(m).catch((e) => console.error("Message:", e.message)));
 client.on(Events.MessageUpdate, async (_o, u) => {
   try { await handleMessage(u.partial ? await u.fetch() : u); } catch (e) { console.error("Edit:", e.message); }
+});
+client.on(Events.MessageDelete, (message) => {
+  conversation.forget(message.channelId, message.id);
+  versions.delete(message.id);
+});
+client.on(Events.MessageBulkDelete, (messages) => {
+  for (const message of messages.values()) { conversation.forget(message.channelId, message.id); versions.delete(message.id); }
 });
 
 // Reactions spelling the answer, or custom emoji named after it
@@ -306,10 +291,12 @@ client.on(Events.Raw, (packet) => {
 });
 client.on(Events.Error, (e) => console.error("Client error:", e.message));
 
-client.login(TOKEN).catch((e) => {
+if (require.main === module) client.login(TOKEN).catch((e) => {
   if (String(e.message).includes("disallowed intents")) {
     console.error("\nDiscord rejected the bot's intents.\nFix: developer portal -> Bot -> Privileged Gateway Intents -> enable MESSAGE CONTENT INTENT; profile scans need SERVER MEMBERS INTENT; presence scans need PRESENCE INTENT" + (POLICE_NICKNAMES ? " and SERVER MEMBERS INTENT" : "") + ", then Save.\n" + (POLICE_NICKNAMES ? "Or set POLICE_NICKNAMES=false in .env.\n" : ""));
     process.exit(1);
   }
   throw e;
 });
+
+module.exports = { client, handleMessage, conversation, versions };

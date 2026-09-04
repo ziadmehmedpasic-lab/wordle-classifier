@@ -71,6 +71,9 @@ The pattern detector reports one of two tiers.
   images are inspected on changes and answer rollover. Confirmed spoilers are cleared
   only when the bot has the necessary permissions; otherwise moderators are alerted.
 - Surface alerts contain generic outcomes and resource IDs, never spoiler text or images.
+- Bounded recent conversation is held in process memory for ten minutes (up to 24 messages
+  per channel, 4,000 characters each) to detect coordinated clues. Edits replace the old
+  content and deletions remove it. Nothing from this context buffer is persisted.
 
 - Members are told that message text, and images posted as attachments, may be sent to
   Anthropic's API and to the project's own scorer endpoint for classification.

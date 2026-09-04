@@ -2,6 +2,7 @@ require("dotenv").config();
 const { Client, GatewayIntentBits, Partials, Events, PermissionsBitField, ChannelType } = require("discord.js");
 const detector = require("./detector");
 const llm = require("./llm");
+const audio = require("./audio");
 
 const env = (k, d) => (process.env[k] ?? d).toString().toLowerCase() === "true";
 const TOKEN = process.env.DISCORD_TOKEN;
@@ -112,6 +113,14 @@ async function collectSlowText(message) {
   return bits.filter(Boolean).join(" \n ");
 }
 
+// Voice messages, audio files and video soundtracks, as text. Link-preview videos are
+// skipped: their embed url is a player page, not a media file.
+async function collectTranscripts(message) {
+  const bits = [];
+  for (const a of message.attachments?.values?.() || []) if (audio.kind(a)) bits.push(await audio.transcribe(a));
+  return bits.filter(Boolean).join(" \n ");
+}
+
 // ---------------------------------------------------------------------
 // Multi-message spelling: "w" "a" "g" "e" "r" or "wa" "ger" as separate messages
 // ---------------------------------------------------------------------
@@ -196,24 +205,29 @@ async function handleMessage(message, { fromBacklog = false } = {}) {
   const hit = detector.scan(text);
   if (hit) return removeMessage(message, hit, "text");
 
-  // Slow path: text attachments and image OCR
+  // Slow path: text attachments, image OCR, speech-to-text
   const imageUrls = [...(message.attachments?.values?.() || [])].filter((a) => /^image\/(png|jpe?g|webp|gif)/.test(a.contentType || "")).map((a) => a.url);
+  let transcript = "";
   if (message.attachments?.size || message.embeds?.some((e) => e.image || e.thumbnail)) {
     const slow = await collectSlowText(message);
     const hit2 = detector.scan(slow);
     if (hit2) return removeMessage(message, hit2, "attachment/ocr");
+    transcript = await collectTranscripts(message);
+    const hit3 = detector.scan(transcript);
+    if (hit3) return removeMessage(message, hit3, "audio");
   }
 
-  // LLM layer: meaning-based hints, riddles, synonyms, translations, solved-grid screenshots
+  // LLM layer: meaning-based hints, riddles, synonyms, translations, solved-grid screenshots, spoken hints
   if (!fromBacklog && !message.author?.bot) {
-    llm.noteContext(message.channelId, text);
+    const llmText = transcript ? `${text}\n[voice transcript]: ${transcript}` : text;
+    llm.noteContext(message.channelId, llmText);
     const context = (channelHistory.get(message.channelId) || []).slice();
-    remember(message, text);
-    if (llm.shouldCheck(message.channelId, text, imageUrls.length > 0)) {
-      const result = await llm.classify({ text, answers: detector.getAnswers(), context, imageUrls: llm.cfg.vision ? imageUrls : [] });
+    remember(message, llmText);
+    if (llm.shouldCheck(message.channelId, llmText, imageUrls.length > 0, Boolean(transcript))) {
+      const result = await llm.classify({ text: llmText, answers: detector.getAnswers(), context, imageUrls: llm.cfg.vision ? imageUrls : [] });
       if (result) {
         const u = result.usage || {};
-        console.log(`LLM verdict: ${result.verdict} (${result.confidence}) "${text.slice(0, 60)}" — ${result.reason} [in ${u.input_tokens ?? "?"} / cached ${u.cache_read_input_tokens ?? 0} / out ${u.output_tokens ?? "?"}]`);
+        console.log(`LLM verdict: ${result.verdict} (${result.confidence}) "${llmText.slice(0, 60)}" — ${result.reason} [in ${u.input_tokens ?? "?"} / cached ${u.cache_read_input_tokens ?? 0} / out ${u.output_tokens ?? "?"}]`);
         if (llm.shouldDelete(result) && canManage(message.channel)) {
           try {
             await message.delete();
@@ -268,6 +282,7 @@ client.once(Events.ClientReady, async (c) => {
   await refreshAnswers(true);
   setInterval(() => refreshAnswers(), 15 * 60 * 1000);
   llm.init();
+  audio.init();
   getOcr(); // warm up in background
   scanBacklog();
 });

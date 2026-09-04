@@ -39,6 +39,7 @@ Bans today's word, plus yesterday's and tomorrow's (covers timezones). Moving to
 - `llm.js` — layer 3, Claude-based meaning classifier (hints, riddles, translations, images)
 - `audio.js` — speech-to-text for voice messages, audio files and video soundtracks (OpenAI)
 - `gifs.js` — Tenor/Giphy tag and description lookup for GIF links
+- `frames.js` — ffmpeg frame sampling so OCR covers every frame of a GIF or video
 - `index.js` — Discord wiring: messages, edits, attachments, OCR, speech-to-text, reactions, names
 - `ml/` — layer 2: data generation, training, evaluation and serving for the fine-tuned classifier (Python, `uv`); see `ml/pyproject.toml`
 - `test/detector.test.js` — 132 targeted cases + generic sweep + false-positive sweep
@@ -46,6 +47,7 @@ Bans today's word, plus yesterday's and tomorrow's (covers timezones). Moving to
 - `test/eval_data.js` — runs the generated ml data through the detector (recall per style, false positives); `--write` stamps each record with `detector_hit` so the classifier is scored only on what reaches it
 - `test/audio.unit.test.js` — offline audio checks; `test/audio.test.js` — live transcription of synthesised clips
 - `test/gifs.test.js` — offline GIF tag checks with a mocked API
+- `test/frames.unit.test.js` — offline frame sampling checks (ffmpeg-built fixtures, faked OCR); `test/frames.test.js` — real tesseract over text fixtures
 
 ## Layer 1: what the pattern detector catches
 | Technique | Example (answer: wager) |
@@ -75,7 +77,8 @@ Bans today's word, plus yesterday's and tomorrow's (covers timezones). Moving to
 | Acrostics | `wife angle grey ear red`, `wage and real`, reversed initials, emoji names 🐳🍎🦒🥚🌈 with one distractor, emoji mixed with letters `w 🍎 g e r` |
 | Hidden in other content | URLs, custom emoji names, file names, embeds, link previews, polls, stickers, forwarded messages |
 | Attachments | `.txt`/`.md`/`.csv` contents, and **screenshots via OCR** |
-| GIF links | Tenor and Giphy URLs: the slug in the link, plus the post's tags, title and description from the provider API (needs `TENOR_API_KEY` / `GIPHY_API_KEY`); the tags also go to the LLM layer. Frames are not examined yet: only the first frame is OCR'd |
+| GIF links | Tenor and Giphy URLs: the slug in the link, plus the post's tags, title and description from the provider API (needs `TENOR_API_KEY` / `GIPHY_API_KEY`); the tags also go to the LLM layer |
+| GIF and video frames | uploaded GIFs, gif link previews and videos are split into frames with ffmpeg (up to 20 per clip, near-duplicates dropped) and every frame is OCR'd, so text on a later frame or one letter per frame is read. Plain OCR reads only the first frame |
 | Speech | Discord **voice messages**, uploaded audio (`mp3/ogg/wav/m4a/flac/webm`) and the soundtrack of uploaded videos (`mp4/mov/webm`) are transcribed, then run through every text check and the LLM layer |
 | Fragments across messages | `w` `a` `g` `e` `r` or `wa` `ger` as separate messages (all deleted) |
 | Edits and link previews | messages re-scanned on edit and when embeds resolve |

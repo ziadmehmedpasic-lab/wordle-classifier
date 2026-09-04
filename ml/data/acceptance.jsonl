@@ -138,3 +138,6 @@
 {"id": "a138", "answer": "ghost", "text": "who wants to play something later", "label": "benign", "style": "chat", "source": "draft", "detector_hit": false}
 {"id": "a139", "answer": "ghost", "text": "i hate mondays", "label": "benign", "style": "chat", "source": "draft", "detector_hit": false}
 {"id": "a140", "answer": "ghost", "text": "same here", "label": "benign", "style": "chat", "source": "draft", "detector_hit": false}
+{"id": "a141", "answer": "wager", "text": "sound like waiig errr", "label": "direct", "style": "phonetic", "source": "draft", "detector_hit": false}
+{"id": "a142", "answer": "ghost", "text": "its like gohh sst", "label": "direct", "style": "phonetic", "source": "draft", "detector_hit": false}
+{"id": "a143", "answer": "wager", "text": "Pager but replace the first letter with vv", "label": "strong_hint", "style": "edit", "source": "draft", "detector_hit": true}

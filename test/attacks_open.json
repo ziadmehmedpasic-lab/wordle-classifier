@@ -238,5 +238,13 @@
   "decode": "whale apple [fire fire] giraffe egg rainbow; ignore the two fires. The emoji-name DFS allows exactly one skipped emoji.",
   "worth_catching": false,
   "fp_risk": "two skips in an emoji-name acrostic collides with ordinary emoji strings"
+ },
+ {
+  "answer": "wager",
+  "text": "sound like waiig errr",
+  "technique": "phonetic-split",
+  "decode": "'waiig errr' read aloud is wager. The phonetic check runs per token, and neither piece alone sounds like the answer; the joined form exceeds the length window.",
+  "worth_catching": true,
+  "fp_risk": "low if adjacent non-dictionary tokens are merged and deduped before the phonetic check; stretched-letter chat like 'ughhh' rarely sounds like an answer"
  }
 ]

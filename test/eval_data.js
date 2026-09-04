@@ -42,8 +42,14 @@ for (const label of ["direct", "strong_hint", "weak_hint", "benign"]) {
   console.log(`  ${label.padEnd(12)} ${passed.filter((r) => r.label === label).length}/${n}`);
 }
 
+// python's json.dumps layout, so a restamp only touches the field it adds
+function fmt(v) {
+  if (Array.isArray(v)) return `[${v.map(fmt).join(", ")}]`;
+  if (v && typeof v === "object") return `{${Object.entries(v).map(([k, x]) => `${JSON.stringify(k)}: ${fmt(x)}`).join(", ")}}`;
+  return JSON.stringify(v);
+}
 if (write) {
-  files.forEach((f, i) => fs.writeFileSync(f, byFile[i].map((r) => JSON.stringify(r)).join("\n") + "\n"));
+  files.forEach((f, i) => fs.writeFileSync(f, byFile[i].map(fmt).join("\n") + "\n"));
   console.log(`wrote detector_hit to ${files.length} file(s)`);
 }
 

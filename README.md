@@ -89,6 +89,17 @@ Examples are generated per past answer with Claude, a small model is fine-tuned 
 
 Layer 1 deletes before the classifier runs, so the classifier is trained on everything but evaluated and thresholded only on records with `detector_hit: false` (about 2 in 3 generated records, and almost none of the single-message `direct` ones). Run `node test/eval_data.js --write` after generating to stamp that field.
 
+Pipeline, all under `ml/` with `uv run`:
+```
+python scripts/build_dataset.py                       # answer-grouped train/val/test splits
+python scripts/evaluate.py --backend zeroshot         # baseline: Qwen3 label likelihoods, no training
+python scripts/evaluate.py --backend claude           # baseline: the Claude judge
+python scripts/train.py --name lora                   # LoRA on Qwen3, loss on the label tokens only
+python scripts/evaluate.py --backend lora --run-dir runs/<date>-lora \
+    --threshold-file data/splits/val.jsonl --max-fp-per-10k 50
+```
+Every scorer returns a distribution over the four labels; the bot's decision is a threshold on `1 - p(benign)`, picked on the validation split at the false-deletion budget. `evaluate.py` writes `metrics.json` (recall and false deletions per 10k benign with bootstrap intervals, per-label and per-style breakdowns, latency) and a Plotly `dashboard.html` per run. The fine-tune only ships if it beats the best baseline on recall at the accepted false-deletion rate.
+
 ## Layer 3: Claude judge (optional, recommended)
 Pattern matching cannot judge meaning. With an Anthropic API key in `.env`, messages that pass the pattern layer
 are sent to Claude, which returns `spoiler`, `hint`, or `clean` with a confidence and reason. Catches:

@@ -6,8 +6,13 @@ requires-python = ">=3.12"
 dependencies = [
     "anthropic>=1.0",
     "httpx>=0.27",
+    "numpy>=2.0",
+    "peft>=0.15",
+    "plotly>=5.24",
     "pydantic>=2.7",
+    "torch>=2.4",
     "tqdm>=4.66",
+    "transformers>=4.51",
     "tyro>=0.9",
 ]
 
@@ -18,6 +23,15 @@ dev = [
     "pytest-cov>=6.0",
     "ruff>=0.8",
 ]
+
+# cpu wheels on linux (ci); the default macos wheel is already cpu/mps
+[tool.uv.sources]
+torch = [{ index = "pytorch-cpu", marker = "sys_platform == 'linux'" }]
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
 
 [build-system]
 requires = ["hatchling"]

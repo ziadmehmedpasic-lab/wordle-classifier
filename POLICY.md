@@ -72,7 +72,10 @@ option and to fix the deployment threshold. It is frozen before any model work. 
 file is a draft written by the maintainers; entries marked `"source": "draft"` still need a
 second person's adjudication before the set counts as frozen.
 
-Fields: `id`, `answer`, `text`, `label`, `style`, `source`. Style names: `plain`, `leet`,
+Fields: `id`, `answer`, `text`, `label`, `style`, `source`, plus `detector_hit`, a derived field
+stamped by `node test/eval_data.js --write` that says whether layer 1 deletes the message before
+any classifier runs; the classifier is benchmarked and thresholded on the records where it is
+false. Style names: `plain`, `leet`,
 `separators`, `unicode`, `emoji`, `encoding`, `acrostic`, `capitalization`, `definition`,
 `synonym`, `rhyme`, `positional`, `translation`, `crossword`, `rebus`, `category`,
 `wordle_chat`, `chat`, `hard_benign`.

@@ -1,5 +1,5 @@
 {
-  "name": "wordle-spoiler-bot",
+  "name": "wordle-classifier",
   "version": "1.0.0",
   "description": "Discord bot that deletes Wordle spoilers: pattern matching, OCR, and an LLM layer",
   "main": "index.js",

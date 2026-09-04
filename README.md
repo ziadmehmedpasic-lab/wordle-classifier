@@ -1,4 +1,4 @@
-# Wordle Spoiler Bot
+# Wordle Classifier
 
 Deletes anything in any text channel that gives away today's Wordle answer.
 

@@ -75,9 +75,9 @@ function collectContent(message) {
 }
 
 /** @param {object} asset @param {object} options @returns {Promise<{text: string, images: string[], issues: string[]}>} */
-async function extractAsset(asset, { ocrImage }) {
+async function extractAsset(asset, { ocrImage, downloadFile = download }) {
   if (asset.unsupported) return { text: "", images: [], issues: [asset.unsupported] };
-  const bytes = await download(asset.url);
+  const bytes = await downloadFile(asset.url);
   const result = await extractDocument(bytes, { name: asset.name, ocrImage });
   const texts = [result.text];
   for (const clip of result.clips) {

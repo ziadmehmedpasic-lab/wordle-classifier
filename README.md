@@ -52,7 +52,7 @@ A web page where testers try to leak a random target word past the pattern layer
 
     npm run build:web    # web/dist/index.html, one self-contained file
 
-It is hosted on Vercel: the static page from `web/dist` plus one serverless function, `api/attempts.js`, that keeps attempts in an Upstash Redis store provisioned through the Vercel marketplace (`vercel integration add upstash`; the function reads `KV_REST_API_URL` and `KV_REST_API_TOKEN`). `vercel.json` holds the build settings and `.vercelignore` keeps `ml/` and `test/` out of the upload. Deploy with `npx vercel --prod`.
+It is hosted on Vercel at https://wordle-classifier.vercel.app: the static page from `web/dist` plus one serverless function, `api/attempts.js`, that keeps attempts in an Upstash Redis store provisioned through the Vercel marketplace (`vercel integration add upstash`; the function reads `KV_REST_API_URL` and `KV_REST_API_TOKEN`). `vercel.json` holds the build settings and `.vercelignore` keeps `ml/` and `test/` out of the upload. Deploy with `npx vercel --prod`.
 
 Targets come from `web/words.json`, a curated list of common five-letter words, all in the detector's dictionary. The NYT answer list never enters the page.
 

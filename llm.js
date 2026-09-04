@@ -87,7 +87,11 @@ async function classify({ text, answers, context = [], imageUrls = [] }, judgeCl
   if (context.length) {
     content.push({ type: "text", text: "Recent messages in this channel, oldest first:\n" + context.map((c) => `- ${c.author}: ${c.text}`).join("\n") });
   }
-  for (const url of imageUrls) content.push({ type: "image", source: { type: "url", url } });
+  for (const url of imageUrls) {
+    const data = /^data:(image\/(?:png|jpeg|webp|gif));base64,(.+)$/.exec(url);
+    const source = data ? { type: "base64", media_type: data[1], data: data[2] } : { type: "url", url };
+    content.push({ type: "image", source });
+  }
   content.push({ type: "text", text: `Message to judge:\n${text || "(no text, see attached image)"}` });
 
   try {

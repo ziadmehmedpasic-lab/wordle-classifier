@@ -1942,5 +1942,197 @@
   "decode": "Backslash-slash-backslash-slash drawn as a W: wager. tokenHit strips the symbols and sees 'ager' (a dictionary word) and wildcardHit needs the token to be the answer's length.",
   "worth_catching": true,
   "fp_risk": "Very low. Add multi-character ASCII-art glyphs to the leet table before stripping: \\/\\/ and VV for w, |-| and ]-[ for h, |\\| for n, |_ for l, |\\/| for m, |) for d, |< for k, |> for p. Nothing in ordinary chat contains '\\/\\/'."
+ },
+ {
+  "answer": "wager",
+  "text": "وايجر",
+  "technique": "script-transliteration",
+  "decode": "arabic: waw alif ya jim ra, read as w-a-y-j-r, the arabic spelling of the english word. posted in the real server on 2026-09-04 with 'found the hack'",
+  "worth_catching": true,
+  "fp_risk": "ordinary chat in that script: a word whose consonants or sound match the answer. measured at 0.24% of (answer, message) pairs over 185 sentences of arabic, hebrew, russian, greek, japanese, korean, hindi, georgian and armenian chat, about the same rate as the whole detector on english benign chat; kept because a friend group that chats in english rarely posts in another script"
+ },
+ {
+  "answer": "wager",
+  "text": "ويجر",
+  "technique": "script-transliteration",
+  "decode": "arabic without the alif: w-y-j-r; arabic writes no short vowels so the consonants w-g-r are the word",
+  "worth_catching": true,
+  "fp_risk": "ordinary chat in that script: a word whose consonants or sound match the answer. measured at 0.24% of (answer, message) pairs over 185 sentences of arabic, hebrew, russian, greek, japanese, korean, hindi, georgian and armenian chat, about the same rate as the whole detector on english benign chat; kept because a friend group that chats in english rarely posts in another script"
+ },
+ {
+  "answer": "wager",
+  "text": "و ا ي ج ر",
+  "technique": "script-transliteration",
+  "decode": "the same arabic letters spaced out, one per token",
+  "worth_catching": true,
+  "fp_risk": "ordinary chat in that script: a word whose consonants or sound match the answer. measured at 0.24% of (answer, message) pairs over 185 sentences of arabic, hebrew, russian, greek, japanese, korean, hindi, georgian and armenian chat, about the same rate as the whole detector on english benign chat; kept because a friend group that chats in english rarely posts in another script"
+ },
+ {
+  "answer": "wager",
+  "text": "found the hack وايجر",
+  "technique": "script-transliteration",
+  "decode": "english sentence with the arabic spelling inside it",
+  "worth_catching": true,
+  "fp_risk": "ordinary chat in that script: a word whose consonants or sound match the answer. measured at 0.24% of (answer, message) pairs over 185 sentences of arabic, hebrew, russian, greek, japanese, korean, hindi, georgian and armenian chat, about the same rate as the whole detector on english benign chat; kept because a friend group that chats in english rarely posts in another script"
+ },
+ {
+  "answer": "wager",
+  "text": "וייג׳ר",
+  "technique": "script-transliteration",
+  "decode": "hebrew: vav yod yod gimel-geresh resh, read as v/w-ey-j-r",
+  "worth_catching": true,
+  "fp_risk": "ordinary chat in that script: a word whose consonants or sound match the answer. measured at 0.24% of (answer, message) pairs over 185 sentences of arabic, hebrew, russian, greek, japanese, korean, hindi, georgian and armenian chat, about the same rate as the whole detector on english benign chat; kept because a friend group that chats in english rarely posts in another script"
+ },
+ {
+  "answer": "wager",
+  "text": "вейджер",
+  "technique": "script-transliteration",
+  "decode": "russian: the standard cyrillic spelling of the english word, v-e-y-d-zh-e-r",
+  "worth_catching": true,
+  "fp_risk": "ordinary chat in that script: a word whose consonants or sound match the answer. measured at 0.24% of (answer, message) pairs over 185 sentences of arabic, hebrew, russian, greek, japanese, korean, hindi, georgian and armenian chat, about the same rate as the whole detector on english benign chat; kept because a friend group that chats in english rarely posts in another script"
+ },
+ {
+  "answer": "wager",
+  "text": "γουέιτζερ",
+  "technique": "script-transliteration",
+  "decode": "greek: gamma-omicron-upsilon (w) epsilon-iota (ey) tau-zeta (j) epsilon rho",
+  "worth_catching": true,
+  "fp_risk": "ordinary chat in that script: a word whose consonants or sound match the answer. measured at 0.24% of (answer, message) pairs over 185 sentences of arabic, hebrew, russian, greek, japanese, korean, hindi, georgian and armenian chat, about the same rate as the whole detector on english benign chat; kept because a friend group that chats in english rarely posts in another script"
+ },
+ {
+  "answer": "wager",
+  "text": "ウェイジャー",
+  "technique": "script-transliteration",
+  "decode": "japanese katakana: we-i-ja-a, the loanword spelling; the trailing long vowel stands for -er",
+  "worth_catching": true,
+  "fp_risk": "ordinary chat in that script: a word whose consonants or sound match the answer. measured at 0.24% of (answer, message) pairs over 185 sentences of arabic, hebrew, russian, greek, japanese, korean, hindi, georgian and armenian chat, about the same rate as the whole detector on english benign chat; kept because a friend group that chats in english rarely posts in another script"
+ },
+ {
+  "answer": "wager",
+  "text": "ワゲル",
+  "technique": "script-transliteration",
+  "decode": "japanese katakana letter by letter: wa-ge-ru",
+  "worth_catching": true,
+  "fp_risk": "ordinary chat in that script: a word whose consonants or sound match the answer. measured at 0.24% of (answer, message) pairs over 185 sentences of arabic, hebrew, russian, greek, japanese, korean, hindi, georgian and armenian chat, about the same rate as the whole detector on english benign chat; kept because a friend group that chats in english rarely posts in another script"
+ },
+ {
+  "answer": "wager",
+  "text": "웨이저",
+  "technique": "script-transliteration",
+  "decode": "korean hangul: we-i-jeo, the loanword spelling; the final 어 stands for -er",
+  "worth_catching": true,
+  "fp_risk": "ordinary chat in that script: a word whose consonants or sound match the answer. measured at 0.24% of (answer, message) pairs over 185 sentences of arabic, hebrew, russian, greek, japanese, korean, hindi, georgian and armenian chat, about the same rate as the whole detector on english benign chat; kept because a friend group that chats in english rarely posts in another script"
+ },
+ {
+  "answer": "wager",
+  "text": "와거",
+  "technique": "script-transliteration",
+  "decode": "korean hangul letter by letter: wa-geo",
+  "worth_catching": true,
+  "fp_risk": "ordinary chat in that script: a word whose consonants or sound match the answer. measured at 0.24% of (answer, message) pairs over 185 sentences of arabic, hebrew, russian, greek, japanese, korean, hindi, georgian and armenian chat, about the same rate as the whole detector on english benign chat; kept because a friend group that chats in english rarely posts in another script"
+ },
+ {
+  "answer": "wager",
+  "text": "वेजर",
+  "technique": "script-transliteration",
+  "decode": "hindi devanagari: va-e ja ra, read as vejar",
+  "worth_catching": true,
+  "fp_risk": "ordinary chat in that script: a word whose consonants or sound match the answer. measured at 0.24% of (answer, message) pairs over 185 sentences of arabic, hebrew, russian, greek, japanese, korean, hindi, georgian and armenian chat, about the same rate as the whole detector on english benign chat; kept because a friend group that chats in english rarely posts in another script"
+ },
+ {
+  "answer": "wager",
+  "text": "ვეიჯერ",
+  "technique": "script-transliteration",
+  "decode": "georgian: v-e-i-j-e-r",
+  "worth_catching": true,
+  "fp_risk": "ordinary chat in that script: a word whose consonants or sound match the answer. measured at 0.24% of (answer, message) pairs over 185 sentences of arabic, hebrew, russian, greek, japanese, korean, hindi, georgian and armenian chat, about the same rate as the whole detector on english benign chat; kept because a friend group that chats in english rarely posts in another script"
+ },
+ {
+  "answer": "wager",
+  "text": "վեյջեր",
+  "technique": "script-transliteration",
+  "decode": "armenian: v-e-y-j-e-r",
+  "worth_catching": true,
+  "fp_risk": "ordinary chat in that script: a word whose consonants or sound match the answer. measured at 0.24% of (answer, message) pairs over 185 sentences of arabic, hebrew, russian, greek, japanese, korean, hindi, georgian and armenian chat, about the same rate as the whole detector on english benign chat; kept because a friend group that chats in english rarely posts in another script"
+ },
+ {
+  "answer": "crane",
+  "text": "كرين",
+  "technique": "script-transliteration",
+  "decode": "arabic: kaf ra ya nun, k-r-y-n",
+  "worth_catching": true,
+  "fp_risk": "ordinary chat in that script: a word whose consonants or sound match the answer. measured at 0.24% of (answer, message) pairs over 185 sentences of arabic, hebrew, russian, greek, japanese, korean, hindi, georgian and armenian chat, about the same rate as the whole detector on english benign chat; kept because a friend group that chats in english rarely posts in another script"
+ },
+ {
+  "answer": "plane",
+  "text": "بلاين",
+  "technique": "script-transliteration",
+  "decode": "arabic has no p, so ba stands in: b-l-a-y-n",
+  "worth_catching": true,
+  "fp_risk": "ordinary chat in that script: a word whose consonants or sound match the answer. measured at 0.24% of (answer, message) pairs over 185 sentences of arabic, hebrew, russian, greek, japanese, korean, hindi, georgian and armenian chat, about the same rate as the whole detector on english benign chat; kept because a friend group that chats in english rarely posts in another script"
+ },
+ {
+  "answer": "tiger",
+  "text": "тайгер",
+  "technique": "script-transliteration",
+  "decode": "russian: t-a-y-g-e-r",
+  "worth_catching": true,
+  "fp_risk": "ordinary chat in that script: a word whose consonants or sound match the answer. measured at 0.24% of (answer, message) pairs over 185 sentences of arabic, hebrew, russian, greek, japanese, korean, hindi, georgian and armenian chat, about the same rate as the whole detector on english benign chat; kept because a friend group that chats in english rarely posts in another script"
+ },
+ {
+  "answer": "light",
+  "text": "ライト",
+  "technique": "script-transliteration",
+  "decode": "japanese: ra-i-to, the loanword spelling",
+  "worth_catching": true,
+  "fp_risk": "ordinary chat in that script: a word whose consonants or sound match the answer. measured at 0.24% of (answer, message) pairs over 185 sentences of arabic, hebrew, russian, greek, japanese, korean, hindi, georgian and armenian chat, about the same rate as the whole detector on english benign chat; kept because a friend group that chats in english rarely posts in another script"
+ },
+ {
+  "answer": "zebra",
+  "text": "지브라",
+  "technique": "script-transliteration",
+  "decode": "korean: ji-beu-ra, the loanword spelling",
+  "worth_catching": true,
+  "fp_risk": "ordinary chat in that script: a word whose consonants or sound match the answer. measured at 0.24% of (answer, message) pairs over 185 sentences of arabic, hebrew, russian, greek, japanese, korean, hindi, georgian and armenian chat, about the same rate as the whole detector on english benign chat; kept because a friend group that chats in english rarely posts in another script"
+ },
+ {
+  "answer": "jumbo",
+  "text": "ジャンボ",
+  "technique": "script-transliteration",
+  "decode": "japanese: ja-n-bo",
+  "worth_catching": true,
+  "fp_risk": "ordinary chat in that script: a word whose consonants or sound match the answer. measured at 0.24% of (answer, message) pairs over 185 sentences of arabic, hebrew, russian, greek, japanese, korean, hindi, georgian and armenian chat, about the same rate as the whole detector on english benign chat; kept because a friend group that chats in english rarely posts in another script"
+ },
+ {
+  "answer": "ghost",
+  "text": "גוסט",
+  "technique": "script-transliteration",
+  "decode": "hebrew: gimel vav samekh tet, g-o-s-t",
+  "worth_catching": true,
+  "fp_risk": "ordinary chat in that script: a word whose consonants or sound match the answer. measured at 0.24% of (answer, message) pairs over 185 sentences of arabic, hebrew, russian, greek, japanese, korean, hindi, georgian and armenian chat, about the same rate as the whole detector on english benign chat; kept because a friend group that chats in english rarely posts in another script"
+ },
+ {
+  "answer": "wager",
+  "text": "ωαγερ",
+  "technique": "script-transliteration",
+  "decode": "Greek letters read by sound: omega alpha gamma epsilon rho",
+  "worth_catching": true,
+  "fp_risk": "ordinary chat in that script: a word whose consonants or sound match the answer. measured at 0.24% of (answer, message) pairs over 185 sentences of arabic, hebrew, russian, greek, japanese, korean, hindi, georgian and armenian chat, about the same rate as the whole detector on english benign chat; kept because a friend group that chats in english rarely posts in another script"
+ },
+ {
+  "answer": "wager",
+  "text": "вагер",
+  "technique": "script-transliteration",
+  "decode": "Cyrillic transliteration read by sound (v-a-g-e-r)",
+  "worth_catching": true,
+  "fp_risk": "ordinary chat in that script: a word whose consonants or sound match the answer. measured at 0.24% of (answer, message) pairs over 185 sentences of arabic, hebrew, russian, greek, japanese, korean, hindi, georgian and armenian chat, about the same rate as the whole detector on english benign chat; kept because a friend group that chats in english rarely posts in another script"
+ },
+ {
+  "answer": "ghost",
+  "text": "гхост",
+  "technique": "script-transliteration",
+  "decode": "Cyrillic transliteration read by sound (g-kh-o-s-t)",
+  "worth_catching": true,
+  "fp_risk": "ordinary chat in that script: a word whose consonants or sound match the answer. measured at 0.24% of (answer, message) pairs over 185 sentences of arabic, hebrew, russian, greek, japanese, korean, hindi, georgian and armenian chat, about the same rate as the whole detector on english benign chat; kept because a friend group that chats in english rarely posts in another script"
  }
 ]

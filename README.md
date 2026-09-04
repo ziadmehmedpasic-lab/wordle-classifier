@@ -36,13 +36,14 @@ Bans today's word, plus yesterday's and tomorrow's (covers timezones). Moving to
 ## Layout
 - `POLICY.md` — the moderation policy: labels, what is deleted, which answers are protected, data handling
 - `detector.js` — layer 1, pure text detection logic (no Discord dependency)
+- `translit.js` — letter tables that read Arabic, Hebrew, Cyrillic, Greek, kana, hangul, Devanagari, Georgian and Armenian back into latin candidates for `detector.js`
 - `llm.js` — layer 3, Claude-based meaning classifier (hints, riddles, translations, images)
 - `audio.js` — speech-to-text for voice messages, audio files and video soundtracks (OpenAI)
 - `gifs.js` — Tenor/Giphy tag and description lookup for GIF links
 - `frames.js` — ffmpeg frame sampling so OCR covers every frame of a GIF or video
 - `index.js` — Discord wiring: messages, edits, attachments, OCR, speech-to-text, reactions, names
 - `ml/` — layer 2: data generation, training, evaluation and serving for the fine-tuned classifier (Python, `uv`); see `ml/pyproject.toml`
-- `test/detector.test.js` — 132 targeted cases + generic sweep + false-positive sweep
+- `test/detector.test.js` — 159 targeted cases + generic sweep + false-positive sweep (English and nine other scripts)
 - `test/attacks.json`, `test/attacks_open.json`, `test/ATTACKS.md` — red-team ledger: attacks the detector must catch, and known gaps
 - `test/eval_data.js` — runs the generated ml data through the detector (recall per style, false positives); `--write` stamps each record with `detector_hit` so the classifier is scored only on what reaches it
 - `test/audio.unit.test.js` — offline audio checks; `test/audio.test.js` — live transcription of synthesised clips
@@ -87,6 +88,7 @@ Attempts feed the red-team ledger: `GET /api/attempts` returns the newest 500 as
 | Suffixes | `wagers`, `wagered`, `wagering`, `lighten`, `placement` |
 | Typos, anagrams, vowel removal, interleaving | `wgaer`, `wsger`, `wagr`, `wgr`, `wxaxgxexr`, reversed `rxexgxaxw` (non-dictionary words only) |
 | Phonetic spellings | `wayjer`, `waygur` (non-dictionary words only) |
+| Other scripts, read by sound | Arabic `وايجر`, Hebrew `וייג׳ר`, Cyrillic `вейджер`, Greek `γουέιτζερ`, katakana `ウェイジャー` / `ワゲル`, hangul `웨이저`, Devanagari `वेजर`, Georgian, Armenian; letter by letter or the loanword spelling; spaced letters `و ا ي ج ر` |
 | Acrostics | `wife angle grey ear red`, `wage and real`, reversed initials, emoji names 🐳🍎🦒🥚🌈 with one distractor, emoji mixed with letters `w 🍎 g e r` |
 | Hidden in other content | URLs, custom emoji names, file names, embeds, link previews, polls, stickers, forwarded messages |
 | Attachments | `.txt`/`.md`/`.csv` contents, and **screenshots via OCR** |
@@ -153,4 +155,5 @@ hints, clean chat) as both voice-message ogg and mp4. macOS only, it uses `say` 
 - On days the answer is a common word (`house`, `light`, `today`), normal sentences using it are deleted. Inherent to any spoiler filter.
 - Acrostic detection can misfire: `star every` on a `stare` day. Disable with `CATCH_ACROSTICS=false`.
 - The word-boundary rule misfires on rare collisions: `the mailman` on an `email` day. Measured at 5 extra hits per 73,000 benign message/answer pairs.
+- Reading other scripts by sound collides with ordinary chat in those languages at about the same rate as the rest of the detector does with English: 0.24% of (answer, message) pairs over 185 sentences of Arabic, Hebrew, Russian, Greek, Japanese, Korean, Hindi, Georgian and Armenian chat, on top of 0.07% before the rule. Disable with `configure({ scripts: false })`.
 - Deliberately not caught by the pattern layer, left to the LLM layer: the answer inside a real word (`delightful` on a `light` day), anagrams and homophones that are real words (`panel`, `plain` for `plane`), acrostics with many filler words, last letters of words. See `test/attacks_open.json`.

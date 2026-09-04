@@ -27,6 +27,8 @@ const cases = [
   ["vvager", C], ["Wayjer", C], ["wajer", C], ["waygur", C], ["VVAYJER", C],
   // acrostics
   ["wife angle grey ear red", C], ["wage real", C], ["wage and real", C], ["wage and then real", C], ["wag ever ring", C], ["🐳🍎🦒🥚🌈", C],
+  // other scripts, read by sound: arabic, hebrew, cyrillic, greek, katakana, hangul, devanagari, georgian, armenian
+  ["وايجر", C], ["ويجر", C], ["و ا ي ج ر", C], ["found the hack وايجر", C], ["וייג׳ר", C], ["вейджер", C], ["вагер", C], ["γουέιτζερ", C], ["ωαγερ", C], ["ウェイジャー", C], ["ワゲル", C], ["웨이저", C], ["와거", C], ["वेजर", C], ["ვეიჯერ", C], ["վեյջեր", C],
   // hidden in other content
   ["https://example.com/wager", C], ["wager123", C], ["<:wager:12345>", C], ["xx-wager-xx", C], ["https://www.merriam-webster.com/dictionary/wager", C],
   // ---- should NOT be caught ----
@@ -35,6 +37,7 @@ const cases = [
   ["wage", N], ["eager", N], ["vague", N], ["wife angle grey", N], ["lol", N], ["brb", N], ["l8r", N], ["2nite", N], ["gg ez 4/6", N], ["10:30", N], ["2024", N],
   ["see you at 5", N], ["call me at 555 1234", N], ["the meeting is 1 2 3 pm", N], ["https://discord.com/channels/123/456", N], ["😂😂😂", N], ["🟩🟩🟩🟩🟩", N],
   ["I got it in 4 today, that was rough", N], ["anyone else struggle", N], ["good morning all", N], ["water is wet", N], ["aged", N], ["wages", N],
+  ["صباح الخير يا شباب", N], ["الكلمة صعبة اليوم", N], ["בוקר טוב לכולם", N], ["всем привет как дела", N], ["сегодня сложное слово", N], ["καλημέρα σε όλους", N], ["今日は難しかった", N], ["오늘 어려웠어", N], ["आज मुश्किल था", N], ["ואו", N], ["вода", N],
 ];
 let fails = 0;
 for (const [i, exp] of cases) {
@@ -48,6 +51,9 @@ console.log(`${cases.length - fails}/${cases.length} passed`);
 const words = ["crane","light","piano","ghost","frown","jumbo","quilt","zebra","mirth","abbey","house","stare","plane","great","tiger"];
 const leet = { a:"4",e:"3",i:"1",o:"0",s:"5",t:"7",b:"8",g:"9" };
 const morse = {a:".-",b:"-...",c:"-.-.",d:"-..",e:".",f:"..-.",g:"--.",h:"....",i:"..",j:".---",k:"-.-",l:".-..",m:"--",n:"-.",o:"---",p:".--.",q:"--.-",r:".-.",s:"...",t:"-",u:"..-",v:"...-",w:".--",x:"-..-",y:"-.--",z:"--.."};
+const cyr = {a:"а",b:"б",c:"к",d:"д",e:"е",f:"ф",g:"г",h:"х",i:"и",j:"дж",k:"к",l:"л",m:"м",n:"н",o:"о",p:"п",q:"к",r:"р",s:"с",t:"т",u:"у",v:"в",w:"в",x:"кс",y:"й",z:"з"};
+const grk = {a:"α",b:"β",c:"κ",d:"δ",e:"ε",f:"φ",g:"γ",h:"χ",i:"ι",j:"τζ",k:"κ",l:"λ",m:"μ",n:"ν",o:"ο",p:"π",q:"κ",r:"ρ",s:"σ",t:"τ",u:"υ",v:"β",w:"ω",x:"ξ",y:"υ",z:"ζ"};
+const arb = {a:"ا",b:"ب",c:"ك",d:"د",e:"ي",f:"ف",g:"ج",h:"ه",i:"ي",j:"ج",k:"ك",l:"ل",m:"م",n:"ن",o:"و",p:"ب",q:"ق",r:"ر",s:"س",t:"ت",u:"و",v:"ف",w:"و",x:"كس",y:"ي",z:"ز"};
 let tot=0, ok=0;
 for (const w of words) { d.setAnswers([w]);
   const tricks=[w, w.toUpperCase()+"!!", "||"+w+"||", [...w].join("."), [...w].join(" "), [...w].map(c=>leet[c]||c).join(""), [...w].reverse().join(""), w+"s", "https://x.com/"+w,
@@ -64,13 +70,17 @@ for (const w of words) { d.setAnswers([w]);
     "LMAO OMG "+[...w].map(c=>"ho"+c.toUpperCase()+"ie").join(" "), [...w].map(c=>"HO"+c+"IE").join(" "), [...w].map(c=>(c.charCodeAt(0)-96)).join(" • "), [...w].map(c=>"("+(c.charCodeAt(0)-96)+")").join(""), [...w].map(c=>(c.charCodeAt(0)-96)).join(" then "),
     [...w].map(c=>morse[c]).join("\n"), [...w].map(c=>morse[c].replace(/\./g,"dot ").replace(/-/g,"dash ").trim()).join(", "), [...w].map(c=>morse[c].replace(/\./g,"🔴").replace(/-/g,"➖")).join(" "),
     [...w].map(c=>"<:blue_letter_"+c+":1>").join(""), [...w].map(c=>":letter_"+c+":").join(""), [...w].map(c=>String.fromCharCode(((c.charCodeAt(0)-97+13)%26)+97)).join("")+"f",
-    "```\nday 5\n"+[...w].map((c,i)=>"x".repeat(i+1)+c+"x".repeat(5-i)).join("\n")+"\n```", [...w].map(c=>c+" then").join(" ")];
+    "```\nday 5\n"+[...w].map((c,i)=>"x".repeat(i+1)+c+"x".repeat(5-i)).join("\n")+"\n```", [...w].map(c=>c+" then").join(" "),
+    // round 3: letter by letter into another script
+    [...w].map(c=>cyr[c]).join(""), [...w].map(c=>grk[c]).join(""), [...w].map(c=>arb[c]).join(""), [...w].map(c=>arb[c]).join(" ")];
   for (const t of tricks) { tot++; if (d.scan(t)===w) ok++; else console.log("MISS", w, JSON.stringify(t), "->", d.scan(t)); }
 }
 console.log(`generic tricks: ${ok}/${tot}`);
 
 // False positive sweep on realistic chat
-const chat = ["I saw a star every night this week","we plan everything on sundays","lets grab lunch at noon tomorrow","did you get it today","i got it in three guesses","so close today","anyone else struggle today","that was a hard one","my streak is alive","lol that was tough","gg everyone","anyone want to play something later","brb getting food","who is online right now","this bot is annoying","can we talk about the game","i love this server","the weather is nice today","hows everyone doing","good morning all","see you at 5","meeting at 10:30","my number ends in 1234","happy birthday!!","🎉🎉🎉 congrats","nice one","ok cool","idk tbh","im so tired","what time is the game","brb 5 min","the code is 1 2 3 4 5 6","lets go team","that movie was great","i live in a big house","turn on the light","i hate mondays","pizza tonight?","who won","same here"];
+const chat = ["I saw a star every night this week","we plan everything on sundays","lets grab lunch at noon tomorrow","did you get it today","i got it in three guesses","so close today","anyone else struggle today","that was a hard one","my streak is alive","lol that was tough","gg everyone","anyone want to play something later","brb getting food","who is online right now","this bot is annoying","can we talk about the game","i love this server","the weather is nice today","hows everyone doing","good morning all","see you at 5","meeting at 10:30","my number ends in 1234","happy birthday!!","🎉🎉🎉 congrats","nice one","ok cool","idk tbh","im so tired","what time is the game","brb 5 min","the code is 1 2 3 4 5 6","lets go team","that movie was great","i live in a big house","turn on the light","i hate mondays","pizza tonight?","who won","same here",
+  // other scripts: the transliteration rule must not fire on ordinary chat in them
+  "صباح الخير يا شباب","كيف حالكم اليوم","الكلمة صعبة اليوم","حصلت عليها في أربع محاولات","בוקר טוב לכולם","המילה של היום קשה","всем привет","как дела сегодня","сегодня сложное слово","решил за четыре попытки","καλημέρα σε όλους","δύσκολη λέξη σήμερα","今日は難しかった","四回で解けた","오늘 어려웠어","네 번 만에 풀었어","आज मुश्किल था","चार कोशिश में हो गया"];
 const fp = {};
 for (const w of ["crane","light","piano","ghost","frown","jumbo","quilt","zebra","mirth","abbey","house","stare","plane","great","tiger","wager","later","today","nicer"]) { d.setAnswers([w]); const hits = chat.filter(s=>d.scan(s)); if (hits.length) fp[w]=hits; }
 console.log("false positives:", JSON.stringify(fp, null, 1));

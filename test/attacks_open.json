@@ -144,36 +144,12 @@
   "fp_risk": "marginal readability"
  },
  {
-  "answer": "wager",
-  "text": "ωαγερ",
-  "technique": "greek-phonetic",
-  "decode": "Greek letters read by sound: omega alpha gamma epsilon rho",
-  "worth_catching": false,
-  "fp_risk": "greek and cyrillic letters are mapped by shape, and a sound-value table would conflict with it"
- },
- {
   "answer": "house",
   "text": "ηουσε",
   "technique": "greek-phonetic",
   "decode": "Greek letters read by sound: eta omicron upsilon sigma epsilon",
   "worth_catching": false,
-  "fp_risk": "greek and cyrillic letters are mapped by shape, and a sound-value table would conflict with it"
- },
- {
-  "answer": "wager",
-  "text": "вагер",
-  "technique": "cyrillic-phonetic",
-  "decode": "Cyrillic transliteration read by sound (v-a-g-e-r)",
-  "worth_catching": false,
-  "fp_risk": "greek and cyrillic letters are mapped by shape, and a sound-value table would conflict with it"
- },
- {
-  "answer": "ghost",
-  "text": "гхост",
-  "technique": "cyrillic-phonetic",
-  "decode": "Cyrillic transliteration read by sound (g-kh-o-s-t)",
-  "worth_catching": false,
-  "fp_risk": "greek and cyrillic letters are mapped by shape, and a sound-value table would conflict with it"
+  "fp_risk": "eta stands for h by shape, not sound; the transliteration rule reads it as e or i. the shape mapping would have to know eta is h only at the start of a word"
  },
  {
   "answer": "wager",
@@ -238,5 +214,13 @@
   "decode": "whale apple [fire fire] giraffe egg rainbow; ignore the two fires. The emoji-name DFS allows exactly one skipped emoji.",
   "worth_catching": false,
   "fp_risk": "two skips in an emoji-name acrostic collides with ordinary emoji strings"
+ },
+ {
+  "answer": "stare",
+  "text": "ステア",
+  "technique": "script-transliteration",
+  "decode": "japanese katakana su-te-a, the loanword spelling, which drops the r entirely",
+  "worth_catching": false,
+  "fp_risk": "reads as 'stea'; matching that to stare needs a rule that guesses a missing final consonant, which would fire on any short foreign word"
  }
 ]

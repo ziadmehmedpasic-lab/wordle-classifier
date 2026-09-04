@@ -3,6 +3,7 @@
 // Every check below corresponds to a documented filter-evasion technique.
 // =====================================================================
 const { doubleMetaphone } = require("double-metaphone");
+const { transliterate } = require("./translit");
 const ENGLISH = new Set(require("an-array-of-english-words"));
 
 let confusablesRemove = (s) => s;
@@ -22,6 +23,7 @@ const opts = {
   fillerJoin: true, // two non-word pieces around one filler token: "cr lol ane"
   capitals: true, // capitals inside a mixed-case message: "hoWie sAid the biG onE was Right"
   streams: true, // single letters with anything between, line initials, columns and diagonals
+  scripts: true, // the answer spelled by sound in another script: وايجر, вейджер, γουέιτζερ, ワゲル
 };
 function configure(o) { Object.assign(opts, o); }
 
@@ -275,6 +277,23 @@ function phoneticHit(word) {
   for (const d of derived) {
     if (word.length < d.word.length - 1 || word.length > d.word.length + 3) continue;
     if (codes.some((c) => c && d.phonetic.has(c))) return d.word;
+  }
+  return null;
+}
+
+// a token transliterated from another script: exact, one edit, doubled letters, or sounds like with the same first
+// letter (c, k and q count as one) and length within one; looser than that, ordinary foreign chat collides too often.
+// abjads (arabic, hebrew) write no short vowels, so their consonant skeleton is compared too: وايجر -> wayjr/waygr -> wgr
+const FIRST_LETTER = { c: "k", q: "k" };
+function translitHit(v, abjad) {
+  if (v.length < 3) return null;
+  const h = exactHit(v);
+  if (h) return h;
+  const first = FIRST_LETTER[v[0]] ?? v[0];
+  for (const d of derived) {
+    if (damerau1(v, d.word) || dedupe(v) === d.deduped) return d.word;
+    if (abjad && d.skeleton.length >= 3 && (skeleton(v) === d.skeleton || v.replace(/[aeiouy]/g, "") === d.skeleton)) return d.word;
+    if (opts.phonetic && Math.abs(v.length - d.word.length) <= 1 && first === (FIRST_LETTER[d.word[0]] ?? d.word[0]) && doubleMetaphone(v).some((c) => c && d.phonetic.has(c))) return d.word;
   }
   return null;
 }
@@ -555,6 +574,9 @@ function scan(text, depth = 0) {
 
   // Individual tokens
   for (const t of trimmed) { const h = tokenHit(t); if (h) return h; }
+
+  // The answer spelled by sound in another script: وايجر, вейджер, γουέιτζερ, ワゲル
+  if (opts.scripts) for (const { variants, abjad } of transliterate(raw.replace(INVISIBLE, ""))) for (const v of variants) { const h = translitHit(v, abjad); if (h) return h; }
 
   // Spoken letters (NATO / letter names)
   const words = trimmed.map((t) => t.replace(/[^a-z]/g, "")).filter(Boolean);

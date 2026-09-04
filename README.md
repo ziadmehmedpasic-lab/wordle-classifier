@@ -4,26 +4,22 @@ Deletes anything in any text channel that gives away today's Wordle answer, incl
 
 ## How it works
 
-Swiss-cheese defense: every layer has holes, and the layers are chosen so the holes do not line up. A spoiler has to get through all of them.
+Swiss-cheese defense. Each layer has holes; they don't line up.
 
-**Inputs become text.** Message text, embeds, link previews, polls, stickers, file names, reactions and names are collected as-is. Images go through OCR. Voice messages, audio files and video soundtracks go through speech-to-text. Everything below runs on the result, so a trick typed into a screenshot meets the same rules as the typed version.
+Everything is turned into text first: message content, embeds, polls, names, reactions; images via OCR; voice, audio and video via speech-to-text.
 
-| layer | what it is | catches | its holes |
-|---|---|---|---|
-| 1. Pattern detector | `detector.js`, deterministic, no network | the answer's letters present in any disguise: leetspeak, separators, look-alike glyphs, encodings, acrostics, capitals, spoken letters, fragments across messages | meaning. It cannot see "rhymes with pager" or "the German is Wette" |
-| 2. Fine-tuned classifier | small LLM trained on generated examples, conditioned on the day's answer and the last few messages (in progress, see `ml/`) | hints, definitions, rhymes, translations, letter clues, build-ups spread across several messages | disguises it has never seen, and calibration at the margin between a weak hint and chat |
-| 3. Claude judge | `llm.js`, hosted model with the same policy labels | the same as layer 2 with a larger model; also reads images when OCR finds nothing | cost and latency, so it runs only on suspicious traffic |
+| layer | catches | misses |
+|---|---|---|
+| 1. Pattern detector (`detector.js`) | the answer's letters in any disguise | meaning |
+| 2. Fine-tuned classifier (`ml/`, in progress) | hints, definitions, translations, build-ups across messages | unseen disguises |
+| 3. Claude judge (`llm.js`) | same as 2, bigger model; images OCR can't read | cost, so only on suspicious traffic |
 
-Layer 1 deletes on its own only when the match is definite. Fuzzy matches (phonetic, anagram, typo, the answer straddling a word boundary) are passed to the later layers as evidence rather than acted on, per `POLICY.md`. The layer split for the detector and the classifier hookup are being landed PR by PR; today the bot runs layer 1 with every rule as a hard delete, then layer 3.
-
-**Operational layer.** Nothing is deleted on an error path: a scorer timeout, an API failure or an OCR failure keeps the message and logs it. Planned alongside the classifier: a mod log channel with a restore reaction, a runtime kill switch, and a dry-run mode.
-
-What counts as a spoiler, which labels exist, and what gets deleted is defined once in `POLICY.md`; the detector, the judge, the classifier, the training data and the evaluation all follow it.
+Errors never delete. Labels and what gets deleted are defined in `POLICY.md`.
 
 ## How it finds the answer
 Fetches the official New York Times endpoint every 15 minutes:
 `https://www.nytimes.com/svc/wordle/v2/YYYY-MM-DD.json`
-Bans today's word, plus yesterday's and tomorrow's (covers timezones). `POLICY.md` moves this to today's word only in a configured timezone; that change lands with the bot operations PR.
+Bans today's word, plus yesterday's and tomorrow's (covers timezones). Moving to today only, see `POLICY.md`.
 
 ## Setup
 1. https://discord.com/developers/applications -> New Application -> Bot.
@@ -85,10 +81,7 @@ Bans today's word, plus yesterday's and tomorrow's (covers timezones). `POLICY.m
 | Offline gap | last 50 messages per channel scanned at startup |
 
 ## Layer 2: fine-tuned classifier (in progress)
-Lives in `ml/`. Labeled examples are generated per past answer with Claude across the policy's four levels and
-dozens of disguise and hint styles, including exchanges of several messages where only the final one spoils.
-A small model is fine-tuned on `(answer, recent messages, message) -> label`, calibrated, and served over HTTP
-for the bot to call before layer 3. Progress and the remaining steps are tracked in the PRs.
+Examples are generated per past answer with Claude, a small model is fine-tuned on `(answer, recent messages, message) -> label`, and served over HTTP for the bot. See `ml/`.
 
 ## Layer 3: Claude judge (optional, recommended)
 Pattern matching cannot judge meaning. With an Anthropic API key in `.env`, messages that pass the pattern layer

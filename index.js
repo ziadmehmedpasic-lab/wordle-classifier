@@ -12,6 +12,10 @@ const CHECK_YESTERDAY = env("CHECK_YESTERDAY", "true");
 const POLICE_NICKNAMES = env("POLICE_NICKNAMES", "true");
 const OCR_IMAGES = env("OCR_IMAGES", "true");
 const SCAN_BACKLOG = env("SCAN_BACKLOG", "true");
+// repeat offenders: this many removals inside the window and the member is timed out. 0 disables
+const TIMEOUT_AFTER = Number(process.env.TIMEOUT_AFTER ?? 3);
+const TIMEOUT_WINDOW_MIN = Number(process.env.TIMEOUT_WINDOW_MIN ?? 10);
+const TIMEOUT_MINUTES = Number(process.env.TIMEOUT_MINUTES ?? 10);
 const ALLOWED_CHANNEL_IDS = new Set((process.env.ALLOWED_CHANNEL_IDS || "").split(",").map((s) => s.trim()).filter(Boolean));
 
 detector.configure({
@@ -172,11 +176,35 @@ const client = new Client({
 
 const canManage = (ch) => { const me = ch.guild?.members?.me; return me && ch.permissionsFor(me)?.has(PermissionsBitField.Flags.ManageMessages); };
 
-async function warn(channel, user) {
+// every removal is a strike; enough strikes inside the window and the member is timed out,
+// which also stops them feeding the ocr and llm layers
+const strikes = new Map();
+async function strike(message) {
+  if (!TIMEOUT_AFTER) return;
+  const key = `${message.guildId}:${message.author.id}`;
+  const now = Date.now();
+  const list = (strikes.get(key) || []).filter((t) => now - t < TIMEOUT_WINDOW_MIN * 60_000);
+  list.push(message.createdTimestamp || now); // posting time, so a startup backlog scan does not stack strikes
+  strikes.set(key, list);
+  if (list.length < TIMEOUT_AFTER) return;
+  strikes.delete(key);
+  const member = message.member || await message.guild.members.fetch(message.author.id).catch(() => null);
+  if (!member?.moderatable) { console.warn(`Cannot time out ${message.author.tag}: needs Moderate Members and a role above theirs`); return; }
   try {
-    const m = await channel.send({ content: `${user}, your message was removed because it contained today's Wordle answer. No spoilers please!`, allowedMentions: { users: [user.id] } });
+    await member.timeout(TIMEOUT_MINUTES * 60_000, `${list.length} Wordle spoilers in ${TIMEOUT_WINDOW_MIN} minutes`);
+    console.log(`Timed out ${message.author.tag} for ${TIMEOUT_MINUTES} min`);
+    await message.channel.send({ content: `${message.author} is timed out for ${TIMEOUT_MINUTES} minutes: ${list.length} spoilers removed in ${TIMEOUT_WINDOW_MIN} minutes.`, allowedMentions: { users: [message.author.id] } });
+  } catch (e) { console.error("Timeout failed:", e.message); }
+}
+
+// tell the author, then count the strike. `what` is how the message spoiled: "contained", "gave away", "hinted at"
+async function warn(message, what = "contained") {
+  if (message.author?.bot) return;
+  try {
+    const m = await message.channel.send({ content: `${message.author}, your message was removed because it ${what} today's Wordle answer. No spoilers please!`, allowedMentions: { users: [message.author.id] } });
     setTimeout(() => m.delete().catch(() => {}), 10_000);
   } catch { /* ignore */ }
+  await strike(message);
 }
 
 async function removeMessage(message, hit, how) {
@@ -184,7 +212,7 @@ async function removeMessage(message, hit, how) {
   try {
     await message.delete();
     console.log(`Deleted spoiler (${how}) from ${message.author?.tag} in #${message.channel.name} (word: ${hit})`);
-    if (!message.author?.bot) await warn(message.channel, message.author);
+    await warn(message);
   } catch (e) { console.error("Failed to delete:", e.message); }
 }
 
@@ -195,14 +223,6 @@ function remember(message, text) {
   list.push({ author: message.author?.username || "user", text: text.slice(0, 300), at: Date.now() });
   while (list.length > llm.cfg.maxContextMessages) list.shift();
   channelHistory.set(message.channelId, list);
-}
-
-async function warnHint(channel, user, verdict) {
-  try {
-    const what = verdict === "spoiler" ? "gave away" : "hinted at";
-    const m = await channel.send({ content: `${user}, your message was removed because it ${what} today's Wordle answer. No spoilers please!`, allowedMentions: { users: [user.id] } });
-    setTimeout(() => m.delete().catch(() => {}), 10_000);
-  } catch { /* ignore */ }
 }
 
 async function handleMessage(message, { fromBacklog = false } = {}) {
@@ -253,7 +273,7 @@ async function handleMessage(message, { fromBacklog = false } = {}) {
           try {
             await message.delete();
             console.log(`Deleted ${result.verdict} (LLM) from ${message.author?.tag} in #${message.channel.name}`);
-            await warnHint(message.channel, message.author, result.verdict);
+            await warn(message, result.verdict === "spoiler" ? "gave away" : "hinted at");
           } catch (e) { console.error("Failed to delete:", e.message); }
           return;
         }
@@ -267,7 +287,7 @@ async function handleMessage(message, { fromBacklog = false } = {}) {
     try {
       await message.channel.bulkDelete(ids, true);
       console.log(`Deleted ${ids.length} fragment messages from ${message.author.tag}`);
-      await warn(message.channel, message.author);
+      await warn(message);
     } catch (e) { console.error("Bulk delete:", e.message); }
   }
 }

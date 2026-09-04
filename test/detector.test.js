@@ -45,10 +45,18 @@ console.log(`${cases.length - fails}/${cases.length} passed`);
 // Generic sweep across other answers
 const words = ["crane","light","piano","ghost","frown","jumbo","quilt","zebra","mirth","abbey","house","stare","plane","great","tiger"];
 const leet = { a:"4",e:"3",i:"1",o:"0",s:"5",t:"7",b:"8",g:"9" };
+const morse = {a:".-",b:"-...",c:"-.-.",d:"-..",e:".",f:"..-.",g:"--.",h:"....",i:"..",j:".---",k:"-.-",l:".-..",m:"--",n:"-.",o:"---",p:".--.",q:"--.-",r:".-.",s:"...",t:"-",u:"..-",v:"...-",w:".--",x:"-..-",y:"-.--",z:"--.."};
 let tot=0, ok=0;
 for (const w of words) { d.setAnswers([w]);
   const tricks=[w, w.toUpperCase()+"!!", "||"+w+"||", [...w].join("."), [...w].join(" "), [...w].map(c=>leet[c]||c).join(""), [...w].reverse().join(""), w+"s", "https://x.com/"+w,
-    w[0]+w[0]+w[0]+w.slice(1), [...w].map(c=>String.fromCodePoint(0x1f1e6+c.charCodeAt(0)-97)).join(""), [...w].map(c=>(c.charCodeAt(0)-96)).join("-"), Buffer.from(w).toString("base64"), w.split("").map(c=>c+"x").join(""), [...w].map(c=>String.fromCharCode(((c.charCodeAt(0)-97+3)%26)+97)).join("")];
+    w[0]+w[0]+w[0]+w.slice(1), [...w].map(c=>String.fromCodePoint(0x1f1e6+c.charCodeAt(0)-97)).join(""), [...w].map(c=>(c.charCodeAt(0)-96)).join("-"), Buffer.from(w).toString("base64"), w.split("").map(c=>c+"x").join(""), [...w].map(c=>String.fromCharCode(((c.charCodeAt(0)-97+3)%26)+97)).join(""),
+    // red-team round 1 (test/attacks.json has the originals)
+    [...w].join(" then "), [...w].map((c,i)=>c+(i+1)).join(" "), [...w].map(c=>c+" for "+c+"ap").join(" "), [...w].join("🔥"), [...w].join("·"), [...w].join("?"), "xx"+w+"xx", "its"+w, w+"maxxing",
+    [...w].map(c=>c+"ok").join("\n"), [...w].map((c,i)=>"x".repeat(i)+c+"x".repeat(4-i)).join("\n"), [...w].map(c=>c.toUpperCase()+"ab").join(" "),
+    Buffer.from(w+"!").toString("base64"), Buffer.from([...w].join(" ")).toString("base64"), [...w].map(c=>(c.charCodeAt(0)-96)).join("/"), [...w].map(c=>(c.charCodeAt(0)-97)).join(" "), [...w].map(c=>c.charCodeAt(0).toString(8)).join(" "),
+    [...w].map(c=>"\\x"+c.charCodeAt(0).toString(16)).join(""), "0x"+Buffer.from(w).toString("hex"), [...w].map(c=>"&#"+c.charCodeAt(0)).join(""), [...w].map(c=>"U+00"+c.charCodeAt(0).toString(16)).join(" "),
+    [...w].map(c=>"22233344455566677778889999"[c.charCodeAt(0)-97]).join(""), [...w].map(c=>"⠁⠃⠉⠙⠑⠋⠛⠓⠊⠚⠅⠇⠍⠝⠕⠏⠟⠗⠎⠞⠥⠧⠺⠭⠽⠵"[c.charCodeAt(0)-97]).join(""),
+    [...w].map(c=>morse[c].replace(/\./g,"·").replace(/-/g,"–")).join(" "), [...w].map(c=>morse[c]).join("/"), [...w].map(c=>String.fromCharCode(((c.charCodeAt(0)-97+5)%26)+97)).join(" ")];
   for (const t of tricks) { tot++; if (d.scan(t)===w) ok++; else console.log("MISS", w, JSON.stringify(t), "->", d.scan(t)); }
 }
 console.log(`generic tricks: ${ok}/${tot}`);

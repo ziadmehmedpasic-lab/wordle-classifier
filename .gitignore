@@ -2,3 +2,17 @@ node_modules/
 .env
 *.traineddata
 *.traineddata.gz
+
+# ml subproject
+ml/.venv/
+ml/.pytest_cache/
+ml/.ruff_cache/
+ml/htmlcov/
+ml/.coverage
+ml/runs/
+ml/data/answers.txt
+ml/data/answers_by_date.jsonl
+ml/data/generated/
+ml/data/real_chat/
+ml/data/probes/
+__pycache__/

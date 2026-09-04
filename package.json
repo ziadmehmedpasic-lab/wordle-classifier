@@ -4,7 +4,8 @@
   "description": "Discord bot that deletes Wordle spoilers: pattern matching, OCR, and an LLM layer",
   "main": "index.js",
   "scripts": {
-    "test": "node test/detector.test.js",
+    "test": "node test/detector.test.js && node test/attacks.test.js",
+    "eval:data": "node test/eval_data.js",
     "start": "node index.js",
     "test:llm": "node test/llm.test.js"
   },

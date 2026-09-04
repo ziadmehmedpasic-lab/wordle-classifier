@@ -1,0 +1,40 @@
+// runs generated ml data through the pattern detector: recall per style on direct records,
+// false-positive rate on everything else. usage: node test/eval_data.js [file.jsonl ...]
+const fs = require("fs");
+const path = require("path");
+const d = require("../detector");
+
+const dataDir = path.join(__dirname, "../ml/data/generated");
+const files = process.argv.slice(2).length ? process.argv.slice(2) : fs.readdirSync(dataDir).map((f) => path.join(dataDir, f));
+const records = files.flatMap((f) => fs.readFileSync(f, "utf8").split("\n").filter(Boolean).map((l) => JSON.parse(l)));
+
+const byStyle = {};
+const misses = [];
+const fps = [];
+for (const r of records) {
+  d.setAnswers([r.answer]);
+  const hit = d.scan(r.text);
+  if (r.label === "direct") {
+    const s = (byStyle[r.style] ||= { n: 0, hit: 0 });
+    s.n++;
+    if (hit) s.hit++; else misses.push(r);
+  } else if (hit) fps.push({ ...r, hit });
+}
+const direct = records.filter((r) => r.label === "direct").length;
+console.log(`direct recall: ${direct - misses.length}/${direct}`);
+for (const [style, s] of Object.entries(byStyle).sort((a, b) => a[1].hit / a[1].n - b[1].hit / b[1].n)) console.log(`  ${style.padEnd(16)} ${s.hit}/${s.n}`);
+console.log(`false positives on non-direct: ${fps.length}/${records.length - direct}`);
+for (const r of fps) console.log(`  FP [${r.label}/${r.style}] ${r.answer} <- ${JSON.stringify(r.text)} (hit ${r.hit})`);
+if (process.env.SHOW_MISSES) for (const r of misses) console.log(`  MISS [${r.style}] ${r.answer} <- ${JSON.stringify(r.text)}`);
+
+// pair mode: every non-direct text against a fixed sample of past answers. a rule's collision
+// rate with ordinary chat shows up here even when no record was written for that answer.
+if (process.env.PAIRS) {
+  const answers = fs.readFileSync(path.join(__dirname, "../ml/data/answers.txt"), "utf8").split("\n").filter(Boolean);
+  const sample = answers.filter((_, i) => i % Math.ceil(answers.length / +process.env.PAIRS) === 0);
+  const texts = records.filter((r) => r.label === "benign").map((r) => r.text);
+  const hits = [];
+  for (const a of sample) { d.setAnswers([a]); for (const t of texts) if (d.scan(t)) hits.push([a, t]); }
+  console.log(`benign pairs flagged: ${hits.length}/${sample.length * texts.length} (${sample.length} answers x ${texts.length} texts)`);
+  for (const [a, t] of hits) console.log(`  ${a} <- ${JSON.stringify(t)}`);
+}

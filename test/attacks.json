@@ -1,0 +1,1306 @@
+[
+ {
+  "answer": "plane",
+  "text": "just help lane it out honestly",
+  "technique": "cross-boundary-substring",
+  "decode": "glue the words together and read straight through: hel-PLANE-it. The answer sits across the space between 'help' and 'lane'.",
+  "worth_catching": true,
+  "fp_risk": "A rule that glues all adjacent words and looks for the answer as a substring will fire on ordinary sentences whenever the answer is common: 'we plan everything' -> planev..., 'the other one' -> 'other', 'a lone' -> 'alone'. Needs a length/rarity gate or a check that the answer straddles a boundary in a way no single word explains."
+ },
+ {
+  "answer": "wager",
+  "text": "I saw a german shepherd on the way in",
+  "technique": "cross-boundary-substring",
+  "decode": "saw + a + german -> sawagerman, which contains 'wager' straddling three words.",
+  "worth_catching": true,
+  "fp_risk": "Same as above. This particular sentence is a genuine false-positive-looking message, which is exactly why it works; the rule cannot distinguish intent, only that the letters line up."
+ },
+ {
+  "answer": "ghost",
+  "text": "watch ghostbusters tonight",
+  "technique": "substring-of-real-word",
+  "decode": "'ghostbusters' starts with the answer; it is a dictionary/proper word so the fuzzy and suffix layers both skip it ('busters' is not in the SUFFIXES list).",
+  "worth_catching": true,
+  "fp_risk": "21 English words contain 'ghost'. Moderate. Extending SUFFIXES does not fix this - the trick is to glue on any word, not a known suffix."
+ },
+ {
+  "answer": "wager",
+  "text": "wagerbros rise up",
+  "technique": "substring-of-nonword-token",
+  "decode": "Read the first five letters of the coined token. 'wagerbros' is not a dictionary word, so nothing about it is innocent - the answer is just glued to a slang suffix.",
+  "worth_catching": true,
+  "fp_risk": "Low. Requiring the containing token to be a non-dictionary word and the answer to be a full 5-letter prefix or suffix of it keeps innocent chat safe; the main risk is names/usernames that happen to contain the day's word."
+ },
+ {
+  "answer": "mirth",
+  "text": "full mirthquake in here today",
+  "technique": "substring-of-nonword-token",
+  "decode": "'mirthquake' = answer + 'quake'. Non-dictionary token containing the answer verbatim.",
+  "worth_catching": true,
+  "fp_risk": "Low, same as above."
+ },
+ {
+  "answer": "light",
+  "text": "lightpilled honestly",
+  "technique": "glued-slang-suffix",
+  "decode": "Strip the Discord-native suffix: 'pilled'. Same family: -maxxing, -core, -ino, -erino, -bros, -zilla, -hood.",
+  "worth_catching": true,
+  "fp_risk": "Low if implemented as an extension of SUFFIXES with the current slang set, but it is an arms race - any new suffix works. The general non-dictionary-substring rule subsumes it."
+ },
+ {
+  "answer": "house",
+  "text": "housemaxxing rn",
+  "technique": "glued-slang-suffix",
+  "decode": "'house' + '-maxxing'.",
+  "worth_catching": true,
+  "fp_risk": "Low. 'housemaxxing' is not a real word so a non-dictionary-token rule catches it without touching 'greenhouse' style innocent usage."
+ },
+ {
+  "answer": "wager",
+  "text": "prowager energy honestly",
+  "technique": "glued-prefix",
+  "decode": "Drop the prefix. exactHit only checks startsWith(answer) + known suffix, so anything glued to the FRONT is invisible. Hyphenated ('pro-wager') is caught because the token is split on non-letters, but the unhyphenated form is not.",
+  "worth_catching": true,
+  "fp_risk": "Low for rare answers, higher for common ones (a prefix rule on 'house' hits 'greenhouse', 'warehouse', which are real words - gate on the token not being a dictionary word)."
+ },
+ {
+  "answer": "plane",
+  "text": "https://en.wikipedia.org/wiki/Airplane",
+  "technique": "url-slug-substring",
+  "decode": "The last URL path segment contains the answer. URLs are tokenised on non-letters, so 'airplane' is checked as a whole and skipped for being a dictionary word.",
+  "worth_catching": true,
+  "fp_risk": "Moderate. Someone linking a genuinely unrelated Wikipedia page on a 'plane' or 'house' day gets deleted. Lower risk if scoped to the final path segment plus a rare-answer gate."
+ },
+ {
+  "answer": "wager",
+  "text": "hoWie sAid the biG onE was Right",
+  "technique": "internal-capitals",
+  "decode": "Read the capital letters in order: W-A-G-E-R. normalize() lowercases before anything else, so case is thrown away entirely. Works whenever the capitals are NOT the word initials - initial capitals are already caught by the acrostic pass.",
+  "worth_catching": true,
+  "fp_risk": "Low if it requires 5 capitals mid-token (not sentence-initial and not an all-caps word). Risk is people SHOUTING or typing 'sPoNgEbOb case' sarcastically, which is common enough in friend Discords to produce occasional hits."
+ },
+ {
+  "answer": "house",
+  "text": "wHy nOt jUst Say Everything",
+  "technique": "internal-capitals",
+  "decode": "Capitals in order: H-O-U-S-E.",
+  "worth_catching": true,
+  "fp_risk": "Same as above; note this one mixes mid-word capitals with sentence-initial ones, so a rule that ignores word-initial capitals would miss it. Taking all capitals in order raises the FP rate on mixed-case typing."
+ },
+ {
+  "answer": "wager",
+  "text": "#WeAllGetEmRight",
+  "technique": "camelcase-initials-one-token",
+  "decode": "Split the hashtag on capital letters and take the initials: We All Get Em Right -> wager. The acrostic pass only runs on whitespace-separated words, so a single camelCase token hides an acrostic completely.",
+  "worth_catching": true,
+  "fp_risk": "Low. Requires >=5 camelCase segments in one token; real hashtags like #GoodMorningEveryone would only fire if their initials happened to spell the answer."
+ },
+ {
+  "answer": "wager",
+  "text": "Wow that was rough today\nAnyone else take forever on this\nGot there in the end somehow\nEnded up using five guesses\nReally glad its over now",
+  "technique": "line-acrostic-multiword",
+  "decode": "First letter of each LINE. The existing acrostic pass walks every word in the flattened text and allows at most 2 skipped words, so a 5-line acrostic with 4-6 words per line needs ~20 skips and is never found.",
+  "worth_catching": true,
+  "fp_risk": "Low. Line-initial acrostics over >=4 lines are rare by accident, and a multi-line message in a Wordle channel whose line initials spell today's answer is essentially never innocent. This is the single highest-value gap found."
+ },
+ {
+  "answer": "ghost",
+  "text": "Got it in four\nHonestly lucky guess\nOne of those days\nSuper annoying start\nToday was fine tho",
+  "technique": "line-acrostic-multiword",
+  "decode": "Line initials: G-H-O-S-T. Reads as an entirely ordinary Wordle post-mortem.",
+  "worth_catching": true,
+  "fp_risk": "Low, as above. Note lines starting with punctuation, bullets or emoji are already normalised away, so the rule only needs to find the first letter of each line after trimming non-letters."
+ },
+ {
+  "answer": "wager",
+  "text": "really easy game and win",
+  "technique": "reversed-acrostic",
+  "decode": "Word initials read backwards: r-e-g-a-w reversed is wager. The acrostic pass only reads left to right.",
+  "worth_catching": true,
+  "fp_risk": "Low incremental cost - it is the existing acrostic check run on the reversed word list, so it roughly doubles the acrostic FP rate rather than changing its character. Cheap to add."
+ },
+ {
+  "answer": "light",
+  "text": "the horrible game i lost",
+  "technique": "reversed-acrostic",
+  "decode": "Initials t-h-g-i-l, reversed: light.",
+  "worth_catching": true,
+  "fp_risk": "Same as above."
+ },
+ {
+  "answer": "wager",
+  "text": "w then a then g then e then r",
+  "technique": "letters-with-connectors",
+  "decode": "Read the single letters and ignore the repeated connector word. The cross-token joiner only concatenates adjacent tokens, and the acrostic pass allows only 2 skips, so 4 repetitions of 'then' defeats both.",
+  "worth_catching": true,
+  "fp_risk": "Very low. A rule that drops a repeated filler word (then / and / dash / dot / comma) between single-letter tokens and re-joins would basically never fire on real chat - single-letter token runs are already rare."
+ },
+ {
+  "answer": "house",
+  "text": "h then o then u then s then e ok",
+  "technique": "letters-with-connectors",
+  "decode": "Same shape, different answer and a trailing word to break the tail alignment.",
+  "worth_catching": true,
+  "fp_risk": "Very low, as above."
+ },
+ {
+  "answer": "wager",
+  "text": "w-a-g-e-and-then-r",
+  "technique": "letters-with-connectors-hyphenated",
+  "decode": "Read the hyphen-separated pieces, dropping the words. This is one whitespace token, so the cross-token joiner never sees it, and the sub-pieces are only checked individually.",
+  "worth_catching": true,
+  "fp_risk": "Very low. Requires treating hyphen/dot-separated pieces inside a single token as a mini token sequence, which is a natural extension of the existing split logic."
+ },
+ {
+  "answer": "wager",
+  "text": "w for whiskey a for apple g for goat e for egg r for red",
+  "technique": "letter-for-word",
+  "decode": "Take the standalone single letters: w, a, g, e, r. The NATO decoder only fires on runs of NATO words, and the 'for X' pairs both break the run and blow the acrostic skip budget.",
+  "worth_catching": true,
+  "fp_risk": "Very low. Extracting all standalone single-letter tokens in order and testing the concatenation is cheap; the FP case is a message with 5+ isolated letters, which is already suspicious. Note 'a', 'i', 'o', 'u' are real words, so the rule needs to allow those to be skipped as well as used."
+ },
+ {
+  "answer": "joist",
+  "text": "j for jam o for owl i for ink s for sun t for tea",
+  "technique": "letter-for-word",
+  "decode": "Standalone letters: j, o, i, s, t.",
+  "worth_catching": true,
+  "fp_risk": "Very low, as above."
+ },
+ {
+  "answer": "wager",
+  "text": "its wage but add an r at the end",
+  "technique": "letter-arithmetic-instruction",
+  "decode": "Apply the instruction literally: wage + r. 'wage' alone is deliberately not a hit (the test suite asserts it), and the 3 filler words break the acrostic path that catches 'wage plus an r'.",
+  "worth_catching": true,
+  "fp_risk": "Low if scoped: look for a token within edit distance 1-2 of the answer near an instruction phrase ('add a/an X', 'minus the X', 'without the X', 'drop the X', 'swap the X for Y'). That co-occurrence is rare in normal chat."
+ },
+ {
+  "answer": "light",
+  "text": "its slight but you drop the s",
+  "technique": "letter-arithmetic-instruction",
+  "decode": "slight minus s = light. 'slight' is a dictionary word so fuzzyHit refuses to look at it.",
+  "worth_catching": true,
+  "fp_risk": "Low with the instruction-phrase gate. Without it, matching every dictionary word within one edit of the answer would delete huge amounts of chat on common-answer days."
+ },
+ {
+  "answer": "house",
+  "text": "its mouse but you swap the m for an h",
+  "technique": "letter-arithmetic-instruction",
+  "decode": "mouse with m->h = house. Note the test suite explicitly asserts 'mouse house' is not a hit, so the near-miss word alone must stay clean; only the instruction phrase makes it a spoiler.",
+  "worth_catching": true,
+  "fp_risk": "Low with the gate. This is arguably borderline LLM-layer territory, but the transformation is purely on letters, not meaning."
+ },
+ {
+  "answer": "plane",
+  "text": "planet without the t",
+  "technique": "letter-arithmetic-instruction",
+  "decode": "planet minus t. 'planet' is a dictionary word and 't' is not in SUFFIXES, so nothing fires.",
+  "worth_catching": true,
+  "fp_risk": "Low. Same instruction-phrase gate."
+ },
+ {
+  "answer": "light",
+  "text": "ightlay",
+  "technique": "pig-latin",
+  "decode": "Pig latin: move the trailing 'lay'/'ay' chunk back to the front. ightlay -> light.",
+  "worth_catching": true,
+  "fp_risk": "Very low. Un-pig-latin-ing a token (strip trailing 'ay'/'way'/'yay', rotate the consonant cluster back) and re-testing produces almost no false positives, since the input has to be a non-word ending in 'ay'."
+ },
+ {
+  "answer": "house",
+  "text": "ousehay",
+  "technique": "pig-latin",
+  "decode": "ousehay -> house.",
+  "worth_catching": true,
+  "fp_risk": "Very low. Note 'agerway' (wager) is already caught by accident via double-metaphone, so coverage today is inconsistent rather than absent."
+ },
+ {
+  "answer": "crane",
+  "text": "anecray lol",
+  "technique": "pig-latin",
+  "decode": "anecray -> crane.",
+  "worth_catching": true,
+  "fp_risk": "Very low."
+ },
+ {
+  "answer": "wager",
+  "text": "d2FnZXIh",
+  "technique": "base64-with-punctuation",
+  "decode": "base64 of 'wager!'. The scanner decodes base64 blobs but only accepts results matching /^[a-z\\s]+$/, so a single trailing '!' or '?' in the plaintext makes the whole decode be discarded.",
+  "worth_catching": true,
+  "fp_risk": "Very low. Loosening the post-decode filter to allow punctuation, or just tokenising the decoded string and running exactHit on each token, costs nothing. Only risk is random base64-looking IDs decoding to garbage that happens to contain the answer, which the existing printable-ASCII gate mostly handles."
+ },
+ {
+  "answer": "house",
+  "text": "aG91c2Uh",
+  "technique": "base64-with-punctuation",
+  "decode": "base64 of 'house!'.",
+  "worth_catching": true,
+  "fp_risk": "Very low, as above."
+ },
+ {
+  "answer": "ghost",
+  "text": "Z2hvc3Qh",
+  "technique": "base64-with-punctuation",
+  "decode": "base64 of 'ghost!'.",
+  "worth_catching": true,
+  "fp_risk": "Very low, as above."
+ },
+ {
+  "answer": "wager",
+  "text": "\\x77\\x61\\x67\\x65\\x72",
+  "technique": "hex-escape-x-form",
+  "decode": "Standard \\xNN hex escapes: 77 61 67 65 72 = wager. The detector handles \\u00NN and bare '77 61 67 65 72' but the \\xNN form defeats its hex regex, because the \\b word boundary fails between 'x' and the digits.",
+  "worth_catching": true,
+  "fp_risk": "Very low. One extra regex. Real code snippets containing \\xNN sequences exist but would have to decode to exactly the answer."
+ },
+ {
+  "answer": "wager",
+  "text": "twenty three one seven five eighteen",
+  "technique": "spelled-out-number-alphabet",
+  "decode": "Alphabet positions written as words: 23=w, 1=a, 7=g, 5=e, 18=r. decodeNumbers only ever looks at digits.",
+  "worth_catching": true,
+  "fp_risk": "Low. Requires a run of >=5 number words, then the same a=1..z=26 mapping already in use. Innocent runs of five spelled-out numbers are rare in chat."
+ },
+ {
+  "answer": "house",
+  "text": "eight fifteen twenty one nineteen five",
+  "technique": "spelled-out-number-alphabet",
+  "decode": "8=h, 15=o, 21=u, 19=s, 5=e. Note 'twenty one' is ambiguous (21, or 20 then 1) - a human tries both, and so should the rule.",
+  "worth_catching": true,
+  "fp_risk": "Low. The ambiguity of compound number words means generating a few readings per run, which slightly raises the chance of an accidental hit."
+ },
+ {
+  "answer": "wager",
+  "text": "22 0 6 4 17",
+  "technique": "zero-indexed-alphabet",
+  "decode": "Zero-indexed alphabet: a=0, so 22=w, 0=a, 6=g, 4=e, 17=r. decodeNumbers requires every number to be >=1, so the presence of a 0 causes the whole group to be dropped without ever being decoded.",
+  "worth_catching": true,
+  "fp_risk": "Low, and narrow: this only slips through when the answer contains an 'a' (otherwise no 0 appears, and the Caesar check catches the off-by-one decoding anyway). Allowing 0 in the a=1 branch, or adding an explicit a=0 branch, closes it."
+ },
+ {
+  "answer": "crane",
+  "text": "2 17 0 13 4",
+  "technique": "zero-indexed-alphabet",
+  "decode": "a=0: 2=c, 17=r, 0=a, 13=n, 4=e.",
+  "worth_catching": true,
+  "fp_risk": "Low. Same fix. Note it fails to be an attack on answers with no 'a' - '11 8 6 7 19' for 'light' is already caught, because a=1 decoding gives a Caesar shift of the answer and the Caesar check fires."
+ },
+ {
+  "answer": "wager",
+  "text": "🐳🍎🔥🦒🥚🌈",
+  "technique": "emoji-acrostic-with-distractor",
+  "decode": "The README's own example is 🐳🍎🦒🥚🌈 (whale apple giraffe egg rainbow). Inserting one unrelated emoji breaks it: the emoji acrostic DFS is strictly contiguous over the emoji list, so a single 🔥 in the middle defeats it even though a human just ignores it.",
+  "worth_catching": true,
+  "fp_risk": "Low-to-moderate. Allowing 1-2 skipped emoji in the DFS raises the accidental-hit rate for emoji-spam messages, since each emoji contributes the initial of every word in its name (several options each). Probably cap at 1 skip."
+ },
+ {
+  "answer": "house",
+  "text": "househouse",
+  "technique": "answer-doubled",
+  "decode": "The answer typed twice with no separator. Not exact, not within one edit, not an anagram, not deduped to the answer.",
+  "worth_catching": true,
+  "fp_risk": "Essentially zero - it is a special case of the non-dictionary-substring rule and needs no separate handling, but it is a reminder that the exact-match path has no substring fallback at all."
+ },
+ {
+  "answer": "wager",
+  "text": "```wager```",
+  "technique": "single-line-code-fence",
+  "decode": "Discord renders ```wager``` as a code block containing 'wager'; the detector's fence regex eats the word as a language tag.",
+  "worth_catching": true,
+  "fp_risk": "None: only strip the language tag when it is followed by a newline."
+ },
+ {
+  "answer": "crane",
+  "text": "```CRANE```",
+  "technique": "single-line-code-fence",
+  "decode": "Same as above, caps.",
+  "worth_catching": true,
+  "fp_risk": "None."
+ },
+ {
+  "answer": "light",
+  "text": "[l](https://x.com)[i](https://x.com)[g](https://x.com)[h](https://x.com)[t](https://x.com)",
+  "technique": "masked-link-per-letter",
+  "decode": "Five one-letter masked links in a row read as 'light'; the expanded URLs sit between the letters and break the spaced-letter join.",
+  "worth_catching": true,
+  "fp_risk": "Low: a run of 3+ one-character link labels is never innocent chat."
+ },
+ {
+  "answer": "light",
+  "text": "[lol](https://example.com/l-i-g-h-t)",
+  "technique": "masked-link-hyphenated-url",
+  "decode": "Hover or click the link, the path is l-i-g-h-t. Same for https://example.com/l-i-g-h-t or https://c.r.a.n.e.com posted bare.",
+  "worth_catching": true,
+  "fp_risk": "Low: split URL path/host on - . / and join single-letter segments; ordinary URLs rarely have 5 one-letter segments."
+ },
+ {
+  "answer": "crane",
+  "text": "https://c.r.a.n.e.com",
+  "technique": "url-dotted-host",
+  "decode": "Hostname labels spell the word.",
+  "worth_catching": true,
+  "fp_risk": "Low, same rule as above."
+ },
+ {
+  "answer": "light",
+  "text": "**l**1 **i**2 **g**3 **h**4 **t**5",
+  "technique": "letter-digit-tokens",
+  "decode": "Ignore the digits: l i g h t. Same with spoilers ||c1|| ||r2|| ||a3|| ||n4|| ||e5||, plain 'l1 i2 g3 h4 t5', or a code block with one 'l1' 'i2' ... per line.",
+  "worth_catching": true,
+  "fp_risk": "Low-moderate: tokens like 'a1 b2 c3' in a list; require 3+ consecutive letter+digit tokens whose letters spell an answer."
+ },
+ {
+  "answer": "crane",
+  "text": "||c1|| ||r2|| ||a3|| ||n4|| ||e5||",
+  "technique": "letter-digit-tokens",
+  "decode": "Open spoilers, drop the numbers.",
+  "worth_catching": true,
+  "fp_risk": "Same as above."
+ },
+ {
+  "answer": "light",
+  "text": "```\nl1\ni2\ng3\nh4\nt5\n```",
+  "technique": "letter-digit-tokens",
+  "decode": "Vertical letters with a line number beside each in a code block.",
+  "worth_catching": true,
+  "fp_risk": "Same as above."
+ },
+ {
+  "answer": "light",
+  "text": "# l ok\n# i ok\n# g ok\n# h ok\n# t ok",
+  "technique": "line-initial-acrostic",
+  "decode": "First character of each line. Works for headers, quotes (> l ok), bullets (- l for sure), subtext (-# l yeah) and per-line spoilers (||l lol||) because every line has 2+ words and the acrostic search only skips 2 fillers.",
+  "worth_catching": true,
+  "fp_risk": "Moderate: 5-line messages whose line initials happen to spell the answer. Rare in chat; restrict to messages with exactly answer-length lines or lines that start with a single-letter word."
+ },
+ {
+  "answer": "light",
+  "text": "- l for sure\n- i for sure\n- g for sure\n- h for sure\n- t for sure",
+  "technique": "line-initial-acrostic",
+  "decode": "Bulleted list, one letter starts each line.",
+  "worth_catching": true,
+  "fp_risk": "As above."
+ },
+ {
+  "answer": "crane",
+  "text": "cmon guys\nreally hard\nabsolutely brutal\nnot fair\neveryone try",
+  "technique": "line-initial-acrostic",
+  "decode": "First letter of each line: c r a n e. Also works inside a code block.",
+  "worth_catching": true,
+  "fp_risk": "Moderate: innocent multi-line messages whose initials form the answer; with 5 lines this is rare but real (weight by line count == answer length)."
+ },
+ {
+  "answer": "light",
+  "text": "```\nlxxxx\nxixxx\nxxgxx\nxxxhx\nxxxxt\n```",
+  "technique": "diagonal-in-code-block",
+  "decode": "Read down the diagonal of the monospace grid: l i g h t. Filler must be letters (dots or spaces are already caught).",
+  "worth_catching": true,
+  "fp_risk": "Low: only fires on square blocks of non-dictionary tokens; check main diagonal, anti-diagonal and columns of code blocks."
+ },
+ {
+  "answer": "crane",
+  "text": "c·r·a·n·e",
+  "technique": "unstripped-separator-chars",
+  "decode": "Middle dots between letters. tokenHit only strips a fixed ASCII punctuation set; · • → │ — – = & # % ? all survive and the 9-char token matches nothing. (Words without b/d/l/n/o/p/q/s/u/x are caught only by accident via the upside-down branch, e.g. wager.)",
+  "worth_catching": true,
+  "fp_risk": "Low: strip all Unicode punctuation/symbol categories (\\p{P}, \\p{S}) from tokens, not just a fixed list. Innocent 'a=b', 'x&y' tokens are short and won't reach 5 letters."
+ },
+ {
+  "answer": "house",
+  "text": "h•o•u•s•e",
+  "technique": "unstripped-separator-chars",
+  "decode": "Bullets between letters.",
+  "worth_catching": true,
+  "fp_risk": "As above."
+ },
+ {
+  "answer": "plane",
+  "text": "p│l│a│n│e",
+  "technique": "unstripped-separator-chars",
+  "decode": "Box-drawing bar between letters (also c→r→a→n→e, h—o—u—s—e, c=r=a=n=e, h&o&u&s&e, p%l%a%n%e, c?r?a?n?e, c#r#a#n#e).",
+  "worth_catching": true,
+  "fp_risk": "As above."
+ },
+ {
+  "answer": "crane",
+  "text": "c🔥r🔥a🔥n🔥e",
+  "technique": "emoji-separator-no-space",
+  "decode": "Emoji between the letters with no spaces; the whole thing is one token that no rule handles.",
+  "worth_catching": true,
+  "fp_risk": "Low: treat emoji as whitespace before tokenizing (the spaced-letter join then catches it)."
+ },
+ {
+  "answer": "house",
+  "text": "h😂o😂u😂s😂e😂",
+  "technique": "emoji-separator-no-space",
+  "decode": "Emoji after each letter.",
+  "worth_catching": true,
+  "fp_risk": "As above."
+ },
+ {
+  "answer": "crane",
+  "text": "cr🔥ane",
+  "technique": "emoji-split-word",
+  "decode": "Word split in two by an emoji, no spaces.",
+  "worth_catching": true,
+  "fp_risk": "Low: same fix (emoji as whitespace) makes it 'cr ane' which the join catches."
+ },
+ {
+  "answer": "wager",
+  "text": "w<:fire:1234567890>a<:fire:1234567890>g<:fire:1234567890>e<:fire:1234567890>r",
+  "technique": "custom-emoji-separator",
+  "decode": "Server emoji between the letters; the detector expands each to ' fire ', leaving 'w fire a fire g fire e fire r' which the acrostic cannot bridge (only 2 skips allowed).",
+  "worth_catching": true,
+  "fp_risk": "Low: treat custom emoji whose name does not itself contain letters of interest as whitespace, or allow more skips when every non-skipped token is a single letter."
+ },
+ {
+  "answer": "ghost",
+  "text": "golf🔥hotel🔥oscar🔥sierra🔥tango",
+  "technique": "nato-emoji-separator",
+  "decode": "NATO words glued with emoji become one token, so the NATO decoder never sees them.",
+  "worth_catching": true,
+  "fp_risk": "Low: emoji-as-whitespace fix."
+ },
+ {
+  "answer": "light",
+  "text": "l then i then g then h then t",
+  "technique": "letters-with-filler-words",
+  "decode": "Drop the filler word between each letter. Also 'c and r and a and n and e', 'first l, then i, then g, then h, then t lol', 'l x i x g x h x t', 'l lol i lol g lol h lol t'.",
+  "worth_catching": true,
+  "fp_risk": "Moderate: single-letter tokens 'a' and 'i' are real words. Rule: 3+ single-letter tokens separated by at most 1-2 words each, joined in order, matches an answer. '\"c\" and \"r\" and ...' too."
+ },
+ {
+  "answer": "crane",
+  "text": "first c, then r, then a, then n, then e lol",
+  "technique": "letters-with-filler-words",
+  "decode": "Same, phrased naturally.",
+  "worth_catching": true,
+  "fp_risk": "As above; the ordinal form 'first c, second r, third a, ...' is the same rule."
+ },
+ {
+  "answer": "crane",
+  "text": "\"c\" and \"r\" and \"a\" and \"n\" and \"e\"",
+  "technique": "letters-with-filler-words",
+  "decode": "Quoted letters joined with 'and'.",
+  "worth_catching": true,
+  "fp_risk": "As above."
+ },
+ {
+  "answer": "light",
+  "text": "y x v x t x u x g",
+  "technique": "letters-with-filler-words-rot13",
+  "decode": "rot13 of light (yvtug) with x fillers: strip fillers, then rot13. Combination of two caught tricks that breaks when combined.",
+  "worth_catching": true,
+  "fp_risk": "Low once the filler rule exists, as long as the joined string is fed through the cipher checks (currently only exactHit)."
+ },
+ {
+  "answer": "light",
+  "text": "1. t\n2. h\n3. g\n4. i\n5. l",
+  "technique": "reversed-numbered-list",
+  "decode": "Numbered list read bottom-up. The forward numbered list is caught by the acrostic; the reversed one is not.",
+  "worth_catching": true,
+  "fp_risk": "Low: check acrostic output against the reversed answer too."
+ },
+ {
+  "answer": "light",
+  "text": "||xxlightxx||",
+  "technique": "junk-wrapped-in-spoiler",
+  "decode": "The word inside a spoiler with junk letters glued on both sides; no separator so nothing splits it and fuzzy matching needs distance <= 1.",
+  "worth_catching": true,
+  "fp_risk": "Moderate: substring matching would hit 'slightly', 'flashlight', 'warehouse'. Rule: flag substring hits only when the containing token is not a dictionary word (xxlightxx, thelight, itscrane, todayscrane, lightlol, craneino are all non-words)."
+ },
+ {
+  "answer": "crane",
+  "text": "itscrane",
+  "technique": "concatenated-with-word",
+  "decode": "'its crane' with the space removed. Also 'thelight', 'lightlol', 'todaysCrane', 'craneino', '[xxlightxx](https://example.com)'.",
+  "worth_catching": true,
+  "fp_risk": "As above."
+ },
+ {
+  "answer": "crane",
+  "text": "craneino",
+  "technique": "slang-suffix",
+  "decode": "-ino / -oo / -inator suffixes that are not in the SUFFIXES list.",
+  "worth_catching": true,
+  "fp_risk": "Low: extend suffix list or use the non-dictionary-substring rule above."
+ },
+ {
+  "answer": "light",
+  "text": "l 🍦 g h t",
+  "technique": "emoji-name-initial-mixed-with-letters",
+  "decode": "Ice cream starts with i: l i g h t. The emoji acrostic only runs on all-emoji runs, and plain letters are dropped before the join.",
+  "worth_catching": true,
+  "fp_risk": "Moderate: let each emoji contribute its name initials as a single-letter token in the spaced-letter join; innocent 'a 🍎 day' style messages are short of 5 letters."
+ },
+ {
+  "answer": "house",
+  "text": "🐴 o 🦄 s e",
+  "technique": "emoji-name-initial-mixed-with-letters",
+  "decode": "horse, o, unicorn, s, e.",
+  "worth_catching": true,
+  "fp_risk": "As above."
+ },
+ {
+  "answer": "light",
+  "text": "<:letter_l:1><:letter_i:2><:letter_g:3><:letter_h:4><:letter_t:5>",
+  "technique": "custom-emoji-letter-names",
+  "decode": "Servers with letter emoji packs (:letter_l:, :blue_c:, :l_:) spell words; the detector expands the names but 'letter_l' never reduces to l.",
+  "worth_catching": true,
+  "fp_risk": "Low: when a custom emoji name ends in _<letter> or starts with <letter>_, emit that letter. Innocent uses of such packs are themselves spelling something."
+ },
+ {
+  "answer": "crane",
+  "text": "<:blue_c:1><:blue_r:2><:blue_a:3><:blue_n:4><:blue_e:5>",
+  "technique": "custom-emoji-letter-names",
+  "decode": "blue_c blue_r ... -> crane.",
+  "worth_catching": true,
+  "fp_risk": "As above."
+ },
+ {
+  "answer": "light",
+  "text": "`:regional_indicator_l: :regional_indicator_i: :regional_indicator_g: :regional_indicator_h: :regional_indicator_t:`",
+  "technique": "emoji-shortcodes-in-code-span",
+  "decode": "Inside a code span Discord does not convert shortcodes, so the reader sees the shortcode names and reads the trailing letters.",
+  "worth_catching": true,
+  "fp_risk": "Low: map :regional_indicator_x: text to x before scanning."
+ },
+ {
+  "answer": "light",
+  "text": "bGlnaHQh",
+  "technique": "base64-with-punctuation",
+  "decode": "base64('light!'). The decoded text must match /^[a-z\\s]+$/ so any punctuation, capital or digit in the plaintext bypasses the check. Also 'Y3JhbmUu' (crane.), 'V2FnZXIh' (Wager!).",
+  "worth_catching": true,
+  "fp_risk": "None: run the decoded string through normalize + scan instead of the strict regex."
+ },
+ {
+  "answer": "light",
+  "text": "bCBpIGcgaCB0",
+  "technique": "base64-of-spaced-letters",
+  "decode": "base64('l i g h t'): decodes to single letters that exactHit never joins.",
+  "worth_catching": true,
+  "fp_risk": "None, same fix."
+ },
+ {
+  "answer": "ghost",
+  "text": "Z2gwNTc=",
+  "technique": "base64-of-leet",
+  "decode": "base64('gh057'): decode, then read the leet.",
+  "worth_catching": true,
+  "fp_risk": "None, same fix (feed decoded text to the full scan)."
+ },
+ {
+  "answer": "crane",
+  "text": "f u d q h",
+  "technique": "caesar-shift-spaced",
+  "decode": "Caesar +3 with spaces between letters; the spaced join only runs exactHit, which does not include Caesar shifts (fuzzyHit does).",
+  "worth_catching": true,
+  "fp_risk": "Low: run the joined 5-letter string through fuzzyHit too; random 5-letter joins hitting a Caesar shift of the answer is ~25/26^5."
+ },
+ {
+  "answer": "house",
+  "text": "k r x v h",
+  "technique": "caesar-shift-spaced",
+  "decode": "Caesar +3 of house, spaced.",
+  "worth_catching": true,
+  "fp_risk": "As above. Same gap for Caesar + emoji separator (z🔥d🔥j🔥h🔥u)."
+ },
+ {
+  "answer": "light",
+  "text": "ʇ ɥ ƃ ᴉ l",
+  "technique": "upside-down-spaced",
+  "decode": "Upside-down text with spaces between the characters; the unflip branch only checks individual tokens.",
+  "worth_catching": true,
+  "fp_risk": "None: unflip the whole message and run the spaced-letter join on it."
+ },
+ {
+  "answer": "crane",
+  "text": "ǝ u ɐ ɹ ɔ",
+  "technique": "upside-down-spaced",
+  "decode": "Same for crane.",
+  "worth_catching": true,
+  "fp_risk": "As above."
+ },
+ {
+  "answer": "light",
+  "text": "0x6c69676874",
+  "technique": "hex-0x-prefix-whole-word",
+  "decode": "Single 0x-prefixed hex string of the whole word; the hex regex needs per-byte word boundaries and exactHit expects no prefix.",
+  "worth_catching": true,
+  "fp_risk": "None: strip a leading 0x before the hex check."
+ },
+ {
+  "answer": "light",
+  "text": "12/9/7/8/20",
+  "technique": "a1-with-slash-separators",
+  "decode": "a=1..z=26 with slashes; decodeNumbers splits groups on / + _ # so the run never reaches 3 numbers. Also '3+18+1+14+5', '#12 #9 #7 #8 #20', '23_1_7_5_18', '23🔥1🔥7🔥5🔥18'.",
+  "worth_catching": true,
+  "fp_risk": "Low-moderate: dates like 12/9/7 are 3 numbers in range; require the decoded string to be an answer (already the case) and length >= 4 numbers."
+ },
+ {
+  "answer": "crane",
+  "text": "3+18+1+14+5",
+  "technique": "a1-with-slash-separators",
+  "decode": "Same, plus signs.",
+  "worth_catching": true,
+  "fp_risk": "As above."
+ },
+ {
+  "answer": "light",
+  "text": "twelve nine seven eight twenty",
+  "technique": "a1-number-words",
+  "decode": "Number words for a=1..z=26.",
+  "worth_catching": true,
+  "fp_risk": "Low: map number words to digits before decodeNumbers; 5 consecutive number words spelling an answer is not innocent."
+ },
+ {
+  "answer": "light",
+  "text": "108/105/103/104/116",
+  "technique": "ascii-decimal-slash",
+  "decode": "ASCII codes separated by slashes (or hex 6c+69+67+68+74 with plus signs).",
+  "worth_catching": true,
+  "fp_risk": "Low, same group-splitting fix."
+ },
+ {
+  "answer": "light",
+  "text": ".-.. | .. | --. | .... | -",
+  "technique": "morse-alt-letter-separators",
+  "decode": "Morse with | between letters (also .-../../--./..../- with slashes). The detector looks for a space-joined morse string only.",
+  "worth_catching": true,
+  "fp_risk": "None: normalise / and | between morse groups to spaces."
+ },
+ {
+  "answer": "light",
+  "text": "·−·· ·· −−· ···· −",
+  "technique": "morse-unicode-glyphs",
+  "decode": "Morse typed with middle dot and minus sign (phones autocorrect to these); also em-dash .—— .— ——. and emoji 🟡➖➖ 🟡➖.",
+  "worth_catching": true,
+  "fp_risk": "None: map · • ● to '.' and − — – ➖ to '-' before the morse check."
+ },
+ {
+  "answer": "light",
+  "text": "dit dah dit dit, dit dit, dah dah dit, dit dit dit dit, dah",
+  "technique": "morse-spoken",
+  "decode": "Spoken morse: dit=., dah=-.",
+  "worth_catching": true,
+  "fp_risk": "Low: map dit/dah/di/dah tokens to ./- then reuse the morse check. Long and rare, but cheap."
+ },
+ {
+  "answer": "wager",
+  "text": "double u a g e r",
+  "technique": "double-u-two-words",
+  "decode": "'double u' (or 'double you', 'double-u', 'dub') as two tokens; LETTER_NAMES only knows the glued forms doubleu/doubleyou/dubya so the run breaks at 'double'.",
+  "worth_catching": true,
+  "fp_risk": "Low: merge 'double u|you|yew' into w before the letter-name decoder."
+ },
+ {
+  "answer": "whale",
+  "text": "double you aitch ay el ee",
+  "technique": "double-u-two-words",
+  "decode": "Letter names read aloud, with w as two words.",
+  "worth_catching": true,
+  "fp_risk": "As above."
+ },
+ {
+  "answer": "light",
+  "text": "kufgr",
+  "technique": "qwerty-shift",
+  "decode": "Each letter typed one key to the left on QWERTY: l->k, i->u, g->f, h->g, t->r. Reader shifts each letter one key right.",
+  "worth_catching": true,
+  "fp_risk": "Low-moderate: decode only non-dictionary tokens; shifted answers occasionally form real words which then go unflagged, otherwise no chat impact."
+ },
+ {
+  "answer": "crane",
+  "text": "v t s m r",
+  "technique": "qwerty-shift",
+  "decode": "One key to the right, spaced: v->c, t->r, s->a, m->n, r->e.",
+  "worth_catching": true,
+  "fp_risk": "As above."
+ },
+ {
+  "answer": "light",
+  "text": "⠇⠊⠛⠓⠞",
+  "technique": "braille-letters",
+  "decode": "Unicode braille cells; readable with a chart on a phone in under a minute.",
+  "worth_catching": true,
+  "fp_risk": "None: add a braille-to-letter map to mapFancyLetters."
+ },
+ {
+  "answer": "crane",
+  "text": "⠉⠗⠁⠝⠑",
+  "technique": "braille-letters",
+  "decode": "Same for crane.",
+  "worth_catching": true,
+  "fp_risk": "As above."
+ },
+ {
+  "answer": "light",
+  "text": "5 4 4 4 8",
+  "technique": "phone-keypad-t9",
+  "decode": "Phone keypad digits: 5=jkl, 4=ghi, 8=tuv; reader picks the letters that make a word.",
+  "worth_catching": false,
+  "fp_risk": "High: any 5-digit sequence (scores, times, codes) decodes to hundreds of candidates; a rule would hit innocent number chat."
+ },
+ {
+  "answer": "wager",
+  "text": "answer in braille ⠺⠁⠛⠑⠗",
+  "technique": "braille",
+  "decode": "one braille cell per letter, standard alphabet",
+  "worth_catching": true,
+  "fp_risk": "none; braille never appears in normal chat"
+ },
+ {
+  "answer": "house",
+  "text": "⠓⠕⠥⠎⠑",
+  "technique": "braille",
+  "decode": "one braille cell per letter, standard alphabet",
+  "worth_catching": true,
+  "fp_risk": "none; braille never appears in normal chat"
+ },
+ {
+  "answer": "light",
+  "text": "ɭเﻮђՇ",
+  "technique": "fancy-font-thai-mix",
+  "decode": "fancy-text generator font (Thai/Hebrew/Armenian lookalikes); several glyphs are missing from the confusables table",
+  "worth_catching": true,
+  "fp_risk": "none once the mapping table is extended"
+ },
+ {
+  "answer": "ghost",
+  "text": "ﻮђ๏รՇ",
+  "technique": "fancy-font-thai-mix",
+  "decode": "fancy-text generator font (Thai/Hebrew/Armenian lookalikes); several glyphs are missing from the confusables table",
+  "worth_catching": true,
+  "fp_risk": "none once the mapping table is extended"
+ },
+ {
+  "answer": "house",
+  "text": "卄ㄖㄩ丂乇",
+  "technique": "fancy-font-cjk-strokes",
+  "decode": "fancy-text generator CJK-stroke font (卄=H, ㄖ=O, ㄩ=U, 丂=S, 乇=E)",
+  "worth_catching": true,
+  "fp_risk": "actual Chinese/Japanese text will not line up with an English answer"
+ },
+ {
+  "answer": "ghost",
+  "text": "Ꮆ卄ㄖ丂ㄒ",
+  "technique": "fancy-font-cjk-strokes",
+  "decode": "fancy-text generator CJK-stroke font",
+  "worth_catching": true,
+  "fp_risk": "actual Chinese/Japanese text will not line up with an English answer"
+ },
+ {
+  "answer": "wager",
+  "text": "ʍɑɠɛɽ",
+  "technique": "ipa-hook-letters",
+  "decode": "IPA letters read as their base letter; turned w (ʍ) is not in any table so the wildcard rule fails too",
+  "worth_catching": true,
+  "fp_risk": "none; add ʍ->w, ɠ->g, ɽ->r to the homoglyph table"
+ },
+ {
+  "answer": "glass",
+  "text": "glaß",
+  "technique": "eszett-for-ss",
+  "decode": "German sharp s stands for ss",
+  "worth_catching": true,
+  "fp_risk": "German chat words ending in ß"
+ },
+ {
+  "answer": "dress",
+  "text": "dreß",
+  "technique": "eszett-for-ss",
+  "decode": "German sharp s stands for ss",
+  "worth_catching": true,
+  "fp_risk": "German chat words ending in ß"
+ },
+ {
+  "answer": "wager",
+  "text": "w𝟖g𝟑r",
+  "technique": "math-digit-leet",
+  "decode": "leetspeak with bold math digits (w8g3r); mapFancyLetters turns these digits into random letters before NFKD can turn them into 8 and 3",
+  "worth_catching": true,
+  "fp_risk": "same as ordinary leetspeak"
+ },
+ {
+  "answer": "house",
+  "text": "h𝟎u𝟓𝟑",
+  "technique": "math-digit-leet",
+  "decode": "leetspeak with bold math digits (h0u53)",
+  "worth_catching": true,
+  "fp_risk": "same as ordinary leetspeak"
+ },
+ {
+  "answer": "crane",
+  "text": "c?r?a?n?e",
+  "technique": "interleave-unstripped-punct",
+  "decode": "letters separated by ? (also # % & = and curly quotes); tokenHit strips only a fixed punctuation list; words without b/d/n/p/q/u are caught by the upside-down path by accident, the rest get through",
+  "worth_catching": true,
+  "fp_risk": "none"
+ },
+ {
+  "answer": "house",
+  "text": "h→o→u→s→e",
+  "technique": "interleave-unstripped-punct",
+  "decode": "letters joined with arrows (also bullets, middle dots, em dashes, ellipses)",
+  "worth_catching": true,
+  "fp_risk": "none"
+ },
+ {
+  "answer": "plane",
+  "text": "p#l#a#n#e",
+  "technique": "interleave-unstripped-punct",
+  "decode": "letters separated by #",
+  "worth_catching": true,
+  "fp_risk": "none"
+ },
+ {
+  "answer": "house",
+  "text": "h😂o😂u😂s😂e",
+  "technique": "interleave-emoji-nospace",
+  "decode": "letters separated by an emoji with no spaces",
+  "worth_catching": true,
+  "fp_risk": "none"
+ },
+ {
+  "answer": "crane",
+  "text": "cr?an?e",
+  "technique": "chunks-with-unstripped-punct",
+  "decode": "two-letter chunks split by ?; the cross-token join only runs on whitespace-separated tokens",
+  "worth_catching": true,
+  "fp_risk": "none"
+ },
+ {
+  "answer": "house",
+  "text": "ho?us?e",
+  "technique": "chunks-with-unstripped-punct",
+  "decode": "two-letter chunks split by ?",
+  "worth_catching": true,
+  "fp_risk": "none"
+ },
+ {
+  "answer": "wager",
+  "text": "w1 a2 g3 e4 r5",
+  "technique": "letter-number-pairs",
+  "decode": "numbered letters; tokens with digits are excluded from acrostics and the join loop keeps the digits",
+  "worth_catching": true,
+  "fp_risk": "grid coordinates like a1 b2 (rare in chat)"
+ },
+ {
+  "answer": "house",
+  "text": "h1 o2 u3 s4 e5",
+  "technique": "letter-number-pairs",
+  "decode": "numbered letters",
+  "worth_catching": true,
+  "fp_risk": "grid coordinates like a1 b2 (rare in chat)"
+ },
+ {
+  "answer": "crane",
+  "text": "c and r and a and n and e",
+  "technique": "letters-with-filler-words",
+  "decode": "single letters separated by 'and'",
+  "worth_catching": true,
+  "fp_risk": "none"
+ },
+ {
+  "answer": "crane",
+  "text": "senarc",
+  "technique": "reversed-plus-suffix",
+  "decode": "read backwards: cranes",
+  "worth_catching": true,
+  "fp_risk": "none beyond current reversed rule (needs reversed+suffix check for words containing b/d/n/p/q/u; others are caught by the upside-down path)"
+ },
+ {
+  "answer": "house",
+  "text": "sesuoh",
+  "technique": "reversed-plus-suffix",
+  "decode": "read backwards: houses",
+  "worth_catching": true,
+  "fp_risk": "none"
+ },
+ {
+  "answer": "wager",
+  "text": "rxexgxaxw",
+  "technique": "reversed-interleaved",
+  "decode": "drop the x's then read backwards; the interleave rule compares to the forward word only",
+  "worth_catching": true,
+  "fp_risk": "none"
+ },
+ {
+  "answer": "crane",
+  "text": "exnxaxrxc",
+  "technique": "reversed-interleaved",
+  "decode": "drop the x's then read backwards",
+  "worth_catching": true,
+  "fp_risk": "none"
+ },
+ {
+  "answer": "wager",
+  "text": "ertnj",
+  "technique": "rot13-of-reversed",
+  "decode": "rot13 then reverse (two trivial steps)",
+  "worth_catching": false,
+  "fp_risk": "random 5-letter junk; cheap to add reversed forms to the caesar set though"
+ },
+ {
+  "answer": "wager",
+  "text": "xbh fs",
+  "technique": "caesar-spaced",
+  "decode": "Caesar shift +1 with a space in it; the join loop only runs exactHit, not the caesar check",
+  "worth_catching": true,
+  "fp_risk": "pairs of short junk tokens"
+ },
+ {
+  "answer": "wager",
+  "text": "one key to the right: eshrt",
+  "technique": "keyboard-shift-right",
+  "decode": "each letter typed one key to the right on qwerty",
+  "worth_catching": false,
+  "fp_risk": "random junk tokens; only decodable with the hint text"
+ },
+ {
+  "answer": "house",
+  "text": "jpidr",
+  "technique": "keyboard-shift-right",
+  "decode": "each letter typed one key to the right on qwerty",
+  "worth_catching": false,
+  "fp_risk": "random junk tokens"
+ },
+ {
+  "answer": "wager",
+  "text": "167 141 147 145 162",
+  "technique": "octal-ascii",
+  "decode": "octal ASCII codes",
+  "worth_catching": true,
+  "fp_risk": "number lists where every value is 141-172 (rare)"
+ },
+ {
+  "answer": "house",
+  "text": "150 157 165 163 145",
+  "technique": "octal-ascii",
+  "decode": "octal ASCII codes",
+  "worth_catching": true,
+  "fp_risk": "number lists where every value is 141-172 (rare)"
+ },
+ {
+  "answer": "wager",
+  "text": "23/1/7/5/18",
+  "technique": "number-code-separators",
+  "decode": "a=1..z=26 with / between numbers; decodeNumbers splits groups on anything except - . , : ; |",
+  "worth_catching": true,
+  "fp_risk": "dates and fractions (5 slash-separated numbers is unusual)"
+ },
+ {
+  "answer": "wager",
+  "text": "119/97/103/101/114",
+  "technique": "number-code-separators",
+  "decode": "ASCII decimal with / separators",
+  "worth_catching": true,
+  "fp_risk": "none"
+ },
+ {
+  "answer": "house",
+  "text": "8_15_21_19_5",
+  "technique": "number-code-separators",
+  "decode": "a=1..z=26 with underscores",
+  "worth_catching": true,
+  "fp_risk": "none"
+ },
+ {
+  "answer": "wager",
+  "text": "23+1+7+5+18",
+  "technique": "number-code-separators",
+  "decode": "a=1..z=26 as a sum",
+  "worth_catching": true,
+  "fp_risk": "arithmetic in chat"
+ },
+ {
+  "answer": "wager",
+  "text": "23 0 1 0 7 0 5 0 18",
+  "technique": "a1z26-with-noise",
+  "decode": "a=1..z=26 with 0 as spacer; one out-of-range number disables the whole group",
+  "worth_catching": true,
+  "fp_risk": "number lists containing zeros"
+ },
+ {
+  "answer": "house",
+  "text": "8 15 21 19 5 99",
+  "technique": "a1z26-with-noise",
+  "decode": "a=1..z=26 followed by an irrelevant number",
+  "worth_catching": true,
+  "fp_risk": "runs of small numbers followed by a big one (scores, times)"
+ },
+ {
+  "answer": "wager",
+  "text": "23rd 1st 7th 5th 18th",
+  "technique": "a1z26-ordinals",
+  "decode": "nth letter of the alphabet",
+  "worth_catching": true,
+  "fp_risk": "lists of ordinals (placings in a race)"
+ },
+ {
+  "answer": "house",
+  "text": "8th 15th 21st 19th 5th",
+  "technique": "a1z26-ordinals",
+  "decode": "nth letter of the alphabet",
+  "worth_catching": true,
+  "fp_risk": "lists of ordinals"
+ },
+ {
+  "answer": "wager",
+  "text": "twenty three, one, seven, five, eighteen",
+  "technique": "a1z26-number-words",
+  "decode": "spelled-out numbers, a=1..z=26",
+  "worth_catching": true,
+  "fp_risk": "lists of spelled-out numbers"
+ },
+ {
+  "answer": "wager",
+  "text": "text me 92437",
+  "technique": "phone-keypad",
+  "decode": "phone keypad digits, guess the word T9-style",
+  "worth_catching": true,
+  "fp_risk": "any 5-digit number whose keypad letters can spell the answer (zip codes, PINs)"
+ },
+ {
+  "answer": "house",
+  "text": "46873",
+  "technique": "phone-keypad",
+  "decode": "phone keypad digits, guess the word T9-style",
+  "worth_catching": true,
+  "fp_risk": "any 5-digit number whose keypad letters can spell the answer"
+ },
+ {
+  "answer": "wager",
+  "text": "O5QWOZLS",
+  "technique": "base32",
+  "decode": "base32 (needs an app, like base64)",
+  "worth_catching": true,
+  "fp_risk": "8-char uppercase blobs are rare"
+ },
+ {
+  "answer": "house",
+  "text": "NBXXK43F",
+  "technique": "base32",
+  "decode": "base32",
+  "worth_catching": true,
+  "fp_risk": "8-char uppercase blobs are rare"
+ },
+ {
+  "answer": "wager",
+  "text": "YW5zd2VyOiB3YWdlcg==",
+  "technique": "base64-with-punct",
+  "decode": "base64 of 'answer: wager'",
+  "worth_catching": true,
+  "fp_risk": "none beyond current base64 rule"
+ },
+ {
+  "answer": "house",
+  "text": "aG91c2Uu",
+  "technique": "base64-with-punct",
+  "decode": "base64 of 'house.'",
+  "worth_catching": true,
+  "fp_risk": "none beyond current base64 rule"
+ },
+ {
+  "answer": "wager",
+  "text": "77 20 61 20 67 20 65 20 72",
+  "technique": "hex-spaced-word",
+  "decode": "hex of 'w a g e r' including 0x20 spaces; decoded candidate with a space is discarded",
+  "worth_catching": true,
+  "fp_risk": "none beyond current hex rule"
+ },
+ {
+  "answer": "wager",
+  "text": "0x7761676572",
+  "technique": "escape-forms-unhandled",
+  "decode": "one 0x-prefixed hex number (only per-byte 0x is handled)",
+  "worth_catching": true,
+  "fp_risk": "hashes and addresses, only if they decode to letters"
+ },
+ {
+  "answer": "wager",
+  "text": "&#x77;&#x61;&#x67;&#x65;&#x72;",
+  "technique": "escape-forms-unhandled",
+  "decode": "hex HTML entities; only decimal &#NNN; are decoded",
+  "worth_catching": true,
+  "fp_risk": "none"
+ },
+ {
+  "answer": "wager",
+  "text": "&#119&#97&#103&#101&#114",
+  "technique": "escape-forms-unhandled",
+  "decode": "decimal HTML entities without semicolons",
+  "worth_catching": true,
+  "fp_risk": "none"
+ },
+ {
+  "answer": "wager",
+  "text": "U+0077 U+0061 U+0067 U+0065 U+0072",
+  "technique": "escape-forms-unhandled",
+  "decode": "Unicode code point notation",
+  "worth_catching": true,
+  "fp_risk": "none"
+ },
+ {
+  "answer": "house",
+  "text": "%u0068%u006f%u0075%u0073%u0065",
+  "technique": "escape-forms-unhandled",
+  "decode": "legacy JS %uXXXX escapes",
+  "worth_catching": true,
+  "fp_risk": "none"
+ },
+ {
+  "answer": "wager",
+  "text": "&#119; &#97; &#103; &#101; &#114;",
+  "technique": "escapes-with-spaces",
+  "decode": "HTML entities separated by spaces; regex requires a contiguous run",
+  "worth_catching": true,
+  "fp_risk": "none"
+ },
+ {
+  "answer": "wager",
+  "text": "\\u0077 \\u0061 \\u0067 \\u0065 \\u0072",
+  "technique": "escapes-with-spaces",
+  "decode": "\\u escapes separated by spaces",
+  "worth_catching": true,
+  "fp_risk": "none"
+ },
+ {
+  "answer": "wager",
+  "text": "double u, a, g, e, r",
+  "technique": "double-u-split",
+  "decode": "'double u' as two words then plain letters; 'double' breaks the spoken-letter run and the acrostic sees d",
+  "worth_catching": true,
+  "fp_risk": "none; 'double u' followed by letters is not natural chat"
+ },
+ {
+  "answer": "wager",
+  "text": "double u ay gee ee are",
+  "technique": "double-u-split",
+  "decode": "'double u' as two words then letter names",
+  "worth_catching": true,
+  "fp_risk": "none"
+ },
+ {
+  "answer": "house",
+  "text": "aych oh yoo ess ee",
+  "technique": "letter-names-alt-spelling",
+  "decode": "letter names spelled aych, yoo (also emm, enn, arr, ecks, wy, dubs)",
+  "worth_catching": true,
+  "fp_risk": "'oh' 'ess' 'ee' already in table; new names are rare as words"
+ },
+ {
+  "answer": "wager",
+  "text": "dubs ay gee ee arr",
+  "technique": "letter-names-alt-spelling",
+  "decode": "dubs for w, arr for r",
+  "worth_catching": true,
+  "fp_risk": "'arr' pirate talk"
+ },
+ {
+  "answer": "wager",
+  "text": "w as in whiskey, a as in alpha, g as in golf, e as in echo, r as in romeo",
+  "technique": "as-in-nato",
+  "decode": "'letter as in word' spelling; NATO words are separated by fillers so neither the spoken-letter run nor the 2-skip acrostic survives",
+  "worth_catching": true,
+  "fp_risk": "none; this phrasing only occurs when spelling something"
+ },
+ {
+  "answer": "crane",
+  "text": "c for charlie, r for romeo, a for alpha, n for november, e for echo",
+  "technique": "as-in-nato",
+  "decode": "'letter for word' spelling",
+  "worth_catching": true,
+  "fp_risk": "none"
+ },
+ {
+  "answer": "wager",
+  "text": "doble u a ge e erre",
+  "technique": "spanish-letter-names",
+  "decode": "Spanish letter names",
+  "worth_catching": true,
+  "fp_risk": "Spanish chat with the short letter-words u, a, e, ge"
+ },
+ {
+  "answer": "house",
+  "text": "hache o u ese e",
+  "technique": "spanish-letter-names",
+  "decode": "Spanish letter names",
+  "worth_catching": true,
+  "fp_risk": "Spanish chat"
+ },
+ {
+  "answer": "wager",
+  "text": "weh ah geh eh err",
+  "technique": "german-letter-names",
+  "decode": "German letter names",
+  "worth_catching": true,
+  "fp_risk": "interjection strings like 'oh eh ah' and 'err'"
+ },
+ {
+  "answer": "crane",
+  "text": "tseh err ah enn eh",
+  "technique": "german-letter-names",
+  "decode": "German letter names",
+  "worth_catching": true,
+  "fp_risk": "interjection strings"
+ },
+ {
+  "answer": "wager",
+  "text": "·–– ·– ––· · ·–·",
+  "technique": "morse-typographic",
+  "decode": "morse with middle dots and en dashes (what a phone keyboard autocorrects to)",
+  "worth_catching": true,
+  "fp_risk": "none"
+ },
+ {
+  "answer": "house",
+  "text": "••••  ———  ••—  •••  •",
+  "technique": "morse-typographic",
+  "decode": "morse with bullets and em dashes",
+  "worth_catching": true,
+  "fp_risk": "none"
+ },
+ {
+  "answer": "wager",
+  "text": ".__ ._ __. . ._.",
+  "technique": "morse-underscore",
+  "decode": "morse with underscores as dashes",
+  "worth_catching": true,
+  "fp_risk": "none"
+ },
+ {
+  "answer": "house",
+  "text": "....|---|..-|...|.",
+  "technique": "morse-alt-separators",
+  "decode": "morse with | between letters",
+  "worth_catching": true,
+  "fp_risk": "none"
+ },
+ {
+  "answer": "wager",
+  "text": ".--  .-  --.  .  .-.",
+  "technique": "morse-alt-separators",
+  "decode": "morse with two spaces between letters",
+  "worth_catching": true,
+  "fp_risk": "none"
+ },
+ {
+  "answer": "wager",
+  "text": "dit dah dah / dit dah / dah dah dit / dit / dit dah dit",
+  "technique": "morse-dit-dah",
+  "decode": "morse spoken as dit and dah",
+  "worth_catching": true,
+  "fp_risk": "none"
+ },
+ {
+  "answer": "crane",
+  "text": "dah dit dah dit / dit dah dit / dit dah / dah dit / dit",
+  "technique": "morse-dit-dah",
+  "decode": "morse spoken as dit and dah",
+  "worth_catching": true,
+  "fp_risk": "none"
+ }
+]

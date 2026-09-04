@@ -1,6 +1,6 @@
 # Wordle Classifier
 
-Deletes anything in any text channel that gives away today's Wordle answer.
+Deletes anything in any text channel that gives away today's Wordle answer, including in screenshots, voice messages and videos.
 
 ## How it finds the answer
 Fetches the official New York Times endpoint every 15 minutes:
@@ -22,8 +22,10 @@ Bans today's word, plus yesterday's and tomorrow's (covers timezones).
 ## Layout
 - `detector.js` — pure text detection logic (no Discord dependency)
 - `llm.js` — Claude-based meaning classifier (hints, riddles, translations, images)
-- `index.js` — Discord wiring: messages, edits, attachments, OCR, reactions, names
-- `test/detector.test.js` — 128 targeted cases + generic sweep + false-positive sweep
+- `audio.js` — speech-to-text for voice messages, audio files and video soundtracks (OpenAI)
+- `index.js` — Discord wiring: messages, edits, attachments, OCR, speech-to-text, reactions, names
+- `test/detector.test.js` — 132 targeted cases + generic sweep + false-positive sweep
+- `test/audio.unit.test.js` — offline audio checks; `test/audio.test.js` — live transcription of synthesised clips
 
 ## What it catches
 | Technique | Example (answer: wager) |
@@ -46,6 +48,7 @@ Bans today's word, plus yesterday's and tomorrow's (covers timezones).
 | Acrostics | `wife angle grey ear red`, `wage and real`, emoji names 🐳🍎🦒🥚🌈 |
 | Hidden in other content | URLs, custom emoji names, file names, embeds, link previews, polls, stickers, forwarded messages |
 | Attachments | `.txt`/`.md`/`.csv` contents, and **screenshots via OCR** |
+| Speech | Discord **voice messages**, uploaded audio (`mp3/ogg/wav/m4a/flac/webm`) and the soundtrack of uploaded videos (`mp4/mov/webm`) are transcribed, then run through every text check and the LLM layer |
 | Fragments across messages | `w` `a` `g` `e` `r` or `wa` `ger` as separate messages (all deleted) |
 | Edits and link previews | messages re-scanned on edit and when embeds resolve |
 | Reactions | 🇼🇦🇬🇪🇷 reactions spelling the word are removed |
@@ -68,10 +71,23 @@ message on Claude Opus 5; the system prompt is cached for an hour to keep repeat
 
 Run `npm run test:llm` to see live verdicts and per-message cost on 16 sample messages.
 
+## Audio layer (optional)
+With an OpenAI API key in `.env`, voice messages, audio files and the soundtrack of video attachments are transcribed
+and the transcript goes through the same pattern checks as text, then to the LLM layer (always, not just when the
+message looks Wordle-related). Bundled ffmpeg converts each clip to mono 16 kHz opus first, so uploads stay small and
+any container works; only the first 10 minutes are transcribed (`AUDIO_MAX_SECONDS`). Roughly $0.006 per minute of
+audio on `gpt-4o-transcribe`; each clip logs its length and cost. Transcripts are cached per attachment, so edits do
+not pay twice.
+
+Run `npm run test:audio` to transcribe a handful of synthesised clips (spoken answer, spelled letters, NATO alphabet,
+hints, clean chat) as both voice-message ogg and mp4. macOS only, it uses `say` to make the clips.
+
 ## What it cannot catch
-- Speech in voice channels, text inside videos
+- Live speech in voice channels
+- Text shown on screen inside videos (only the soundtrack is transcribed)
 - Private DMs between members
 - Without the LLM layer: hints, riddles, synonyms, translations
+- Without the audio layer: voice messages and audio/video files
 
 ## Known trade-offs
 - On days the answer is a common word (`house`, `light`, `today`), normal sentences using it are deleted. Inherent to any spoiler filter.

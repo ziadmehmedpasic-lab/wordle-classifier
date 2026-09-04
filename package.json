@@ -1,12 +1,13 @@
 {
   "name": "wordle-classifier",
   "version": "1.0.0",
-  "description": "Discord bot that deletes Wordle spoilers: pattern matching, OCR, and an LLM layer",
+  "description": "Discord bot that deletes Wordle spoilers: pattern matching, OCR, speech-to-text, and an LLM layer",
   "main": "index.js",
   "scripts": {
-    "test": "node test/detector.test.js",
+    "test": "node test/detector.test.js && node test/audio.unit.test.js",
     "start": "node index.js",
-    "test:llm": "node test/llm.test.js"
+    "test:llm": "node test/llm.test.js",
+    "test:audio": "node test/audio.test.js"
   },
   "keywords": [],
   "author": "",
@@ -19,6 +20,8 @@
     "discord.js": "^14.27.0",
     "dotenv": "^17.4.2",
     "double-metaphone": "^2.0.1",
+    "ffmpeg-static": "^5.3.0",
+    "openai": "^7.10.0",
     "tesseract.js": "^7.0.0",
     "unicode-emoji-json": "^0.9.0"
   },

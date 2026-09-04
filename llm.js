@@ -39,9 +39,10 @@ const channelHot = new Map(); // channelId -> timestamp of last Wordle-related m
 function noteContext(channelId, text) {
   if (SUSPICIOUS.test(text || "")) channelHot.set(channelId, Date.now());
 }
-function shouldCheck(channelId, text, hasImage) {
+function shouldCheck(channelId, text, hasImage, hasTranscript = false) {
   if (!cfg.enabled) return false;
   if (cfg.mode === "all") return true;
+  if (hasTranscript) return true; // speech uploads are rare and already paid for; always judge them
   if (SUSPICIOUS.test(text || "")) return true;
   const hot = channelHot.get(channelId);
   if (hot && Date.now() - hot < cfg.contextWindowMs) return true;
@@ -75,6 +76,8 @@ Verdicts:
 - "clean": normal conversation. Includes standard share grids (coloured squares with no letters), scores like 4/6, saying it was hard or easy, and discussion that does not narrow the answer. A message that uses a protected word's meaning coincidentally, with no Wordle framing and no way to infer the puzzle answer, is clean.
 
 Be strict about spoilers and hints that reference Wordle, the puzzle, "the word", or the day's answer. Be lenient with ordinary chat that has nothing to do with the puzzle. Consider the recent messages provided as context: a sequence of innocent-looking messages can together spell or hint at the word.
+
+Text marked [voice transcript] came from speech-to-text: letters may appear spelled out, joined, or as homophones, and non-English speech is transcribed in its original language.
 
 Confidence is how sure you are of the verdict, from 0 to 1. Keep the reason to one sentence.`;
 }

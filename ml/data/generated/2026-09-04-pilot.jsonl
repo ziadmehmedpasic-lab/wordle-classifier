@@ -1,0 +1,600 @@
+{"id": "wager-casual-00", "answer": "wager", "text": "i'd wager none of you got it in 3 lol", "label": "direct", "style": "plain", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "wager-casual-01", "answer": "wager", "text": "w4g3r ez today", "label": "direct", "style": "leet", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "wager-casual-02", "answer": "wager", "text": "w-a-g-e-r took me 5 tries smh", "label": "direct", "style": "separators", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "wager-casual-03", "answer": "wager", "text": "W\nA\nG\nE\nR", "label": "direct", "style": "vertical", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "wager-casual-04", "answer": "wager", "text": "my friend and i were wagering on how many guesses id need", "label": "direct", "style": "inflection", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "wager-casual-05", "answer": "wager", "text": "rhymes with major but with a w", "label": "strong_hint", "style": "rhyme", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "wager-casual-06", "answer": "wager", "text": "basically a bet you place at the track", "label": "strong_hint", "style": "definition", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "wager-casual-07", "answer": "wager", "text": "en español apuesta 👀", "label": "strong_hint", "style": "translation", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "wager-casual-08", "answer": "wager", "text": "pascal had a famous one about god", "label": "strong_hint", "style": "reference", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "wager-casual-09", "answer": "wager", "text": "🇼 + 💰🎲 = todays answer", "label": "strong_hint", "style": "rebus", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "wager-casual-10", "answer": "wager", "text": "ends in r if that helps anyone", "label": "weak_hint", "style": "letter", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "wager-casual-11", "answer": "wager", "text": "kinda gambling vibes today", "label": "weak_hint", "style": "theme", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "wager-casual-12", "answer": "wager", "text": "only two vowels and theyre both boring", "label": "weak_hint", "style": "count", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "wager-casual-13", "answer": "wager", "text": "🟨🟩⬜⬜⬜\n🟩🟩🟩🟩🟩 got there", "label": "benign", "style": "wordle_chat", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "wager-casual-14", "answer": "wager", "text": "day 412 streak intact babyyy", "label": "benign", "style": "wordle_chat", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "wager-casual-15", "answer": "wager", "text": "anyone else eating cereal at 11pm or just me", "label": "benign", "style": "chat", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "wager-casual-16", "answer": "wager", "text": "the water heater is broken again im so tired", "label": "benign", "style": "hard_benign", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "wager-casual-17", "answer": "wager", "text": "my wagon needs new tires before the camping trip", "label": "benign", "style": "hard_benign", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "wager-casual-18", "answer": "wager", "text": "we're getting wings later if anyone wants in", "label": "benign", "style": "hard_benign", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "wager-casual-19", "answer": "wager", "text": "that one took me like 8 minutes of staring, brutal", "label": "benign", "style": "wordle_chat", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "wager-evade-00", "answer": "wager", "text": "w-a-g-e-r ez today ngl", "label": "direct", "style": "separators", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "wager-evade-01", "answer": "wager", "text": "i'd w4g3r nobody got this in 3", "label": "direct", "style": "leet", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "wager-evade-02", "answer": "wager", "text": "We\nAll\nGot\nEasy\nRuns", "label": "direct", "style": "acrostic", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "wager-evade-03", "answer": "wager", "text": "my paycheck is a WAGE Ruined by rent lol", "label": "direct", "style": "hidden", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "wager-evade-04", "answer": "wager", "text": "🇼🇦g3🇷 done in 4", "label": "direct", "style": "emoji", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "wager-evade-05", "answer": "wager", "text": "basically a bet you'd place at a track", "label": "strong_hint", "style": "definition", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "wager-evade-06", "answer": "wager", "text": "rhymes with major but starts different", "label": "strong_hint", "style": "rhyme", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "wager-evade-07", "answer": "wager", "text": "apuesta for my spanish class friends 👀", "label": "strong_hint", "style": "translation", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "wager-evade-08", "answer": "wager", "text": "pascal had a famous one about god", "label": "strong_hint", "style": "reference", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "wager-evade-09", "answer": "wager", "text": "5 letters, gambling term, ends in -er, you're welcome", "label": "strong_hint", "style": "crossword", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "wager-evade-10", "answer": "wager", "text": "one vowel repeated, no double letters today", "label": "weak_hint", "style": "count", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "wager-evade-11", "answer": "wager", "text": "kinda casino vibes today", "label": "weak_hint", "style": "theme", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "wager-evade-12", "answer": "wager", "text": "there's a g in there somewhere and it wrecked me", "label": "weak_hint", "style": "letter", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "wager-evade-13", "answer": "wager", "text": "🟩🟨⬜⬜⬜\n🟩🟩🟩🟩🟩 lucky guess honestly", "label": "benign", "style": "wordle_chat", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "wager-evade-14", "answer": "wager", "text": "streak at 61 lets gooo", "label": "benign", "style": "wordle_chat", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "wager-evade-15", "answer": "wager", "text": "anyone else's water heater making a weird noise or just mine", "label": "benign", "style": "hard_benign", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "wager-evade-16", "answer": "wager", "text": "i need a raise, my wages have not moved in three years", "label": "benign", "style": "hard_benign", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "wager-evade-17", "answer": "wager", "text": "the waiter got our order completely wrong lmao", "label": "benign", "style": "hard_benign", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "wager-evade-18", "answer": "wager", "text": "who's down for smash later tonight", "label": "benign", "style": "chat", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "wager-evade-19", "answer": "wager", "text": "took me 5 but i started with a garbage opener as usual", "label": "benign", "style": "wordle_chat", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "wager-subtle-00", "answer": "wager", "text": "i'd wager most of you got this in 4", "label": "direct", "style": "plain", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "wager-subtle-01", "answer": "wager", "text": "w4g3r ez today ngl", "label": "direct", "style": "leet", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "wager-subtle-02", "answer": "wager", "text": "w-a-g-e-r and im out", "label": "direct", "style": "separators", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "wager-subtle-03", "answer": "wager", "text": "betting shops call it a wagering slip so yeah", "label": "direct", "style": "inflection", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "wager-subtle-04", "answer": "wager", "text": "Would\nAnyone\nGuess\nEver\nRight", "label": "direct", "style": "acrostic", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "wager-subtle-05", "answer": "wager", "text": "basically a bet but fancier, 5 letters", "label": "strong_hint", "style": "definition", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "wager-subtle-06", "answer": "wager", "text": "rhymes with major if you say it wrong lol, think staged money", "label": "strong_hint", "style": "rhyme", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "wager-subtle-07", "answer": "wager", "text": "pascal's famous one 😏", "label": "strong_hint", "style": "reference", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "wager-subtle-08", "answer": "wager", "text": "crossword clue: put money on it (5)", "label": "strong_hint", "style": "crossword", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "wager-subtle-09", "answer": "wager", "text": "in german it's wette. thats all im saying", "label": "strong_hint", "style": "translation", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "wager-subtle-10", "answer": "wager", "text": "gambling adjacent vibes today", "label": "weak_hint", "style": "theme", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "wager-subtle-11", "answer": "wager", "text": "ends in r, thats my only gift to you", "label": "weak_hint", "style": "letter", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "wager-subtle-12", "answer": "wager", "text": "two vowels, no repeats, pretty clean word", "label": "weak_hint", "style": "count", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "wager-subtle-13", "answer": "wager", "text": "3/6 today feeling smug", "label": "benign", "style": "wordle_chat", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "wager-subtle-14", "answer": "wager", "text": "🟨⬜⬜⬜⬜\n🟩🟩⬜🟨⬜\n🟩🟩🟩🟩🟩", "label": "benign", "style": "wordle_chat", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "wager-subtle-15", "answer": "wager", "text": "my streak died last tuesday and i still havent recovered", "label": "benign", "style": "wordle_chat", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "wager-subtle-16", "answer": "wager", "text": "anyone else going to the thing on saturday or is it just me", "label": "benign", "style": "chat", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "wager-subtle-17", "answer": "wager", "text": "water bill came in and i genuinely gasped", "label": "benign", "style": "hard_benign", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "wager-subtle-18", "answer": "wager", "text": "lost a tenner on the match last night, never betting on them again", "label": "benign", "style": "hard_benign", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "wager-subtle-19", "answer": "wager", "text": "the wagon in that movie was cooler than any of the characters", "label": "benign", "style": "hard_benign", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "stare-casual-00", "answer": "stare", "text": "stop trying to stare into my soul lol", "label": "direct", "style": "plain", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "stare-casual-01", "answer": "stare", "text": "5T4R3 got it in 4 today", "label": "direct", "style": "leet", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "stare-casual-02", "answer": "stare", "text": "s-t-a-r-e easiest one all week", "label": "direct", "style": "separators", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "stare-casual-03", "answer": "stare", "text": "she stares at the screen for like ten minutes before guessing anything", "label": "direct", "style": "inflection", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "stare-casual-04", "answer": "stare", "text": "honestly the answer is right there if u ju*st are* paying attention", "label": "direct", "style": "hidden", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "stare-casual-05", "answer": "stare", "text": "rhymes with glare and flare 👀", "label": "strong_hint", "style": "rhyme", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "stare-casual-06", "answer": "stare", "text": "to look at something fixedly for a long time", "label": "strong_hint", "style": "definition", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "stare-casual-07", "answer": "stare", "text": "👁️👁️➡️😐 that's the whole word", "label": "strong_hint", "style": "rebus", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "stare-casual-08", "answer": "stare", "text": "german would be starren, close enough", "label": "strong_hint", "style": "translation", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "stare-casual-09", "answer": "stare", "text": "if you look long into an abyss, the abyss also does this back at you", "label": "strong_hint", "style": "reference", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "stare-casual-10", "answer": "stare", "text": "one vowel repeated? nah just two vowels and they're both common ones", "label": "weak_hint", "style": "count", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "stare-casual-11", "answer": "stare", "text": "something you do with your eyes basically", "label": "weak_hint", "style": "category", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "stare-casual-12", "answer": "stare", "text": "ends in e, that helped a ton", "label": "weak_hint", "style": "letter", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "stare-casual-13", "answer": "stare", "text": "🟨⬜⬜🟩⬜\n⬜🟨🟩🟩⬜\n🟩🟩🟩🟩🟩 3/6 lucky", "label": "benign", "style": "wordle_chat", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "stare-casual-14", "answer": "stare", "text": "streak at 47 pls don't let me choke tmrw", "label": "benign", "style": "wordle_chat", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "stare-casual-15", "answer": "stare", "text": "anyone else's power flicker last night or just me", "label": "benign", "style": "chat", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "stare-casual-16", "answer": "stare", "text": "i started with rates and it did absolutely nothing for me", "label": "benign", "style": "hard_benign", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "stare-casual-17", "answer": "stare", "text": "my sister and her roommate are coming over for dinner", "label": "benign", "style": "hard_benign", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "stare-casual-18", "answer": "stare", "text": "the stairs at the new place are so steep i almost ate it twice", "label": "benign", "style": "hard_benign", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "stare-casual-19", "answer": "stare", "text": "gonna go get coffee brb, someone order me a bagel", "label": "benign", "style": "chat", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "stare-evade-00", "answer": "stare", "text": "s~t~a~r~e that's all im saying", "label": "direct", "style": "separators", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "stare-evade-01", "answer": "stare", "text": "5tar3 with an s in front lol easy day", "label": "direct", "style": "leet", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "stare-evade-02", "answer": "stare", "text": "my cat likes to just🇸🇹🇦🇷🇪 at the wall for hours", "label": "direct", "style": "emoji", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "stare-evade-03", "answer": "stare", "text": "iS That A Real Estimate? because i solved it in 3", "label": "direct", "style": "capitalization", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "stare-evade-04", "answer": "stare", "text": "the bus tare was too high so i walked", "label": "direct", "style": "hidden", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "stare-evade-05", "answer": "stare", "text": "rhymes with glare and flare, you're welcome", "label": "strong_hint", "style": "rhyme", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "stare-evade-06", "answer": "stare", "text": "what you do when someone won't stop looking at you on the train", "label": "strong_hint", "style": "definition", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "stare-evade-07", "answer": "stare", "text": "👀➕😐 for 5 minutes straight", "label": "strong_hint", "style": "rebus", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "stare-evade-08", "answer": "stare", "text": "if you gaze long into the abyss... you know the rest", "label": "strong_hint", "style": "reference", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "stare-evade-09", "answer": "stare", "text": "anagram of the thing you do at a restaurant when the bill comes plus... nah it's just rate scrambled", "label": "strong_hint", "style": "crossword", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "stare-evade-10", "answer": "stare", "text": "ends in e, that helped me a lot today", "label": "weak_hint", "style": "letter", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "stare-evade-11", "answer": "stare", "text": "one vowel doing all the heavy lifting today, plus the e at the end", "label": "weak_hint", "style": "count", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "stare-evade-12", "answer": "stare", "text": "today's is a verb about eyes basically", "label": "weak_hint", "style": "category", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "stare-evade-13", "answer": "stare", "text": "🟨⬜⬜🟨⬜ 🟩🟩⬜🟨⬜ 🟩🟩🟩🟩🟩 clutch save", "label": "benign", "style": "wordle_chat", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "stare-evade-14", "answer": "stare", "text": "streak at 47 dont talk to me", "label": "benign", "style": "wordle_chat", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "stare-evade-15", "answer": "stare", "text": "my starting word never works anymore i need a new one", "label": "benign", "style": "hard_benign", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "stare-evade-16", "answer": "stare", "text": "the stairs at my building are so steep i almost died carrying groceries", "label": "benign", "style": "hard_benign", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "stare-evade-17", "answer": "stare", "text": "anyone else think the stars looked crazy last night", "label": "benign", "style": "hard_benign", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "stare-evade-18", "answer": "stare", "text": "i got so lucky, green on the first guess and then panicked anyway", "label": "benign", "style": "wordle_chat", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "stare-evade-19", "answer": "stare", "text": "pizza tonight or are we doing the taco place again", "label": "benign", "style": "chat", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "stare-subtle-00", "answer": "stare", "text": "lmao i just sat there in a stare for like 5 mins before i saw it", "label": "direct", "style": "plain", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "stare-subtle-01", "answer": "stare", "text": "5t4r3 got me today ngl", "label": "direct", "style": "leet", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "stare-subtle-02", "answer": "stare", "text": "s-t-a-r-e ez", "label": "direct", "style": "separators", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "stare-subtle-03", "answer": "stare", "text": "guys stop staring at the board and just guess", "label": "direct", "style": "inflection", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "stare-subtle-04", "answer": "stare", "text": "Someone Tried Adding Random Endings", "label": "direct", "style": "acrostic", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "stare-subtle-05", "answer": "stare", "text": "rhymes with glare, same vibe too", "label": "strong_hint", "style": "rhyme", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "stare-subtle-06", "answer": "stare", "text": "to look fixedly at something without blinking", "label": "strong_hint", "style": "definition", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "stare-subtle-07", "answer": "stare", "text": "👁️👁️➕⏳", "label": "strong_hint", "style": "rebus", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "stare-subtle-08", "answer": "stare", "text": "_ T A R E and it's not the money one", "label": "strong_hint", "style": "positional", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "stare-subtle-09", "answer": "stare", "text": "contest of the eyes... you know the phrase, first one to blink loses", "label": "strong_hint", "style": "reference", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "stare-subtle-10", "answer": "stare", "text": "something you do with your face basically", "label": "weak_hint", "style": "category", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "stare-subtle-11", "answer": "stare", "text": "two vowels, one of em at the end", "label": "weak_hint", "style": "count", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "stare-subtle-12", "answer": "stare", "text": "way easier than yesterday, felt like a 3 guess day", "label": "weak_hint", "style": "theme", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "stare-subtle-13", "answer": "stare", "text": "wordle 1284 4/6 🟨⬜⬜🟩⬜ 🟩🟩⬜🟩⬜ ⬜⬜⬜⬜⬜ 🟩🟩🟩🟩🟩", "label": "benign", "style": "wordle_chat", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "stare-subtle-14", "answer": "stare", "text": "streak at 61 pls dont jinx me", "label": "benign", "style": "wordle_chat", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "stare-subtle-15", "answer": "stare", "text": "my starter is always crane, works like 80% of the time", "label": "benign", "style": "hard_benign", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "stare-subtle-16", "answer": "stare", "text": "the steak i made last night was actually elite 🥩", "label": "benign", "style": "hard_benign", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "stare-subtle-17", "answer": "stare", "text": "anyone else's eyes killing them from screens all day, i need blue light glasses", "label": "benign", "style": "hard_benign", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "stare-subtle-18", "answer": "stare", "text": "are we still doing trivia thurs or nah", "label": "benign", "style": "chat", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "stare-subtle-19", "answer": "stare", "text": "raining so hard my bus is 20 mins late 😭", "label": "benign", "style": "chat", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "plane-casual-00", "answer": "plane", "text": "my flight got delayed 4 hrs the plane hasnt even landed yet 😤", "label": "direct", "style": "plain", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "plane-casual-01", "answer": "plane", "text": "p1an3 lol got it in 3", "label": "direct", "style": "leet", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "plane-casual-02", "answer": "plane", "text": "p-l-a-n-e ez today", "label": "direct", "style": "separators", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "plane-casual-03", "answer": "plane", "text": "woodworking class today, we were shaving boards with hand planes", "label": "direct", "style": "inflection", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "plane-casual-04", "answer": "plane", "text": "help a\np\nl\na\nn\ne\nbrained take", "label": "direct", "style": "vertical", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "plane-casual-05", "answer": "plane", "text": "rhymes with brain but with an L in there somewhere 😏", "label": "strong_hint", "style": "rhyme", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "plane-casual-06", "answer": "plane", "text": "snakes on a ____ (1996? whatever) thats ur clue", "label": "strong_hint", "style": "reference", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "plane-casual-07", "answer": "plane", "text": "avión for my spanish speakers", "label": "strong_hint", "style": "translation", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "plane-casual-08", "answer": "plane", "text": "✈️ literally just that", "label": "strong_hint", "style": "rebus", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "plane-casual-09", "answer": "plane", "text": "a flat two dimensional surface OR the thing you board at the airport, same 5 letters", "label": "strong_hint", "style": "definition", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "plane-casual-10", "answer": "plane", "text": "transportation vibes today", "label": "weak_hint", "style": "category", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "plane-casual-11", "answer": "plane", "text": "two vowels and one of them shows up twice, thats all im saying", "label": "weak_hint", "style": "count", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "plane-casual-12", "answer": "plane", "text": "starts with p, good luck", "label": "weak_hint", "style": "letter", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "plane-casual-13", "answer": "plane", "text": "🟨⬜⬜⬜⬜\n⬜🟩🟩⬜🟨\n🟩🟩🟩🟩🟩 3/6 baby", "label": "benign", "style": "wordle_chat", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "plane-casual-14", "answer": "plane", "text": "streak at 112 pls dont let me forget tonight", "label": "benign", "style": "wordle_chat", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "plane-casual-15", "answer": "plane", "text": "anyone else getting rain rn or just me", "label": "benign", "style": "chat", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "plane-casual-16", "answer": "plane", "text": "i keep opening with adieu and i keep regretting it", "label": "benign", "style": "chat", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "plane-casual-17", "answer": "plane", "text": "my train was late again, uk rail is a joke", "label": "benign", "style": "hard_benign", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "plane-casual-18", "answer": "plane", "text": "pasta night. leftovers in the fridge if anyone wants", "label": "benign", "style": "hard_benign", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "plane-casual-19", "answer": "plane", "text": "the pilot episode of that show was so mid ngl", "label": "benign", "style": "hard_benign", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "plane-evade-00", "answer": "plane", "text": "p·l·a·n·e no big deal today", "label": "direct", "style": "separators", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "plane-evade-01", "answer": "plane", "text": "got it in 3, gonna go take a nap Later After No Exams tho", "label": "direct", "style": "capitalization", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "plane-evade-02", "answer": "plane", "text": "my dad flies a p1An3 for work btw", "label": "direct", "style": "leet", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "plane-evade-03", "answer": "plane", "text": "help i'm stuck on the last row 🇵🇱🇦🇳🇪", "label": "direct", "style": "emoji", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "plane-evade-04", "answer": "plane", "text": "the shop l🅰️ne was closed so i took the P one lol jk it's pl + ane", "label": "direct", "style": "hidden", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "plane-evade-05", "answer": "plane", "text": "rhymes with insane and it flies", "label": "strong_hint", "style": "rhyme", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "plane-evade-06", "answer": "plane", "text": "✈️ literally just that", "label": "strong_hint", "style": "rebus", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "plane-evade-07", "answer": "plane", "text": "french would be avion", "label": "strong_hint", "style": "translation", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "plane-evade-08", "answer": "plane", "text": "a flat surface in geometry, also a carpentry tool. 5 letters. ur welcome", "label": "strong_hint", "style": "definition", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "plane-evade-09", "answer": "plane", "text": "snakes on a ____ (2006)", "label": "strong_hint", "style": "reference", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "plane-evade-10", "answer": "plane", "text": "transportation vibes today", "label": "weak_hint", "style": "category", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "plane-evade-11", "answer": "plane", "text": "one vowel repeated? no wait. two different vowels, no doubles", "label": "weak_hint", "style": "count", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "plane-evade-12", "answer": "plane", "text": "ends in e which felt way too easy", "label": "weak_hint", "style": "letter", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "plane-evade-13", "answer": "plane", "text": "wordle 1234 4/6 ⬛🟨⬛⬛⬛ 🟨⬛🟩⬛⬛ ⬛🟩🟩🟩🟨 🟩🟩🟩🟩🟩", "label": "benign", "style": "wordle_chat", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "plane-evade-14", "answer": "plane", "text": "my flight got delayed 3 hrs at the airport i want to die", "label": "benign", "style": "hard_benign", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "plane-evade-15", "answer": "plane", "text": "streak at 91 lets goooo", "label": "benign", "style": "wordle_chat", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "plane-evade-16", "answer": "plane", "text": "planet fitness membership was a mistake, went twice", "label": "benign", "style": "hard_benign", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "plane-evade-17", "answer": "plane", "text": "pretty late already, need naps every evening lately", "label": "benign", "style": "hard_benign", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "plane-evade-18", "answer": "plane", "text": "anyone else's connections way harder than wordle today", "label": "benign", "style": "chat", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "plane-evade-19", "answer": "plane", "text": "brb dinner, mom made pasta again 🍝", "label": "benign", "style": "chat", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "plane-subtle-00", "answer": "plane", "text": "caught the red eye plane out of denver last night, never again", "label": "direct", "style": "plain", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "plane-subtle-01", "answer": "plane", "text": "p1an3 lol got it in 3", "label": "direct", "style": "leet", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "plane-subtle-02", "answer": "plane", "text": "p-l-a-n-e ez", "label": "direct", "style": "separators", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "plane-subtle-03", "answer": "plane", "text": "my flight got cancelled so now im stuck watching planes take off from the window", "label": "direct", "style": "inflection", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "plane-subtle-04", "answer": "plane", "text": "🇵🇱🇦🇳🇪 gg everyone", "label": "direct", "style": "emoji", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "plane-subtle-05", "answer": "plane", "text": "clue: a flat surface, or the thing that gets you to spain", "label": "strong_hint", "style": "definition", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "plane-subtle-06", "answer": "plane", "text": "rhymes with train but you can't take it to the office", "label": "strong_hint", "style": "rhyme", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "plane-subtle-07", "answer": "plane", "text": "el avión pero en ingles, thats all im saying", "label": "strong_hint", "style": "translation", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "plane-subtle-08", "answer": "plane", "text": "✈️🟰 today's answer basically", "label": "strong_hint", "style": "rebus", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "plane-subtle-09", "answer": "plane", "text": "snakes on a ____ (2006). good luck", "label": "strong_hint", "style": "reference", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "plane-subtle-10", "answer": "plane", "text": "transportation-ish vibes today", "label": "weak_hint", "style": "category", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "plane-subtle-11", "answer": "plane", "text": "only one vowel repeated? nope, two different ones and no doubles", "label": "weak_hint", "style": "count", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "plane-subtle-12", "answer": "plane", "text": "way easier than yesterday if you've ever been in an airport", "label": "weak_hint", "style": "theme", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "plane-subtle-13", "answer": "plane", "text": "4/6 today, opener was useless as usual", "label": "benign", "style": "wordle_chat", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "plane-subtle-14", "answer": "plane", "text": "🟨⬜⬜⬜⬜\n⬜🟩🟨⬜⬜\n🟩🟩🟩🟩🟩", "label": "benign", "style": "wordle_chat", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "plane-subtle-15", "answer": "plane", "text": "is anyone actually free for dinner thursday or am i talking to myself", "label": "benign", "style": "chat", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "plane-subtle-16", "answer": "plane", "text": "streak at 61 baby, dont talk to me", "label": "benign", "style": "wordle_chat", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "plane-subtle-17", "answer": "plane", "text": "i started with PLANT and it did NOT help me at all lmao", "label": "benign", "style": "hard_benign", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "plane-subtle-18", "answer": "plane", "text": "my train was 40 mins late again, transport in this country is a joke", "label": "benign", "style": "hard_benign", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "plane-subtle-19", "answer": "plane", "text": "nepal apparently has the wildest airport landings, saw a video and now im scared", "label": "benign", "style": "hard_benign", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "light-casual-00", "answer": "light", "text": "can someone please turn off the light in the hallway i'm trying to sleep", "label": "direct", "style": "plain", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "light-casual-01", "answer": "light", "text": "today was l1gh7 work honestly 2/6", "label": "direct", "style": "leet", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "light-casual-02", "answer": "light", "text": "l\ni\ng\nh\nt", "label": "direct", "style": "vertical", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "light-casual-03", "answer": "light", "text": "that dinner was absolutely delightful ngl", "label": "direct", "style": "hidden", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "light-casual-04", "answer": "light", "text": "my landlord still hasnt fixed the lights in the stairwell", "label": "direct", "style": "inflection", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "light-casual-05", "answer": "light", "text": "rhymes with night but its not night, thats all im saying", "label": "strong_hint", "style": "rhyme", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "light-casual-06", "answer": "light", "text": "basically the opposite of heavy, or the opposite of dark, works either way", "label": "strong_hint", "style": "definition", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "light-casual-07", "answer": "light", "text": "germans would just type licht and be done with it 🇩🇪", "label": "strong_hint", "style": "translation", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "light-casual-08", "answer": "light", "text": "💡", "label": "strong_hint", "style": "rebus", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "light-casual-09", "answer": "light", "text": "let there be ______ 📖", "label": "strong_hint", "style": "reference", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "light-casual-10", "answer": "light", "text": "kinda a physics-y word today", "label": "weak_hint", "style": "category", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "light-casual-11", "answer": "light", "text": "starts with L for anyone stuck", "label": "weak_hint", "style": "letter", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "light-casual-12", "answer": "light", "text": "one vowel only, good luck lmao", "label": "weak_hint", "style": "count", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "light-casual-13", "answer": "light", "text": "4/6 streak alive 🙏", "label": "benign", "style": "wordle_chat", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "light-casual-14", "answer": "light", "text": "⬛🟨⬛⬛⬛\n🟩⬛🟨⬛⬛\n🟩🟩🟩🟩🟩", "label": "benign", "style": "wordle_chat", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "light-casual-15", "answer": "light", "text": "anyone down for val later? i'm free after 9", "label": "benign", "style": "chat", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "light-casual-16", "answer": "light", "text": "my cat just knocked an entire mug of tea onto the rug", "label": "benign", "style": "chat", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "light-casual-17", "answer": "light", "text": "the night bus took like 40 mins to show up, never again", "label": "benign", "style": "hard_benign", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "light-casual-18", "answer": "light", "text": "these jeans are way too tight after the holidays lol", "label": "benign", "style": "hard_benign", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "light-casual-19", "answer": "light", "text": "sun was absolutely brutal on the hike, i got roasted", "label": "benign", "style": "hard_benign", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "light-evade-00", "answer": "light", "text": "l·i·g·h·t work today ngl", "label": "direct", "style": "separators", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "light-evade-01", "answer": "light", "text": "1i9h7 mode activated", "label": "direct", "style": "leet", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "light-evade-02", "answer": "light", "text": "loved it\niffy start tho\nguessed row 2\nheavy sigh\ntook 4", "label": "direct", "style": "acrostic", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "light-evade-03", "answer": "light", "text": "someone pls turn the 🇱🇮🇬🇭🇹 on in here", "label": "direct", "style": "emoji", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "light-evade-04", "answer": "light", "text": "my braIn is turninG on tHe ligThouse ok i mean im fine", "label": "direct", "style": "capitalization", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "light-evade-05", "answer": "light", "text": "opposite of heavy, or of dark. take your pick", "label": "strong_hint", "style": "definition", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "light-evade-06", "answer": "light", "text": "rhymes with night and might, you're welcome", "label": "strong_hint", "style": "rhyme", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "light-evade-07", "answer": "light", "text": "luz 💡", "label": "strong_hint", "style": "translation", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "light-evade-08", "answer": "light", "text": "💡 but as a word", "label": "strong_hint", "style": "rebus", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "light-evade-09", "answer": "light", "text": "ends in T, has that -GHT combo everyone forgets exists", "label": "strong_hint", "style": "positional", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "light-evade-10", "answer": "light", "text": "one vowel only today, brutal", "label": "weak_hint", "style": "count", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "light-evade-11", "answer": "light", "text": "kinda physics-y vibe to this one", "label": "weak_hint", "style": "theme", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "light-evade-12", "answer": "light", "text": "starts with L for the ppl struggling", "label": "weak_hint", "style": "letter", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "light-evade-13", "answer": "light", "text": "4/6 phew that was close", "label": "benign", "style": "wordle_chat", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "light-evade-14", "answer": "light", "text": "🟨⬜⬜⬜⬜\n⬜🟩🟨⬜⬜\n🟩🟩🟩🟩🟩", "label": "benign", "style": "wordle_chat", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "light-evade-15", "answer": "light", "text": "streak at 61 lets gooo", "label": "benign", "style": "wordle_chat", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "light-evade-16", "answer": "light", "text": "i left the lamp on all night again my electric bill is gonna cry", "label": "benign", "style": "hard_benign", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "light-evade-17", "answer": "light", "text": "got it in 3 but only bc my first guess was lucky", "label": "benign", "style": "wordle_chat", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "light-evade-18", "answer": "light", "text": "tight schedule tmrw so im logging off early", "label": "benign", "style": "hard_benign", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "light-evade-19", "answer": "light", "text": "anyone else's power flicker earlier or just me", "label": "benign", "style": "chat", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "light-subtle-00", "answer": "light", "text": "can someone turn on the light in here its so dark lol", "label": "direct", "style": "plain", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "light-subtle-01", "answer": "light", "text": "l1ght in 3 today ez", "label": "direct", "style": "leet", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "light-subtle-02", "answer": "light", "text": "l-i-g-h-t and im done bye", "label": "direct", "style": "separators", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "light-subtle-03", "answer": "light", "text": "🇱🇮🇬🇭🇹 boom", "label": "direct", "style": "emoji", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "light-subtle-04", "answer": "light", "text": "my lights keep flickering btw, unrelated to anything", "label": "direct", "style": "inflection", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "light-subtle-05", "answer": "light", "text": "rhymes with night, took me 5 guesses", "label": "strong_hint", "style": "rhyme", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "light-subtle-06", "answer": "light", "text": "basically the opposite of heavy AND the opposite of dark at the same time", "label": "strong_hint", "style": "definition", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "light-subtle-07", "answer": "light", "text": "en español sería luz 🤷", "label": "strong_hint", "style": "translation", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "light-subtle-08", "answer": "light", "text": "💡", "label": "strong_hint", "style": "rebus", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "light-subtle-09", "answer": "light", "text": "guess the thing you see at the end of the tunnel", "label": "strong_hint", "style": "reference", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "light-subtle-10", "answer": "light", "text": "has that -ght ending that always wrecks me", "label": "weak_hint", "style": "letter", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "light-subtle-11", "answer": "light", "text": "only one vowel today gl", "label": "weak_hint", "style": "count", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "light-subtle-12", "answer": "light", "text": "very physics classroom energy today", "label": "weak_hint", "style": "theme", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "light-subtle-13", "answer": "light", "text": "🟨⬛⬛⬛⬛\n🟩🟩⬛⬛⬛\n🟩🟩🟩🟩🟩 clutch", "label": "benign", "style": "wordle_chat", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "light-subtle-14", "answer": "light", "text": "streak 87 baby dont talk to me", "label": "benign", "style": "wordle_chat", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "light-subtle-15", "answer": "light", "text": "that was way harder than yesterday ngl", "label": "benign", "style": "wordle_chat", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "light-subtle-16", "answer": "light", "text": "anyone down for valorant tonight around 9", "label": "benign", "style": "chat", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "light-subtle-17", "answer": "light", "text": "my flight got delayed again im losing it", "label": "benign", "style": "hard_benign", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "light-subtle-18", "answer": "light", "text": "the sunset over the lake was unreal yesterday, took like 40 pics", "label": "benign", "style": "hard_benign", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "light-subtle-19", "answer": "light", "text": "i keep tightening this screw and it just wont hold", "label": "benign", "style": "hard_benign", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "crane-casual-00", "answer": "crane", "text": "there's a giant crane outside my apartment and it's been beeping since 6am", "label": "direct", "style": "plain", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "crane-casual-01", "answer": "crane", "text": "c-r-a-n-e literally opener word too, felt like cheating", "label": "direct", "style": "separators", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "crane-casual-02", "answer": "crane", "text": "answer today: cr4n3 😭", "label": "direct", "style": "leet", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "crane-casual-03", "answer": "crane", "text": "C\nR\nA\nN\nE\nyeah", "label": "direct", "style": "vertical", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "crane-casual-04", "answer": "crane", "text": "my uncle operates cranes for a living, never been more useful info", "label": "direct", "style": "inflection", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "crane-casual-05", "answer": "crane", "text": "big bird with long legs, or the thing that lifts steel beams", "label": "strong_hint", "style": "definition", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "crane-casual-06", "answer": "crane", "text": "rhymes with plane and brain 🙃", "label": "strong_hint", "style": "rhyme", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "crane-casual-07", "answer": "crane", "text": "think frasier's last name", "label": "strong_hint", "style": "reference", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "crane-casual-08", "answer": "crane", "text": "in japanese it's 鶴, fold a thousand of them", "label": "strong_hint", "style": "translation", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "crane-casual-09", "answer": "crane", "text": "🏗️🐦", "label": "strong_hint", "style": "rebus", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "crane-casual-10", "answer": "crane", "text": "it's an animal today, kinda", "label": "weak_hint", "style": "category", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "crane-casual-11", "answer": "crane", "text": "only one vowel repeated? nah two different vowels, no doubles", "label": "weak_hint", "style": "count", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "crane-casual-12", "answer": "crane", "text": "construction site vibes ngl", "label": "weak_hint", "style": "theme", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "crane-casual-13", "answer": "crane", "text": "Wordle 1,234 4/6\n⬜🟨⬜⬜🟩\n⬜🟨🟩⬜🟩\n🟨🟩🟩⬜🟩\n🟩🟩🟩🟩🟩", "label": "benign", "style": "wordle_chat", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "crane-casual-14", "answer": "crane", "text": "streak at 62 lets gooo", "label": "benign", "style": "wordle_chat", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "crane-casual-15", "answer": "crane", "text": "who's down for valorant tonight", "label": "benign", "style": "chat", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "crane-casual-16", "answer": "crane", "text": "i started with crate like i always do and it did nothing for me", "label": "benign", "style": "hard_benign", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "crane-casual-17", "answer": "crane", "text": "got absolutely craned by my boss today, 3 hours of overtime", "label": "benign", "style": "hard_benign", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "crane-casual-18", "answer": "crane", "text": "anyone else's coffee taste like sadness this morning", "label": "benign", "style": "chat", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "crane-casual-19", "answer": "crane", "text": "took me 5, brain fully offline before noon", "label": "benign", "style": "hard_benign", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "crane-evade-00", "answer": "crane", "text": "c~r~a~n~e ez mode today ngl", "label": "direct", "style": "separators", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "crane-evade-01", "answer": "crane", "text": "answer is 🇨 🇷 a 🇳 e go figure", "label": "direct", "style": "emoji", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "crane-evade-02", "answer": "crane", "text": "couldn't\nreally\nargue\nnailed\neasily", "label": "direct", "style": "acrostic", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "crane-evade-03", "answer": "crane", "text": "honestly i Couldn't Remember A Normal Everyday word for like 4 guesses lmao", "label": "direct", "style": "capitalization", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "crane-evade-04", "answer": "crane", "text": "full panic ran early this morning but i got it in 3", "label": "direct", "style": "hidden", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "crane-evade-05", "answer": "crane", "text": "long necked bird that doubles as construction equipment. thats all im saying", "label": "strong_hint", "style": "definition", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "crane-evade-06", "answer": "crane", "text": "rhymes with mane and pain 🐦", "label": "strong_hint", "style": "rhyme", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "crane-evade-07", "answer": "crane", "text": "my german friend just texted me 'kranich' and now i feel dumb", "label": "strong_hint", "style": "translation", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "crane-evade-08", "answer": "crane", "text": "frasier would get this one in 1", "label": "strong_hint", "style": "reference", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "crane-evade-09", "answer": "crane", "text": "🏗️ = 🐦 today. thats the whole puzzle", "label": "strong_hint", "style": "rebus", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "crane-evade-10", "answer": "crane", "text": "if you open with a bird word you're eating good today", "label": "weak_hint", "style": "category", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "crane-evade-11", "answer": "crane", "text": "the third letter is a, that's my only gift to you", "label": "weak_hint", "style": "letter", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "crane-evade-12", "answer": "crane", "text": "two vowels, no repeats, should be quick", "label": "weak_hint", "style": "count", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "crane-evade-13", "answer": "crane", "text": "🟨⬜⬜🟩⬜\n⬜🟨🟩🟩⬜\n🟩🟩🟩🟩🟩\nwordle 4/6 phew", "label": "benign", "style": "wordle_chat", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "crane-evade-14", "answer": "crane", "text": "streak at 61 baby 😤", "label": "benign", "style": "wordle_chat", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "crane-evade-15", "answer": "crane", "text": "my brain is completely fried today, took me forever", "label": "benign", "style": "hard_benign", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "crane-evade-16", "answer": "crane", "text": "someone grab a crate of drinks for saturday pls", "label": "benign", "style": "hard_benign", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "crane-evade-17", "answer": "crane", "text": "the rain here is insane, cant even walk to the shop", "label": "benign", "style": "hard_benign", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "crane-evade-18", "answer": "crane", "text": "anyone watching the game tonight or am i solo again", "label": "benign", "style": "chat", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "crane-evade-19", "answer": "crane", "text": "i had to guess randomly and somehow got lucky lol dont ask me how", "label": "benign", "style": "wordle_chat", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "crane-subtle-00", "answer": "crane", "text": "there's a crane parked outside my apartment and it woke me up at 6am, also that was todays answer lol", "label": "direct", "style": "plain", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "crane-subtle-01", "answer": "crane", "text": "c-r-a-n-e ez clap", "label": "direct", "style": "separators", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "crane-subtle-02", "answer": "crane", "text": "cr4n3 in 3 not bad", "label": "direct", "style": "leet", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "crane-subtle-03", "answer": "crane", "text": "my starter was so lucky today, cranes fly right in on turn 1", "label": "direct", "style": "inflection", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "crane-subtle-04", "answer": "crane", "text": "c\nr\na\nn\ne", "label": "direct", "style": "vertical", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "crane-subtle-05", "answer": "crane", "text": "rhymes with plane but starts like crab 🏗️", "label": "strong_hint", "style": "rhyme", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "crane-subtle-06", "answer": "crane", "text": "big machine that lifts steel beams on construction sites, also a long legged bird. same word", "label": "strong_hint", "style": "definition", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "crane-subtle-07", "answer": "crane", "text": "1000 paper ____ 🕊️ if u know origami u already got it", "label": "strong_hint", "style": "reference", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "crane-subtle-08", "answer": "crane", "text": "in german it's Kranich 👀", "label": "strong_hint", "style": "translation", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "crane-subtle-09", "answer": "crane", "text": "c _ a _ e with an n in the 4th spot, only one real word left there", "label": "strong_hint", "style": "positional", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "crane-subtle-10", "answer": "crane", "text": "it's a bird one today ig", "label": "weak_hint", "style": "category", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "crane-subtle-11", "answer": "crane", "text": "only one vowel pair and no repeats, pretty clean word", "label": "weak_hint", "style": "count", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "crane-subtle-12", "answer": "crane", "text": "ends in e like yesterdays did, felt very similar", "label": "weak_hint", "style": "theme", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "crane-subtle-13", "answer": "crane", "text": "🟨⬜⬜🟩⬜\n⬜🟨🟩🟩⬜\n🟩🟩🟩🟩🟩 3/6 phew", "label": "benign", "style": "wordle_chat", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "crane-subtle-14", "answer": "crane", "text": "streak at 47 do not talk to me until i've had coffee", "label": "benign", "style": "wordle_chat", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "crane-subtle-15", "answer": "crane", "text": "anyone else's train delayed this morning or just me", "label": "benign", "style": "hard_benign", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "crane-subtle-16", "answer": "crane", "text": "i keep opening with CRATE every single day and it has never once failed me as a starter", "label": "benign", "style": "hard_benign", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "crane-subtle-17", "answer": "crane", "text": "my neighbour's new fence is crooked as hell, nancy is gonna complain about it for a week", "label": "benign", "style": "hard_benign", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "crane-subtle-18", "answer": "crane", "text": "who's down for board games friday", "label": "benign", "style": "chat", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "crane-subtle-19", "answer": "crane", "text": "went to the zoo saturday, the flamingos were honestly rude to me", "label": "benign", "style": "hard_benign", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "house-casual-00", "answer": "house", "text": "guys i left my keys at the house again lmao", "label": "direct", "style": "plain", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "house-casual-01", "answer": "house", "text": "h0u5e in 3 today feeling smug", "label": "direct", "style": "leet", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "house-casual-02", "answer": "house", "text": "h-o-u-s-e ez", "label": "direct", "style": "separators", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "house-casual-03", "answer": "house", "text": "we're painting the houses on our street this weekend, everyone got green somehow", "label": "direct", "style": "inflection", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "house-casual-04", "answer": "house", "text": "🇭🇴🇺🇸🇪 boom", "label": "direct", "style": "emoji", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "house-casual-05", "answer": "house", "text": "a building where people live, come on now", "label": "strong_hint", "style": "definition", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "house-casual-06", "answer": "house", "text": "rhymes with mouse and it's not blouse", "label": "strong_hint", "style": "rhyme", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "house-casual-07", "answer": "house", "text": "casa 🇪🇸 that's all im saying", "label": "strong_hint", "style": "translation", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "house-casual-08", "answer": "house", "text": "🏠 literally just this", "label": "strong_hint", "style": "rebus", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "house-casual-09", "answer": "house", "text": "gryffindor is one of these at hogwarts 👀", "label": "strong_hint", "style": "reference", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "house-casual-10", "answer": "house", "text": "today's is very much a 'place' word", "label": "weak_hint", "style": "category", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "house-casual-11", "answer": "house", "text": "two vowels and they're not next to each other for once", "label": "weak_hint", "style": "count", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "house-casual-12", "answer": "house", "text": "starts with h, that's your freebie", "label": "weak_hint", "style": "letter", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "house-casual-13", "answer": "house", "text": "🟨⬜⬜🟩⬜\n⬜🟨🟩🟩⬜\n🟩🟩🟩🟩🟩 3/6 phew", "label": "benign", "style": "wordle_chat", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "house-casual-14", "answer": "house", "text": "streak at 47 and my hands were sweating ngl", "label": "benign", "style": "wordle_chat", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "house-casual-15", "answer": "house", "text": "anyone else's connections absolutely brutal today", "label": "benign", "style": "chat", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "house-casual-16", "answer": "house", "text": "im making pasta tonight, someone bring garlic bread pls", "label": "benign", "style": "chat", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "house-casual-17", "answer": "house", "text": "the mouse in my kitchen has beaten three traps at this point, respect", "label": "benign", "style": "hard_benign", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "house-casual-18", "answer": "house", "text": "my horse riding lesson got cancelled because of the rain 😤", "label": "benign", "style": "hard_benign", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "house-casual-19", "answer": "house", "text": "we should all get a big airbnb for new years, i'll look at listings", "label": "benign", "style": "hard_benign", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "house-evade-00", "answer": "house", "text": "h·o·u·s·e took me 5 today lmao", "label": "direct", "style": "separators", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "house-evade-01", "answer": "house", "text": "got it after guessing h0u5e on a whim", "label": "direct", "style": "leet", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "house-evade-02", "answer": "house", "text": "honestly other users struggle every day", "label": "direct", "style": "acrostic", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "house-evade-03", "answer": "house", "text": "my brain went straight to🇭🇴u🇸e and it just worked", "label": "direct", "style": "emoji", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "house-evade-04", "answer": "house", "text": "i really thought oH OU Sure Enough it was that easy", "label": "direct", "style": "capitalization", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "house-evade-05", "answer": "house", "text": "rhymes with mouse, thank me later", "label": "strong_hint", "style": "rhyme", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "house-evade-06", "answer": "house", "text": "casa in spanish btw 👀", "label": "strong_hint", "style": "translation", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "house-evade-07", "answer": "house", "text": "🏠 that's it that's the post", "label": "strong_hint", "style": "rebus", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "house-evade-08", "answer": "house", "text": "there's a hbo show about dragons and a certain building type... yeah", "label": "strong_hint", "style": "reference", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "house-evade-09", "answer": "house", "text": "the place you live in, 5 letters, not home", "label": "strong_hint", "style": "definition", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "house-evade-10", "answer": "house", "text": "today is very much an architecture vibe", "label": "weak_hint", "style": "theme", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "house-evade-11", "answer": "house", "text": "3 vowels today which felt illegal", "label": "weak_hint", "style": "count", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "house-evade-12", "answer": "house", "text": "ends in e like half the answers this month", "label": "weak_hint", "style": "letter", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "house-evade-13", "answer": "house", "text": "4/6 today, saved by a lucky third guess", "label": "benign", "style": "wordle_chat", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "house-evade-14", "answer": "house", "text": "🟨⬛⬛⬛⬛\n⬛🟩🟨⬛⬛\n🟩🟩🟩🟩🟩", "label": "benign", "style": "wordle_chat", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "house-evade-15", "answer": "house", "text": "anyone else's mouse dying constantly or is it just my desk", "label": "benign", "style": "hard_benign", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "house-evade-16", "answer": "house", "text": "we were out at the pub til 2am, i'm dead today", "label": "benign", "style": "chat", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "house-evade-17", "answer": "house", "text": "my streak is at 137 and i'm terrified", "label": "benign", "style": "wordle_chat", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "house-evade-18", "answer": "house", "text": "gonna go hose down the patio before it rains again", "label": "benign", "style": "hard_benign", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "house-evade-19", "answer": "house", "text": "is the new season out yet or am i thinking of next week", "label": "benign", "style": "chat", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "house-subtle-00", "answer": "house", "text": "cant believe i needed 5 tries for house lmao", "label": "direct", "style": "plain", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "house-subtle-01", "answer": "house", "text": "h0u5e in 3 today, feeling smug", "label": "direct", "style": "leet", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "house-subtle-02", "answer": "house", "text": "h-o-u-s-e. that easy huh", "label": "direct", "style": "separators", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "house-subtle-03", "answer": "house", "text": "guessed housed first and got 4 yellows, pain", "label": "direct", "style": "inflection", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "house-subtle-04", "answer": "house", "text": "Honestly\nOnly\nUsed\nSeven\nExtra guesses lol", "label": "direct", "style": "acrostic", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "house-subtle-05", "answer": "house", "text": "rhymes with mouse and it's not blouse or louse", "label": "strong_hint", "style": "rhyme", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "house-subtle-06", "answer": "house", "text": "la casa 🇪🇸 for anyone stuck", "label": "strong_hint", "style": "translation", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "house-subtle-07", "answer": "house", "text": "a building where people live, 5 letters, silent e", "label": "strong_hint", "style": "definition", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "house-subtle-08", "answer": "house", "text": "🏠 that's it that's the puzzle", "label": "strong_hint", "style": "rebus", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "house-subtle-09", "answer": "house", "text": "think of that hugh laurie medical show", "label": "strong_hint", "style": "reference", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "house-subtle-10", "answer": "house", "text": "todays one is a thing you can be inside of rn probably", "label": "weak_hint", "style": "category", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "house-subtle-11", "answer": "house", "text": "two vowels stuck together in the middle, thats all im saying", "label": "weak_hint", "style": "count", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "house-subtle-12", "answer": "house", "text": "way easier than yesterday if you start with a common noun", "label": "weak_hint", "style": "theme", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "house-subtle-13", "answer": "house", "text": "🟨🟨⬜⬜⬜\n🟩🟩🟩⬜⬜\n🟩🟩🟩🟩🟩 clutch", "label": "benign", "style": "wordle_chat", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "house-subtle-14", "answer": "house", "text": "streak at 141 pls dont let me forget tomorrow", "label": "benign", "style": "wordle_chat", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "house-subtle-15", "answer": "house", "text": "anyone else's connections purple category make zero sense today", "label": "benign", "style": "chat", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "house-subtle-16", "answer": "house", "text": "the mouse on my work laptop is dying, keeps double clicking everything", "label": "benign", "style": "hard_benign", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "house-subtle-17", "answer": "house", "text": "just signed the lease on the new place, moving in saturday 🎉", "label": "benign", "style": "hard_benign", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "house-subtle-18", "answer": "house", "text": "opened with slate again like the coward i am", "label": "benign", "style": "hard_benign", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "house-subtle-19", "answer": "house", "text": "brb making dinner, someone remind me to take the bins out", "label": "benign", "style": "chat", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "piano-casual-00", "answer": "piano", "text": "i literally have a piano lesson in 20 mins lol what a coincidence", "label": "direct", "style": "plain", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "piano-casual-01", "answer": "piano", "text": "p1@n0 ez today ngl", "label": "direct", "style": "leet", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "piano-casual-02", "answer": "piano", "text": "p-i-a-n-o and im done in 3", "label": "direct", "style": "separators", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "piano-casual-03", "answer": "piano", "text": "my neighbor pianos at 6am every day and i hate him", "label": "direct", "style": "inflection", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "piano-casual-04", "answer": "piano", "text": "🇵🇮🇦🇳🇴 gg everyone", "label": "direct", "style": "emoji", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "piano-casual-05", "answer": "piano", "text": "88 keys, black and white, sits in your living room", "label": "strong_hint", "style": "definition", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "piano-casual-06", "answer": "piano", "text": "in italian it also means 'slowly' or 'softly' 🤌", "label": "strong_hint", "style": "translation", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "piano-casual-07", "answer": "piano", "text": "🎹", "label": "strong_hint", "style": "rebus", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "piano-casual-08", "answer": "piano", "text": "elton john's whole career in five letters", "label": "strong_hint", "style": "reference", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "piano-casual-09", "answer": "piano", "text": "starts like 'pin', ends in the letter that starts 'october', has 3 vowels in a row", "label": "strong_hint", "style": "sequence", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "piano-casual-10", "answer": "piano", "text": "musical vibes today", "label": "weak_hint", "style": "theme", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "piano-casual-11", "answer": "piano", "text": "three vowels?? in a five letter word?? rude", "label": "weak_hint", "style": "count", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "piano-casual-12", "answer": "piano", "text": "if you know one instrument you're basically done", "label": "weak_hint", "style": "category", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "piano-casual-13", "answer": "piano", "text": "Wordle 1,203 3/6 ⬜🟨⬜⬜⬜ 🟩🟩⬜🟨⬜ 🟩🟩🟩🟩🟩", "label": "benign", "style": "wordle_chat", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "piano-casual-14", "answer": "piano", "text": "27 day streak baby 😤", "label": "benign", "style": "wordle_chat", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "piano-casual-15", "answer": "piano", "text": "anyone else's train delayed again this morning", "label": "benign", "style": "chat", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "piano-casual-16", "answer": "piano", "text": "i had a panic moment on line 4 not gonna lie", "label": "benign", "style": "hard_benign", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "piano-casual-17", "answer": "piano", "text": "pain. that's it that's the review of my monday", "label": "benign", "style": "hard_benign", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "piano-casual-18", "answer": "piano", "text": "my guitar strings are so dead i need new ones", "label": "benign", "style": "hard_benign", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "piano-casual-19", "answer": "piano", "text": "who's down for food later, im thinking thai", "label": "benign", "style": "chat", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "piano-evade-00", "answer": "piano", "text": "p1@n0 lessons paid off today lol", "label": "direct", "style": "leet", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "piano-evade-01", "answer": "piano", "text": "p.i.a.n.o but like, no reason for the dots", "label": "direct", "style": "separators", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "piano-evade-02", "answer": "piano", "text": "🅿️i🅰️n🅾️ vibes today", "label": "direct", "style": "emoji", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "piano-evade-03", "answer": "piano", "text": "my grandPa IAlways NOticed had one in the hallway", "label": "direct", "style": "capitalization", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "piano-evade-04", "answer": "piano", "text": "the ostrich saw the mediciNO in the field, weird sentence i know", "label": "direct", "style": "hidden", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "piano-evade-05", "answer": "piano", "text": "my grandma had one in her living room, nobody ever played it", "label": "strong_hint", "style": "definition", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "piano-evade-06", "answer": "piano", "text": "88 keys and i still needed 5 guesses", "label": "strong_hint", "style": "crossword", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "piano-evade-07", "answer": "piano", "text": "🎹 literally just that", "label": "strong_hint", "style": "rebus", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "piano-evade-08", "answer": "piano", "text": "same word in spanish and italian, translators hate this one", "label": "strong_hint", "style": "translation", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "piano-evade-09", "answer": "piano", "text": "3 vowels in a row at the end, only one thing it can be tbh", "label": "strong_hint", "style": "positional", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "piano-evade-10", "answer": "piano", "text": "todays one is an instrument if that helps anyone", "label": "weak_hint", "style": "category", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "piano-evade-11", "answer": "piano", "text": "way more vowels than consonants today, brutal", "label": "weak_hint", "style": "count", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "piano-evade-12", "answer": "piano", "text": "kinda musical theme going on this week huh", "label": "weak_hint", "style": "theme", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "piano-evade-13", "answer": "piano", "text": "3/6 today, got lucky with my starter", "label": "benign", "style": "wordle_chat", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "piano-evade-14", "answer": "piano", "text": "🟨⬛⬛⬛⬛\n⬛🟩🟨⬛⬛\n🟩🟩🟩🟩🟩", "label": "benign", "style": "wordle_chat", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "piano-evade-15", "answer": "piano", "text": "streak at 47 pls dont let me lose it", "label": "benign", "style": "wordle_chat", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "piano-evade-16", "answer": "piano", "text": "anyone down for valorant in like an hour", "label": "benign", "style": "chat", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "piano-evade-17", "answer": "piano", "text": "my plant is dying and i water it every day, what am i doing wrong", "label": "benign", "style": "hard_benign", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "piano-evade-18", "answer": "piano", "text": "got a pain in my knee from running yesterday, ouch", "label": "benign", "style": "hard_benign", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "piano-evade-19", "answer": "piano", "text": "the neighbours upstairs were blasting music till 2am again i swear", "label": "benign", "style": "hard_benign", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "piano-subtle-00", "answer": "piano", "text": "my sister has been practicing piano all morning so honestly this was free", "label": "direct", "style": "plain", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "piano-subtle-01", "answer": "piano", "text": "p1@n0 lmao took me 5", "label": "direct", "style": "leet", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "piano-subtle-02", "answer": "piano", "text": "p-i-a-n-o and i still needed 4 guesses", "label": "direct", "style": "separators", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "piano-subtle-03", "answer": "piano", "text": "pretty\nimpossible\nand\nnow\nover", "label": "direct", "style": "acrostic", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "piano-subtle-04", "answer": "piano", "text": "got it from #pianowordle trending on twitter lol don't ask", "label": "direct", "style": "url", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "piano-subtle-05", "answer": "piano", "text": "88 keys 🎹 you're welcome", "label": "strong_hint", "style": "rebus", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "piano-subtle-06", "answer": "piano", "text": "rhymes with sorta like \"chiano\"... ok that's not a word but you get it", "label": "strong_hint", "style": "rhyme", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "piano-subtle-07", "answer": "piano", "text": "three vowels in a row in the middle, only one word does that", "label": "strong_hint", "style": "positional", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "piano-subtle-08", "answer": "piano", "text": "in italian it also means \"slowly\" or \"flat\" 👀", "label": "strong_hint", "style": "translation", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "piano-subtle-09", "answer": "piano", "text": "large keyboard instrument with strings and hammers (5)", "label": "strong_hint", "style": "crossword", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "piano-subtle-10", "answer": "piano", "text": "musical today, hope you all like the arts", "label": "weak_hint", "style": "category", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "piano-subtle-11", "answer": "piano", "text": "four different vowels in one 5 letter word is EVIL", "label": "weak_hint", "style": "count", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "piano-subtle-12", "answer": "piano", "text": "starts with p and i went through like 3 wrong p words", "label": "weak_hint", "style": "letter", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "piano-subtle-13", "answer": "piano", "text": "3/6 today, guessed lucky on the second row", "label": "benign", "style": "wordle_chat", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "piano-subtle-14", "answer": "piano", "text": "🟨⬜⬜⬜⬜\n⬜🟩🟨⬜⬜\n🟩🟩🟩🟩🟩", "label": "benign", "style": "wordle_chat", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "piano-subtle-15", "answer": "piano", "text": "anyone else's streak die last week or was that just me being dumb at 1am", "label": "benign", "style": "wordle_chat", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "piano-subtle-16", "answer": "piano", "text": "my neighbour's kid is learning trumpet and i want to move house", "label": "benign", "style": "hard_benign", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "piano-subtle-17", "answer": "piano", "text": "opened with adieu again, terrible habit i know", "label": "benign", "style": "hard_benign", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "piano-subtle-18", "answer": "piano", "text": "pain au chocolat for breakfast, i am a european now", "label": "benign", "style": "hard_benign", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "piano-subtle-19", "answer": "piano", "text": "are we still doing movie night friday or nah", "label": "benign", "style": "chat", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "ghost-casual-00", "answer": "ghost", "text": "lmao i totally saw the ghost in that grid after 2 guesses", "label": "direct", "style": "plain", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "ghost-casual-01", "answer": "ghost", "text": "gh0$t ez today ngl", "label": "direct", "style": "leet", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "ghost-casual-02", "answer": "ghost", "text": "g-h-o-s-t and im out", "label": "direct", "style": "separators", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "ghost-casual-03", "answer": "ghost", "text": "g\nh\no\ns\nt", "label": "direct", "style": "vertical", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "ghost-casual-04", "answer": "ghost", "text": "stop ghosting me in the group chat btw", "label": "direct", "style": "inflection", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "ghost-casual-05", "answer": "ghost", "text": "rhymes with toast but way spookier", "label": "strong_hint", "style": "rhyme", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "ghost-casual-06", "answer": "ghost", "text": "what casper is, 5 letters", "label": "strong_hint", "style": "crossword", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "ghost-casual-07", "answer": "ghost", "text": "👻 basically", "label": "strong_hint", "style": "rebus", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "ghost-casual-08", "answer": "ghost", "text": "the spanish word is fantasma if that helps anyone", "label": "strong_hint", "style": "translation", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "ghost-casual-09", "answer": "ghost", "text": "a spirit of a dead person appearing to the living. thats the whole clue", "label": "strong_hint", "style": "definition", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "ghost-casual-10", "answer": "ghost", "text": "very halloween coded answer today", "label": "weak_hint", "style": "theme", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "ghost-casual-11", "answer": "ghost", "text": "ends in T which i did NOT expect", "label": "weak_hint", "style": "letter", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "ghost-casual-12", "answer": "ghost", "text": "only one vowel again wtf wordle", "label": "weak_hint", "style": "count", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "ghost-casual-13", "answer": "ghost", "text": "🟩🟨⬜⬜⬜\n🟩🟩🟩🟩🟩 lucky", "label": "benign", "style": "wordle_chat", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "ghost-casual-14", "answer": "ghost", "text": "5/6 barely saved my streak", "label": "benign", "style": "wordle_chat", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "ghost-casual-15", "answer": "ghost", "text": "anyone else watching the game tonight", "label": "benign", "style": "chat", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "ghost-casual-16", "answer": "ghost", "text": "i made toast for dinner because i am an adult", "label": "benign", "style": "hard_benign", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "ghost-casual-17", "answer": "ghost", "text": "my host at the airbnb was so nice", "label": "benign", "style": "hard_benign", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "ghost-casual-18", "answer": "ghost", "text": "got sooo goated with the sauce on this one, no clue tho", "label": "benign", "style": "hard_benign", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "ghost-casual-19", "answer": "ghost", "text": "brb dog needs a walk", "label": "benign", "style": "chat", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "ghost-evade-00", "answer": "ghost", "text": "g.h~o.s~t took me 5 today lmao", "label": "direct", "style": "separators", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "ghost-evade-01", "answer": "ghost", "text": "gh0$7 energy fr", "label": "direct", "style": "leet", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "ghost-evade-02", "answer": "ghost", "text": "got it! the big hos t-shirt joke doesnt work here but anyway", "label": "direct", "style": "hidden", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "ghost-evade-03", "answer": "ghost", "text": "Guess\nHonestly\nObvious\nSecond\nTry", "label": "direct", "style": "acrostic", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "ghost-evade-04", "answer": "ghost", "text": "my brother said he Got Here On Some Try and i wanna scream", "label": "direct", "style": "capitalization", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "ghost-evade-05", "answer": "ghost", "text": "casper vibes today ngl", "label": "strong_hint", "style": "reference", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "ghost-evade-06", "answer": "ghost", "text": "rhymes with most but way spookier", "label": "strong_hint", "style": "rhyme", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "ghost-evade-07", "answer": "ghost", "text": "👻 basically", "label": "strong_hint", "style": "rebus", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "ghost-evade-08", "answer": "ghost", "text": "spanish word would be fantasma if that helps anyone", "label": "strong_hint", "style": "translation", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "ghost-evade-09", "answer": "ghost", "text": "a spirit of a dead person appearing to the living, 5 letters, go", "label": "strong_hint", "style": "definition", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "ghost-evade-10", "answer": "ghost", "text": "very halloween coded answer today", "label": "weak_hint", "style": "theme", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "ghost-evade-11", "answer": "ghost", "text": "one vowel only. good luck", "label": "weak_hint", "style": "count", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "ghost-evade-12", "answer": "ghost", "text": "ends in t and i still needed 5 tries", "label": "weak_hint", "style": "letter", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "ghost-evade-13", "answer": "ghost", "text": "🟨🟩⬛⬛⬛\n⬛🟩🟩🟨⬛\n🟩🟩🟩🟩🟩 phew", "label": "benign", "style": "wordle_chat", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "ghost-evade-14", "answer": "ghost", "text": "streak of 68 baby lets go", "label": "benign", "style": "wordle_chat", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "ghost-evade-15", "answer": "ghost", "text": "anyone else think the toast at brunch was mid", "label": "benign", "style": "hard_benign", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "ghost-evade-16", "answer": "ghost", "text": "i keep getting ghosted on hinge, unrelated rant sorry", "label": "benign", "style": "hard_benign", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "ghost-evade-17", "answer": "ghost", "text": "the host of that podcast talks way too fast", "label": "benign", "style": "hard_benign", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "ghost-evade-18", "answer": "ghost", "text": "connections was the real villain today", "label": "benign", "style": "chat", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "ghost-evade-19", "answer": "ghost", "text": "brb dog needs a walk, ill do the puzzle after", "label": "benign", "style": "chat", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "ghost-subtle-00", "answer": "ghost", "text": "gh05t in 3 today lets gooo", "label": "direct", "style": "leet", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "ghost-subtle-01", "answer": "ghost", "text": "g.h.o.s.t 💀 that took me 5", "label": "direct", "style": "separators", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "ghost-subtle-02", "answer": "ghost", "text": "g\nh\no\ns\nt\nfinally", "label": "direct", "style": "vertical", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "ghost-subtle-03", "answer": "ghost", "text": "ghosts are apparently wordle material now huh", "label": "direct", "style": "inflection", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "ghost-subtle-04", "answer": "ghost", "text": "ugh ostriches are terrifying, anyway 4/6", "label": "direct", "style": "hidden", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "ghost-subtle-05", "answer": "ghost", "text": "👻", "label": "strong_hint", "style": "rebus", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "ghost-subtle-06", "answer": "ghost", "text": "basically a dead person's spirit haunting a house lol", "label": "strong_hint", "style": "definition", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "ghost-subtle-07", "answer": "ghost", "text": "rhymes with toast and it starts with a silent-ish gh", "label": "strong_hint", "style": "rhyme", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "ghost-subtle-08", "answer": "ghost", "text": "if u took german in school u already know it. gespenst 👀", "label": "strong_hint", "style": "translation", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "ghost-subtle-09", "answer": "ghost", "text": "casper is famously one of these, thats all im saying", "label": "strong_hint", "style": "reference", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "ghost-subtle-10", "answer": "ghost", "text": "very halloween-y answer today", "label": "weak_hint", "style": "category", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "ghost-subtle-11", "answer": "ghost", "text": "one vowel. ONE. i hate it here", "label": "weak_hint", "style": "count", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "ghost-subtle-12", "answer": "ghost", "text": "starts with g, that's your freebie", "label": "weak_hint", "style": "letter", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "ghost-subtle-13", "answer": "ghost", "text": "4/6 and i had zero business getting it", "label": "benign", "style": "wordle_chat", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "ghost-subtle-14", "answer": "ghost", "text": "⬜🟨⬜⬜⬜\n⬜🟩⬜🟨⬜\n🟩🟩🟩🟩🟩", "label": "benign", "style": "wordle_chat", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "ghost-subtle-15", "answer": "ghost", "text": "who's hosting game night this week bc my place is a disaster", "label": "benign", "style": "hard_benign", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "ghost-subtle-16", "answer": "ghost", "text": "made way too much toast this morning and now i'm sad", "label": "benign", "style": "hard_benign", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "ghost-subtle-17", "answer": "ghost", "text": "goats are genuinely the funniest animals on earth", "label": "benign", "style": "hard_benign", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "ghost-subtle-18", "answer": "ghost", "text": "rewatching stranger things s2 and it still holds up", "label": "benign", "style": "hard_benign", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "ghost-subtle-19", "answer": "ghost", "text": "anyone want food later or am i eating cereal for dinner again", "label": "benign", "style": "chat", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "joist-casual-00", "answer": "joist", "text": "my dad literally pointed at a joist in the garage yesterday and today it shows up lol", "label": "direct", "style": "plain", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "joist-casual-01", "answer": "joist", "text": "j0!st ... took me 5 tries ugh", "label": "direct", "style": "leet", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "joist-casual-02", "answer": "joist", "text": "j-o-i-s-t and i almost went with hoist first", "label": "direct", "style": "separators", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "joist-casual-03", "answer": "joist", "text": "they had to replace two joists when the ceiling sagged", "label": "direct", "style": "inflection", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "joist-casual-04", "answer": "joist", "text": "🇯🇴🇮🇸🇹 easy today", "label": "direct", "style": "emoji", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "joist-casual-05", "answer": "joist", "text": "rhymes with hoist but it's a beam thing", "label": "strong_hint", "style": "rhyme", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "joist-casual-06", "answer": "joist", "text": "horizontal timber supporting a floor (5)", "label": "strong_hint", "style": "crossword", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "joist-casual-07", "answer": "joist", "text": "german would be balken, english version is 5 letters and very construction-y", "label": "strong_hint", "style": "translation", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "joist-casual-08", "answer": "joist", "text": "starts with j, ends with t, and it's the thing your floorboards sit on", "label": "strong_hint", "style": "sequence", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "joist-casual-09", "answer": "joist", "text": "🪵➕🏠🔨 the beam under your floor", "label": "strong_hint", "style": "rebus", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "joist-casual-10", "answer": "joist", "text": "construction vocab today, my contractor uncle would've gotten this in 1", "label": "weak_hint", "style": "category", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "joist-casual-11", "answer": "joist", "text": "one vowel pair in the middle and no repeats", "label": "weak_hint", "style": "count", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "joist-casual-12", "answer": "joist", "text": "starts with the rarest letter basically", "label": "weak_hint", "style": "letter", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "joist-casual-13", "answer": "joist", "text": "3/6 today feeling smug about it", "label": "benign", "style": "wordle_chat", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "joist-casual-14", "answer": "joist", "text": "🟨⬜⬜⬜⬜\n⬜🟩🟨⬜⬜\n🟩🟩🟩🟩🟩", "label": "benign", "style": "wordle_chat", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "joist-casual-15", "answer": "joist", "text": "streak at 47 pls don't let me choke tomorrow", "label": "benign", "style": "wordle_chat", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "joist-casual-16", "answer": "joist", "text": "anyone else's power flicker last night or just me", "label": "benign", "style": "chat", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "joist-casual-17", "answer": "joist", "text": "we're doing the pub quiz at 8, be there or be square", "label": "benign", "style": "chat", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "joist-casual-18", "answer": "joist", "text": "had to hoist my suitcase into the overhead bin and nearly threw my back out", "label": "benign", "style": "hard_benign", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "joist-casual-19", "answer": "joist", "text": "the moist cake discourse is back on twitter apparently", "label": "benign", "style": "hard_benign", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "joist-evade-00", "answer": "joist", "text": "j-o~i~s-t and yes i took 5 tries", "label": "direct", "style": "separators", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "joist-evade-01", "answer": "joist", "text": "🇯o🇮s🇹 easiest one all week ngl", "label": "direct", "style": "emoji", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "joist-evade-02", "answer": "joist", "text": "Just\nOne\nIdea\nSaved\nToday", "label": "direct", "style": "acrostic", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "joist-evade-03", "answer": "joist", "text": "honestly my brain was Just Off, I Suffered Today", "label": "direct", "style": "capitalization", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "joist-evade-04", "answer": "joist", "text": "heard the banjo is tuned a whole step down lol", "label": "direct", "style": "hidden", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "joist-evade-05", "answer": "joist", "text": "rhymes with the grossest word in english", "label": "strong_hint", "style": "rhyme", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "joist-evade-06", "answer": "joist", "text": "a horizontal beam that holds up your floorboards. in a word game. cool", "label": "strong_hint", "style": "crossword", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "joist-evade-07", "answer": "joist", "text": "moist but make it scrabble points 😤", "label": "strong_hint", "style": "rebus", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "joist-evade-08", "answer": "joist", "text": "in spanish it's viga if that helps anyone", "label": "strong_hint", "style": "translation", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "joist-evade-09", "answer": "joist", "text": "ends in -oist and the first letter is worth 8 points", "label": "strong_hint", "style": "positional", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "joist-evade-10", "answer": "joist", "text": "todays answer belongs in a hardware store", "label": "weak_hint", "style": "category", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "joist-evade-11", "answer": "joist", "text": "there's a letter in there i would literally never guess", "label": "weak_hint", "style": "letter", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "joist-evade-12", "answer": "joist", "text": "two vowels and they're sitting right next to each other", "label": "weak_hint", "style": "count", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "joist-evade-13", "answer": "joist", "text": "gotta hoist this dresser up three flights of stairs today, pray for me", "label": "benign", "style": "hard_benign", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "joist-evade-14", "answer": "joist", "text": "my joints have been killing me since the gym", "label": "benign", "style": "hard_benign", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "joist-evade-15", "answer": "joist", "text": "🟨⬜⬜⬜⬜\n⬜🟩🟨⬜⬜\n🟩🟩🟩🟩🟩 3/6 clutch", "label": "benign", "style": "wordle_chat", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "joist-evade-16", "answer": "joist", "text": "streak 62 and i'm sweating every day now", "label": "benign", "style": "wordle_chat", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "joist-evade-17", "answer": "joist", "text": "that was way harder than yesterday tbh", "label": "benign", "style": "wordle_chat", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "joist-evade-18", "answer": "joist", "text": "anyone up for mario kart later", "label": "benign", "style": "chat", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "joist-evade-19", "answer": "joist", "text": "jess ordered indian, sat there for two hours waiting lmao", "label": "benign", "style": "hard_benign", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "joist-subtle-00", "answer": "joist", "text": "never thought a joist would end my streak lmao", "label": "direct", "style": "plain", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "joist-subtle-01", "answer": "joist", "text": "j0!5t got me today ngl", "label": "direct", "style": "leet", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "joist-subtle-02", "answer": "joist", "text": "j-o-i-s-t. six guesses. barely.", "label": "direct", "style": "separators", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "joist-subtle-03", "answer": "joist", "text": "J\nO\nI\nS\nT\nyep", "label": "direct", "style": "vertical", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "joist-subtle-04", "answer": "joist", "text": "my dad has been talking about the joists in his attic for 3 years and NOW it pays off", "label": "direct", "style": "inflection", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "joist-subtle-05", "answer": "joist", "text": "horizontal beam that holds up your floorboards. thats it thats the puzzle", "label": "strong_hint", "style": "definition", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "joist-subtle-06", "answer": "joist", "text": "rhymes with hoist and its a construction thing 🙃", "label": "strong_hint", "style": "rhyme", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "joist-subtle-07", "answer": "joist", "text": "5 down: floor support (5)", "label": "strong_hint", "style": "crossword", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "joist-subtle-08", "answer": "joist", "text": "the german word is balken if that helps anyone lol", "label": "strong_hint", "style": "translation", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "joist-subtle-09", "answer": "joist", "text": "_ o i _ t with a j at the front, go", "label": "strong_hint", "style": "positional", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "joist-subtle-10", "answer": "joist", "text": "if you've ever renovated a house you're getting this in 2", "label": "weak_hint", "style": "category", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "joist-subtle-11", "answer": "joist", "text": "one vowel pair in the middle and no repeats, thats all im saying", "label": "weak_hint", "style": "count", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "joist-subtle-12", "answer": "joist", "text": "way harder than yesterday's, felt very home depot coded", "label": "weak_hint", "style": "theme", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "joist-subtle-13", "answer": "joist", "text": "4/6 today, guessed wrong twice on the same letter like an idiot", "label": "benign", "style": "wordle_chat", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "joist-subtle-14", "answer": "joist", "text": "🟨⬜⬜⬜⬜\n⬜🟩⬜🟨⬜\n🟩🟩🟩🟩🟩", "label": "benign", "style": "wordle_chat", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "joist-subtle-15", "answer": "joist", "text": "anyone else free for board games friday or is it just me and my sad little snacks", "label": "benign", "style": "chat", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "joist-subtle-16", "answer": "joist", "text": "i hoisted my suitcase into the overhead bin and immediately pulled something", "label": "benign", "style": "hard_benign", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "joist-subtle-17", "answer": "joist", "text": "the moist cake discourse in this server needs to end", "label": "benign", "style": "hard_benign", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "joist-subtle-18", "answer": "joist", "text": "contractor came by to look at the roof, quoted me a number i will not be repeating", "label": "benign", "style": "hard_benign", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "joist-subtle-19", "answer": "joist", "text": "starting with ADIEU every day and it has never once helped me", "label": "benign", "style": "wordle_chat", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "mirth-casual-00", "answer": "mirth", "text": "the whole table was full of mirth after that toast lol", "label": "direct", "style": "plain", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "mirth-casual-01", "answer": "mirth", "text": "m1rth is such a weird word to guess ngl", "label": "direct", "style": "leet", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "mirth-casual-02", "answer": "mirth", "text": "m-i-r-t-h took me 5 tries today smh", "label": "direct", "style": "separators", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "mirth-casual-03", "answer": "mirth", "text": "today's answer had me feeling mirthful for once", "label": "direct", "style": "inflection", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "mirth-casual-04", "answer": "mirth", "text": "Making\nIt\nReally\nTough\nHuh", "label": "direct", "style": "acrostic", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "mirth-casual-05", "answer": "mirth", "text": "rhymes with birth but starts like mirror 💀", "label": "strong_hint", "style": "rhyme", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "mirth-casual-06", "answer": "mirth", "text": "basically means amusement or merriment, old timey word", "label": "strong_hint", "style": "definition", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "mirth-casual-07", "answer": "mirth", "text": "crossword clue energy: gaiety and laughter (5)", "label": "strong_hint", "style": "crossword", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "mirth-casual-08", "answer": "mirth", "text": "german would be heiterkeit if that helps anyone lol", "label": "strong_hint", "style": "translation", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "mirth-casual-09", "answer": "mirth", "text": "m _ _ _ h and there's an r in the middle. only one word really", "label": "strong_hint", "style": "positional", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "mirth-casual-10", "answer": "mirth", "text": "kinda an emotion-ish word today", "label": "weak_hint", "style": "category", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "mirth-casual-11", "answer": "mirth", "text": "only one vowel in this thing, brutal", "label": "weak_hint", "style": "count", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "mirth-casual-12", "answer": "mirth", "text": "there's an h in it somewhere, that's all im saying", "label": "weak_hint", "style": "letter", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "mirth-casual-13", "answer": "mirth", "text": "🟨⬛⬛🟩⬛\n⬛🟨🟩🟩⬛\n🟩🟩🟩🟩🟩 phew 3/6", "label": "benign", "style": "wordle_chat", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "mirth-casual-14", "answer": "mirth", "text": "streak's at 47 pls dont let me choke tomorrow", "label": "benign", "style": "wordle_chat", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "mirth-casual-15", "answer": "mirth", "text": "anyone else's power flicker last night or just me", "label": "benign", "style": "chat", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "mirth-casual-16", "answer": "mirth", "text": "i put birth as my second guess and it did nothing for me", "label": "benign", "style": "hard_benign", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "mirth-casual-17", "answer": "mirth", "text": "my mom's third cousin is visiting this weekend, send help", "label": "benign", "style": "chat", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "mirth-casual-18", "answer": "mirth", "text": "the party was genuinely so fun, everyone was cracking up", "label": "benign", "style": "hard_benign", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "mirth-casual-19", "answer": "mirth", "text": "ordering thai tonight, who's in", "label": "benign", "style": "chat", "template_id": "casual", "generator": "claude-opus-5"}
+{"id": "mirth-evade-00", "answer": "mirth", "text": "m·i·r·t·h took me 5 today lol", "label": "direct", "style": "separators", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "mirth-evade-01", "answer": "mirth", "text": "the vibes were full of m1rth this morning ngl", "label": "direct", "style": "leet", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "mirth-evade-02", "answer": "mirth", "text": "May I Recommend This Hint: green on 2", "label": "direct", "style": "acrostic", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "mirth-evade-03", "answer": "mirth", "text": "i was screaMIng at how Rude That Hard puzzle was", "label": "direct", "style": "capitalization", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "mirth-evade-04", "answer": "mirth", "text": "🇲🇮r🇹h 4/6 ez", "label": "direct", "style": "emoji", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "mirth-evade-05", "answer": "mirth", "text": "rhymes with birth if you say it posh", "label": "strong_hint", "style": "rhyme", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "mirth-evade-06", "answer": "mirth", "text": "basically a fancy word for merriment/laughter", "label": "strong_hint", "style": "definition", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "mirth-evade-07", "answer": "mirth", "text": "heiterkeit in german if that helps anyone", "label": "strong_hint", "style": "translation", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "mirth-evade-08", "answer": "mirth", "text": "the ghost of christmas present is basically made of this", "label": "strong_hint", "style": "reference", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "mirth-evade-09", "answer": "mirth", "text": "_ _ R T H and it's not worth or north 😌", "label": "strong_hint", "style": "positional", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "mirth-evade-10", "answer": "mirth", "text": "one of those words that only shows up in dickens novels", "label": "weak_hint", "style": "theme", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "mirth-evade-11", "answer": "mirth", "text": "ends in a consonant cluster, only one vowel in the whole thing", "label": "weak_hint", "style": "count", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "mirth-evade-12", "answer": "mirth", "text": "there's an m somewhere in there, that's all im saying", "label": "weak_hint", "style": "letter", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "mirth-evade-13", "answer": "mirth", "text": "3/6 today, opener carried me", "label": "benign", "style": "wordle_chat", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "mirth-evade-14", "answer": "mirth", "text": "🟨⬜⬜⬜⬜\n⬜🟩🟨⬜⬜\n🟩🟩🟩🟩🟩", "label": "benign", "style": "wordle_chat", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "mirth-evade-15", "answer": "mirth", "text": "my streak died at 47 and i'm still not over it", "label": "benign", "style": "wordle_chat", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "mirth-evade-16", "answer": "mirth", "text": "anyone else think the earth looks weird in that photo lmao", "label": "benign", "style": "hard_benign", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "mirth-evade-17", "answer": "mirth", "text": "we had so much fun at trivia last night, everyone was cracking up", "label": "benign", "style": "hard_benign", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "mirth-evade-18", "answer": "mirth", "text": "my third try at this recipe and it's still mush", "label": "benign", "style": "hard_benign", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "mirth-evade-19", "answer": "mirth", "text": "ok who's down for smash later, im free after 8", "label": "benign", "style": "chat", "template_id": "evade", "generator": "claude-opus-5"}
+{"id": "mirth-subtle-00", "answer": "mirth", "text": "the whole table was full of mirth by the end of dinner lol", "label": "direct", "style": "plain", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "mirth-subtle-01", "answer": "mirth", "text": "m1rth in 4, not bad", "label": "direct", "style": "leet", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "mirth-subtle-02", "answer": "mirth", "text": "m-i-r-t-h ez", "label": "direct", "style": "separators", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "mirth-subtle-03", "answer": "mirth", "text": "m\ni\nr\nt\nh", "label": "direct", "style": "vertical", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "mirth-subtle-04", "answer": "mirth", "text": "pure mirthful energy in here today", "label": "direct", "style": "inflection", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "mirth-subtle-05", "answer": "mirth", "text": "rhymes with birth, took me 5 tries", "label": "strong_hint", "style": "rhyme", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "mirth-subtle-06", "answer": "mirth", "text": "basically a fancy word for merriment/amusement", "label": "strong_hint", "style": "definition", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "mirth-subtle-07", "answer": "mirth", "text": "german would be heiterkeit apparently", "label": "strong_hint", "style": "translation", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "mirth-subtle-08", "answer": "mirth", "text": "crossword clue energy: gaiety, laughter (5)", "label": "strong_hint", "style": "crossword", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "mirth-subtle-09", "answer": "mirth", "text": "m _ _ t h and it means joy. good luck", "label": "strong_hint", "style": "positional", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "mirth-subtle-10", "answer": "mirth", "text": "one of those old timey words nobody says anymore", "label": "weak_hint", "style": "category", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "mirth-subtle-11", "answer": "mirth", "text": "only one vowel today, brutal", "label": "weak_hint", "style": "count", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "mirth-subtle-12", "answer": "mirth", "text": "way harder than yesterday, ends in a consonant cluster", "label": "weak_hint", "style": "theme", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "mirth-subtle-13", "answer": "mirth", "text": "\ff\ff\ff\ff\ff\n\ff\ff\ff\ff\ff\n\ff\ff\ff\ff\ff 4/6", "label": "benign", "style": "wordle_chat", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "mirth-subtle-14", "answer": "mirth", "text": "streak of 62 baby", "label": "benign", "style": "wordle_chat", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "mirth-subtle-15", "answer": "mirth", "text": "anyone else's train delayed again this morning", "label": "benign", "style": "chat", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "mirth-subtle-16", "answer": "mirth", "text": "my birth certificate says im 30 but my knees say 60", "label": "benign", "style": "hard_benign", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "mirth-subtle-17", "answer": "mirth", "text": "we were all laughing so hard at that clip last night", "label": "benign", "style": "hard_benign", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "mirth-subtle-18", "answer": "mirth", "text": "third time this month the wifi died mid meeting", "label": "benign", "style": "hard_benign", "template_id": "subtle", "generator": "claude-opus-5"}
+{"id": "mirth-subtle-19", "answer": "mirth", "text": "is it just me or has this week been way too long", "label": "benign", "style": "chat", "template_id": "subtle", "generator": "claude-opus-5"}

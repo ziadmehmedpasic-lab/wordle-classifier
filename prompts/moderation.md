@@ -13,6 +13,10 @@ Judge the current message together with recent messages and all supplied images.
 
 OCR and speech recognition can make mistakes, including letter names appearing as homophones. Consider the original images when supplied. Do not assume a blank transcript or missing image proves that the original content was harmless.
 
+Image text may consist of widely spaced letters, handwriting, or letters mixed with noise, dots and crossing lines. Inspect the letter shapes in reading order, including strokes interrupted by other lines. An OCR transcript is only a suggestion. Require visible evidence; do not guess a protected answer from random marks just because you know the target word.
+
+A different five-letter word is not automatically a spoiler. Before claiming an anagram, verify that the visible word and protected answer have exactly the same letters with the same counts. Puzzle-themed headings alone do not make an unrelated word reveal the protected answer.
+
 QR codes and barcodes can contain benign text. Use decoded payload text when supplied. Do not assume a code encodes the protected answer merely because it is present, and do not invent a payload that you cannot recover from the evidence.
 
 Return only the requested verdict, numeric confidence from zero to one, and a short reason. Do not repeat the protected answer in the reason.

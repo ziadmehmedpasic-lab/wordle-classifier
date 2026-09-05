@@ -1,0 +1,12 @@
+{
+  "model": "claude-sonnet-5",
+  "source": "https://platform.claude.com/docs/en/about-claude/pricing",
+  "date": "2026-09-05",
+  "currency": "USD",
+  "unit": "per million tokens",
+  "input": 2,
+  "output": 10,
+  "cacheRead": 0.2,
+  "cacheWrite5m": 2.5,
+  "cacheWrite1h": 4
+}

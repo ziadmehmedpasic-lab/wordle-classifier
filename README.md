@@ -37,6 +37,7 @@ Useful settings in [.env.example](.env.example):
 | Setting | Purpose |
 | --- | --- |
 | `ANTHROPIC_API_KEY` | Enable the judge for hints and visual evidence that text rules miss. |
+| `LLM_MODEL` | Choose the Claude model explicitly. No automatic model substitution. Haiku is supported, but missed crossed-line handwriting in our image tests; see the evaluation notes. |
 | `LLM_MODE` | `suspicious` by default; `all` checks every message and `off` disables the judge. Attachments trigger judge checks in suspicious mode. |
 | `OPENAI_API_KEY` | Enable transcription of voice messages, audio files and video soundtracks. |
 | `POLICE_PROFILES`, `POLICE_PRESENCES` | Opt into available profile images/account names and status/activity text. Both default off. |
@@ -61,6 +62,10 @@ transcription sends audio to OpenAI. Tell server members which features are enab
 Short fragments can be joined across authors within three minutes; only contributing
 messages are removed. The judge gets up to 24 recent messages from the last ten minutes.
 That context stays in memory and is updated on edits, deletions and answer changes.
+
+OCR tries text-block layout, color masks and speck removal before the existing rotation
+passes. Low-confidence OCR text is discarded; the original image still reaches the
+vision judge. Handwriting and text covered by crossing lines can defeat OCR.
 
 Profiles and statuses require moderator action because the bot cannot edit another
 account. Other server fields are cleared only when the bot has permission.

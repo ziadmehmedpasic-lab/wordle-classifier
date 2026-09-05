@@ -23,3 +23,27 @@ test("a blank image is retained, and a broken image does not poison the next job
   const png = await sharp(await fs.readFile("test/fixtures/spoiler.svg")).png().toBuffer();
   assert.equal(detector.scan(await ocrImage(png)), "wager");
 });
+
+test("real OCR recovers letters from supplied noisy images and JPEG copies", async () => {
+  try {
+    for (const [name, answer] of [["flat-gray", "soupy"], ["static", "wager"], ["dots", "wager"]]) {
+      detector.setAnswers([answer]);
+      const input = await fs.readFile(`test/fixtures/noisy-images/${name}.png`);
+      for (const [index, image] of [input, await sharp(input).jpeg({ quality: 85 }).toBuffer()].entries()) {
+        const text = await ocrImage(image);
+        assert.ok(text.toLowerCase().replace(/\s/g, "").includes(answer), `${name} variant ${index}: ${text}`);
+      }
+    }
+  } finally { detector.setAnswers(["wager"]); }
+});
+
+test("noise and unrelated image text do not turn into the protected answer", async () => {
+  const staticImage = sharp("test/fixtures/noisy-images/static.png");
+  const dots = sharp("test/fixtures/noisy-images/dots.png");
+  const controls = [
+    await staticImage.extract({ left: 0, top: 0, width: 261, height: 20 }).resize({ height: 77, width: 261 }).png().toBuffer(),
+    await dots.extract({ left: 0, top: 65, width: 262, height: 15 }).resize({ height: 80, width: 262 }).png().toBuffer(),
+    await fs.readFile("test/fixtures/noisy-images/flat-gray.png"),
+  ];
+  for (const [index, image] of controls.entries()) assert.equal(detector.scan(await ocrImage(image)), null, `benign image ${index}`);
+});

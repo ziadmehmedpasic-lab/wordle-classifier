@@ -2,8 +2,9 @@
 
 Run `npm run eval:attacks` for real OCR, document/media decoding, pattern checks and
 conversation matching. The judge is disabled unless `--live-judge` is passed. There are
-no canned OCR transcripts or judge verdicts. Every run protects the synthetic answer
-`wager`; it never fetches today's answer or sends Discord messages.
+no canned OCR transcripts or judge verdicts. Cases protect the synthetic answer `wager`
+unless their manifest entry specifies another `answer`; runs never fetch today's
+answer or send Discord messages.
 
 `npm run eval:attacks -- --live-judge --prices eval/prices/2026-09-05-opus-5.json`
 uses the configured Anthropic credentials/model and measures API requests. The default
@@ -29,7 +30,43 @@ disabled layer still counts as a miss; `incomplete` additionally identifies such
 The fixed corpus is a regression sample, not an estimate of real-server accuracy. Keep
 newly discovered misses in the manifest when improving coverage. Normal tests validate
 metric accounting and actual fixture frame boundaries; the full OCR/API evaluation is
-an explicit command so CI needs neither API credentials nor model calls.
+an explicit command. CI runs the real Tesseract regression tests too, without API keys
+or vision model calls.
+
+## Noisy images
+
+`eval/noisy-images.json` contains the four supplied images, JPEG copies and benign
+controls. The answers are fixed test values, including `soupy` for the gray-text image.
+Cases with unrelated words deliberately protect a different answer. The runner records
+the actual OCR transcript separately from the final decision, so an accidental fuzzy
+match cannot be mistaken for correct transcription.
+
+```sh
+npm run eval:attacks -- --cases eval/noisy-images.json
+LLM_MODEL=claude-sonnet-5 npm run eval:attacks -- --cases eval/noisy-images.json --live-judge --prices eval/prices/2026-09-05-sonnet-5.json --max-requests 13
+```
+
+Add `--vision-only` to a live run to bypass OCR and measure the vision layer separately.
+For Haiku, use `LLM_MODEL=claude-haiku-4-5-20251001` and
+`eval/prices/2026-09-05-haiku-4-5.json`. Haiku omits the unsupported effort parameter.
+Requests stay on the selected model; they do not automatically fall back to another.
+
+The OCR preprocessing uses pixel statistics, never the protected answer. It tries up
+to 13 variants within the existing 30-second recognition budget, skips duplicate
+passes, and caps each processed dimension at 1640 pixels including borders. Median
+filtering and connected-component cleanup help with background specks and JPEG noise.
+Passes below Tesseract confidence 50 do not feed the broad text heuristics; this score
+is a filter, not a calibrated probability of correctness. Original pixels remain
+available to the vision judge even when OCR returns no useful text.
+
+Crossed-line handwriting remains an OCR miss. Haiku also missed it and falsely linked
+an unrelated word to the protected answer in the integrated tests. Do not count all
+images with empty OCR as safe or assume a high judge confidence is reliable.
+
+On 2026-09-05, the final OCR + Sonnet 5 run caught all eight attack cases and kept all
+five benign controls. It made seven API calls with an estimated token cost of $0.009866.
+Sonnet received original images, without line-removal copies. This is a small regression
+set, not a guarantee for other handwriting, noise patterns or future model responses.
 
 `npm run eval:overload` submits 24 image inspections together, using real OCR with the
 judge disabled, and checks direct text during saturation. It saves queue rejections,

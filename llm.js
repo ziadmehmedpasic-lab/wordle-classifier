@@ -98,9 +98,8 @@ async function classify({ text, answers, context = [], imageUrls = [] }, judgeCl
     const response = await judgeClient.beta.messages.create({
       model: cfg.model,
       max_tokens: 400,
-      betas: ["server-side-fallback-2026-07-01"],
-      fallbacks: "default",
-      output_config: { effort: cfg.effort, format: { type: "json_schema", schema: SCHEMA } },
+      // Haiku has no effort parameter. Keep requests on the explicitly selected model.
+      output_config: { ...(!cfg.model.includes("haiku") && { effort: cfg.effort }), format: { type: "json_schema", schema: SCHEMA } },
       system: [{ type: "text", text: systemPrompt(answers), cache_control: { type: "ephemeral", ttl: "1h" } }],
       messages: [{ role: "user", content }],
     }, { timeout: 30_000, maxRetries: 0 });
@@ -110,6 +109,7 @@ async function classify({ text, answers, context = [], imageUrls = [] }, judgeCl
     const parsed = JSON.parse(block.text);
     if (!parsed || !["spoiler", "hint", "clean"].includes(parsed.verdict) || typeof parsed.confidence !== "number" || !Number.isFinite(parsed.confidence) || parsed.confidence < 0 || parsed.confidence > 1 || typeof parsed.reason !== "string" || Object.keys(parsed).some((key) => !["verdict", "confidence", "reason"].includes(key))) throw new Error("invalid judge response");
     parsed.usage = response.usage;
+    parsed.model = response.model;
     return parsed;
   } catch (e) {
     if (e instanceof Anthropic.AuthenticationError) { console.error("LLM layer: invalid ANTHROPIC_API_KEY, disabling."); cfg.enabled = false; }

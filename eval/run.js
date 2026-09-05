@@ -17,7 +17,8 @@ const { summarize, estimateCost } = require("./metrics");
 
 /** @returns {Promise<void>} */
 async function main() {
-  const { values } = parseArgs({ options: { "live-judge": { type: "boolean", default: false }, out: { type: "string" }, cases: { type: "string" }, prices: { type: "string" }, "max-requests": { type: "string", default: "40" } } });
+  const { values } = parseArgs({ options: { "live-judge": { type: "boolean", default: false }, "vision-only": { type: "boolean", default: false }, out: { type: "string" }, cases: { type: "string" }, prices: { type: "string" }, "max-requests": { type: "string", default: "40" } } });
+  assert.ok(!values["vision-only"] || values["live-judge"], "vision-only evaluation requires --live-judge");
   const out = path.resolve(values.out || path.join(__dirname, "runs", new Date().toISOString().replace(/[:.]/g, "-")));
   const maxRequests = Number(values["max-requests"]);
   assert.ok(Number.isInteger(maxRequests) && maxRequests > 0);
@@ -47,7 +48,7 @@ async function main() {
   const judge = { ...llm, classify: (input) => llm.classify(input, measuredClient) };
   detector.setAnswers(["wager"]);
   frames.init();
-  const config = { answer: "wager", liveJudge: values["live-judge"], model: llm.cfg.model, judge: llm.cfg, frames: frames.cfg, limits, prices, maxRequests, transport: "local fixture bytes through validated download; no Discord writes", audio: "not exercised", commit: execFileSync("git", ["rev-parse", "HEAD"], { encoding: "utf8" }).trim(), createdAt: new Date().toISOString() };
+  const config = { defaultAnswer: "wager", liveJudge: values["live-judge"], visionOnly: values["vision-only"], model: llm.cfg.model, judge: llm.cfg, frames: frames.cfg, limits, prices, maxRequests, transport: "local fixture bytes through validated download; no Discord writes", audio: "not exercised", commit: execFileSync("git", ["rev-parse", "HEAD"], { encoding: "utf8" }).trim(), createdAt: new Date().toISOString() };
   await fs.writeFile(path.join(out, "config.json"), JSON.stringify(config, null, 2) + "\n");
   await fs.writeFile(path.join(out, "cases.json"), JSON.stringify(manifest, null, 2) + "\n");
   const assets = path.join(out, "assets");
@@ -55,6 +56,9 @@ async function main() {
   const rows = [];
   for (const entry of manifest) {
     assert.ok(entry.id && entry.messages.length && Array.isArray(entry.remove));
+    const answer = entry.answer || "wager";
+    assert.match(answer, /^[a-z]{5}$/);
+    detector.setAnswers([answer]);
     const conversation = new Conversation();
     const removed = new Set();
     const steps = [];
@@ -65,11 +69,17 @@ async function main() {
       const message = { id, channelId: entry.id, content: input.content || "", author: { id: input.author || "tester" }, createdTimestamp: Date.now(), attachments: [] };
       if (input.asset) message.attachments.push({ url: `https://cdn.discordapp.com/attachments/evaluation/${encodeURIComponent(input.asset)}`, name: input.name || input.asset, contentType: input.contentType });
       conversation.remember(message, message.content);
+      const transcripts = [];
       const result = await inspectMessage(message, {
-        ocrImage, judge, context: conversation.get(entry.id).filter((row) => row.id !== id),
+        ocrImage: async (image) => {
+          if (values["vision-only"]) return "";
+          const text = await ocrImage(image);
+          transcripts.push(text);
+          return text;
+        }, judge, context: conversation.get(entry.id).filter((row) => row.id !== id),
         extract: (asset, options) => extractAsset(asset, { ...options, downloadFile: (url) => download(url, { fetchImpl: async () => new Response(await fs.readFile(path.join(assets, input.asset))) }) }),
       });
-      steps.push({ id, status: result.status, issues: result.issues, hit: result.hit || null });
+      steps.push({ id, status: result.status, issues: result.issues, hit: result.hit || null, ocr: transcripts });
       if (result.status === "spoiler") { removed.add(id); conversation.forget(entry.id, id); }
       else {
         conversation.remember(message, result.text, result.fragmentText ?? result.text);
@@ -77,7 +87,7 @@ async function main() {
       }
     }
     const used = requests.slice(requestStart);
-    const row = { id: entry.id, category: entry.category, expected: entry.remove, removed: [...removed], steps, latencyMs: performance.now() - start, requests: used, estimatedCostUsd: estimateCost(used, prices) };
+    const row = { id: entry.id, answer, category: entry.category, expected: entry.remove, removed: [...removed], steps, latencyMs: performance.now() - start, requests: used, estimatedCostUsd: estimateCost(used, prices) };
     rows.push(row);
     await fs.writeFile(path.join(out, "results.json"), JSON.stringify(rows, null, 2) + "\n");
     await fs.writeFile(path.join(out, "summary.json"), JSON.stringify(summarize(rows), null, 2) + "\n");

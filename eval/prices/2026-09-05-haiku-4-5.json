@@ -1,0 +1,12 @@
+{
+  "model": "claude-haiku-4-5-20251001",
+  "source": "https://platform.claude.com/docs/en/about-claude/pricing",
+  "date": "2026-09-05",
+  "currency": "USD",
+  "unit": "per million tokens",
+  "input": 1,
+  "output": 5,
+  "cacheRead": 0.1,
+  "cacheWrite5m": 1.25,
+  "cacheWrite1h": 2
+}

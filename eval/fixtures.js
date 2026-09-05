@@ -28,6 +28,13 @@ async function buildFixtures(directory) {
     images[name] = await sharp({ create: { width: 680, height: 340, channels: 3, background: "white" } }).composite([{ input: images["benign-qr.png"], left: 10, top: 10 }, { input: right, left: 350, top: 10 }]).png().toBuffer();
   }
   for (const [name, bytes] of Object.entries(images)) await fs.writeFile(path.join(directory, name), bytes);
+  for (const name of ["static", "dots", "flat-gray", "handwriting"]) {
+    const source = path.join(__dirname, `../test/fixtures/noisy-images/${name}.png`);
+    await fs.copyFile(source, path.join(directory, `${name}.png`));
+    await sharp(source).jpeg({ quality: 85 }).toFile(path.join(directory, `${name}.jpg`));
+  }
+  await sharp(path.join(__dirname, "../test/fixtures/noisy-images/static.png")).extract({ left: 0, top: 0, width: 261, height: 20 }).resize({ width: 261, height: 77 }).png().toFile(path.join(directory, "static-background.png"));
+  await sharp(path.join(__dirname, "../test/fixtures/noisy-images/dots.png")).extract({ left: 0, top: 65, width: 262, height: 15 }).resize({ width: 262, height: 80 }).png().toFile(path.join(directory, "dots-background.png"));
   for (const [name, pages] of [["image.pdf", 1], ["long.pdf", 11]]) {
     const pdf = await PDFDocument.create();
     const image = await pdf.embedPng(png);

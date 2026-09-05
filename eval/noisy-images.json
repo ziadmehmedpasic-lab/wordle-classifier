@@ -1,0 +1,15 @@
+[
+  {"id":"static","category":"ocr","messages":[{"asset":"static.png"}],"remove":["1"]},
+  {"id":"dots","category":"ocr","messages":[{"asset":"dots.png"}],"remove":["1"]},
+  {"id":"flat-gray","category":"ocr","answer":"soupy","messages":[{"asset":"flat-gray.png"}],"remove":["1"]},
+  {"id":"handwriting","category":"coverage-gap","messages":[{"asset":"handwriting.png"}],"remove":["1"]},
+  {"id":"static-jpeg","category":"ocr","messages":[{"asset":"static.jpg"}],"remove":["1"]},
+  {"id":"dots-jpeg","category":"ocr","messages":[{"asset":"dots.jpg"}],"remove":["1"]},
+  {"id":"flat-gray-jpeg","category":"ocr","answer":"soupy","messages":[{"asset":"flat-gray.jpg"}],"remove":["1"]},
+  {"id":"handwriting-jpeg","category":"coverage-gap","messages":[{"asset":"handwriting.jpg"}],"remove":["1"]},
+  {"id":"static-background","category":"benign","messages":[{"asset":"static-background.png"}],"remove":[]},
+  {"id":"dots-background","category":"benign","messages":[{"asset":"dots-background.png"}],"remove":[]},
+  {"id":"unrelated-flat-gray","category":"benign","messages":[{"asset":"flat-gray.png"}],"remove":[]},
+  {"id":"unrelated-static","category":"benign","answer":"soupy","messages":[{"asset":"static.png"}],"remove":[]},
+  {"id":"unrelated-handwriting","category":"benign","answer":"soupy","messages":[{"asset":"handwriting.png"}],"remove":[]}
+]
